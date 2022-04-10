@@ -9,7 +9,7 @@ include(fetch-gflags)
 include(noa-test-data)
 
 # Find OpenMP
-find_package(OpenMP QUIET)
+include(find-omp)
 
 # Main executable
 add_executable(sampler sampler.cc)

@@ -11,7 +11,7 @@ include(fetch-benchmark)
 include(noa-test-data)
 
 # Find OpenMP
-find_package(OpenMP QUIET)
+include(find-omp)
 
 set(NOA_BENCH_SRC
         measure-dcs-calc.cc)

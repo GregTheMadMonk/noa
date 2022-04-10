@@ -6,7 +6,7 @@
 include(fetch-gflags)
 
 # Find OpenMP
-find_package(OpenMP QUIET)
+include(find-omp)
 
 # Find ZLIB
 find_package(ZLIB)

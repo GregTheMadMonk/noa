@@ -10,7 +10,7 @@ include(fetch-gtest)
 include(noa-test-data)
 
 # Find OpenMP
-find_package(OpenMP QUIET)
+include(find-omp)
 
 # Source files
 set(NOA_TEST_SRC
