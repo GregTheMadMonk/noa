@@ -82,7 +82,8 @@ int main(int argc, char** argv) {
     std::cout << "DynamicComputation:" << std::endl;
     using noa::utils::combine::DynamicComputation;
     DynamicComputation dcomp;
-    dcomp.template setTasks<Task4>();
+    const std::size_t task4Index = Task4::index(); // No `constexpr`! Fully run-time
+    dcomp.setTasks({ task4Index });
     dcomp.update();
     dcomp.template get<Task1>().input = 3;
 
