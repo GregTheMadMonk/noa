@@ -96,6 +96,10 @@ static_assert(compHasGet<detail::DummyComputation>, "DummyComputation doesn't ha
 static_assert(compHasConstGet<detail::DummyComputation>, "DummyComputation doesn't have a proper const `get` method");
 static_assert(isComputation<detail::DummyComputation>, "DummyComputation is not detected as a valid computation");
 
+static_assert(compHasGet<detail::DynamicComputationT>, "DynamicComputation doesn't have a proper `get` method");
+static_assert(compHasConstGet<detail::DynamicComputationT>, "DynamicComputation doesn't have a proper const `get` method");
+static_assert(isComputation<detail::DynamicComputationT>, "DynamicComputation is not detected as a valid computation");
+
 static_assert(
     std::is_same_v<
         typename StaticComputation<Task1, Task2, Task3>::TasksOrder,

@@ -18,8 +18,10 @@
 #include "computation_traits.hh"
 #include "dependency_list.hh"
 #include "dummies.hh"
+#include "dynamic_computation.hh"
 #include "static_computation.hh"
 #include "task.hh"
+#include "task_dynamic.hh"
 
 /**
  * \brief Combine's main namespace
