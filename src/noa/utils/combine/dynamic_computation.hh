@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "task_dynamic_base.hh"
@@ -47,6 +48,9 @@ namespace detail {
         using TaskPtr = std::unique_ptr<DynamicTaskBase>;
         /// \brief Tasks list
         std::vector<TaskPtr> tasks; 
+
+        /// \brief Task lookup map
+        std::unordered_map<std::size_t, std::size_t> taskMap;
 
         /// \brief Tasks that are user-required
         std::vector<std::size_t> input;
@@ -102,6 +106,12 @@ namespace detail {
 
                 offset++;
             }
+
+            // Populate task map
+            this->taskMap.clear();
+            for (std::size_t i = 0; i < this->tasks.size(); ++i) {
+                this->taskMap[this->tasks.at(i)->type()] = i;
+            }
         } // <-- update()
 
         /// \brief Run computation
@@ -114,37 +124,15 @@ namespace detail {
         /// \brief Gets a task of requested type dynamically from the tasks list
         template <typename Task>
         Task& get() {
-            const auto it = std::find_if(
-                tasks.begin(),
-                tasks.end(),
-                [] (const TaskPtr& tp) {
-                    return tp->type() == Task::index();
-                }
-            );
-
-            if (it == tasks.end()) {
-                throw std::runtime_error("Could not find the task!");
-            }
-
-            return *dynamic_cast<Task*>(it->get());
+            const auto& index = this->taskMap.at(Task::index());
+            return *dynamic_cast<Task*>(this->tasks[index].get());
         } // <-- Task& get()
 
         /// \brief Gets a task of requested type dynamically from the tasks list (const overload)
         template <typename Task>
         const Task& get() const {
-            const auto it = std::find_if(
-                tasks.begin(),
-                tasks.end(),
-                [] (const TaskPtr& tp) {
-                    return tp->type() == Task::index();
-                }
-            );
-
-            if (it == tasks.end()) {
-                throw std::runtime_error("Could not find the task!");
-            }
-
-            return *dynamic_cast<Task*>(it->get());
+            const auto& index = this->taskMap.at(Task::index());
+            return *dynamic_cast<Task*>(this->tasks[index].get());
         } // <-- const Task& get() const
     }; // <-- class DynamicComputationT
 
