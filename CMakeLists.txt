@@ -34,8 +34,8 @@ function(target_add_openmp target_name)
 	target_compile_options( ${target_name} BEFORE PRIVATE -DHAVE_OPENMP $<$<COMPILE_LANGUAGE:CXX>:${OpenMP_CXX_FLAGS}> )
 endfunction()
 
-# Require C++17
-set(CMAKE_CXX_STANDARD 17)
+# Require C++20
+set(CMAKE_CXX_STANDARD 20)
 
 # Warning flags
 set(W_FLAGS "") #"-Wall;-Wextra;-Wpedantic")
