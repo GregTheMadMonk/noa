@@ -31,6 +31,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "concepts_prelude.hh"
 #include "task_dynamic_base.hh"
 
 namespace noa::utils::combine {
@@ -62,10 +63,8 @@ namespace detail {
         } // <-- setTasks(taskTypes)
 
         /// \brief Set required end tasks from template parameter pack
-        template <typename... Tasks>
+        template <TaskType... Tasks>
         void setTasks() {
-            static_assert((isTask<Tasks> && ... && true), "All template parameters must be valid tasks!");
-
             input.clear();
             (input.push_back(Tasks::index()), ...);
         } // <-- setTasks()
@@ -92,7 +91,6 @@ namespace detail {
 
                     // If the new dependecny is already present in the list, move it to the start
                     if (it != this->tasks.end()) {
-                        // TODO: C++20 shift_right
                         auto shifter = it;
                         while (shifter != this->tasks.begin()) {
                             std::swap(*shifter, *std::prev(shifter));

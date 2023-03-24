@@ -30,6 +30,7 @@
 
 #include <tuple>
 
+#include "concepts_prelude.hh"
 #include "dummies.hh"
 
 namespace noa::utils::combine {
@@ -55,13 +56,8 @@ namespace detail {
 /// be changed.
 ///
 /// \tparam Tasks tasks to be processed. Tasks are ordered as they follow in the list, left-to-right
-template <typename... Tasks>
+template <TaskType... Tasks>
 struct StaticComputation {
-    static_assert(
-        (isTask<Tasks> && ... && true),
-        "All StaticComputation template arguments are required to be valid tasks"
-    );
-
     using TasksOrder = typename detail::Unravel<DependencyList<Tasks...>>::Type;
 
     private:

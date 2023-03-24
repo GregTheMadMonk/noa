@@ -31,67 +31,24 @@
 
 #include <type_traits>
 
+#include "concepts_prelude.hh"
 #include "dummies.hh"
 #include "template_details.hh"
 
 namespace noa::utils::combine {
 
-namespace detail {
-
-    /// \brief Determines if a class has a `Depends` subtype that is a \ref DependencyList
-    ///
-    /// TODO C++20: Replace SIFNAE with a concept
-    template <typename Task, typename = void>
-    struct HasDepends {
-        using Type = std::false_type;
-    };
+namespace concepts_detail {
 
     template <typename Task>
-    struct HasDepends<
-        Task,
-        std::enable_if_t<
-            isDependencyList<typename Task::Depends>
-        >
-    > {
-        using Type = std::true_type;
-    };
+    requires requires (typename Task::Depends dl) {
+        [] <typename... Ts> (DependencyList<Ts...>) {} (dl);
+    } constexpr bool hasDepends<Task> = true;
 
-} // <-- namespace detail
+    template <typename Task>
+    requires requires (Task t) {
+        { t.run(std::declval<detail::DummyComputation<>>()) } -> std::same_as<void>;
+    } constexpr bool hasRun<Task> = true;
 
-/// \brief Does the class have a `Depends` subtype that is a \ref DependencyList
-///
-/// Either `std::true_type` or `std::false_type`
-///
-/// TODO C++20: Replace with a concept
-template <typename Task>
-using HasDepends = typename detail::HasDepends<Task>::Type;
-
-/// \brief An alias for `HasDepends<Task>::value`
-///
-/// TODO C++20: Replace with a concept
-template <typename Task>
-constexpr bool hasDepends = HasDepends<Task>::value;
-
-/// \brief Determines whether the class has a non-static `run` method that accepts
-/// a computation as an argument
-///
-/// TODO C++20: Replace with a concept
-template <typename Task, typename = void>
-constexpr bool hasRun = false;
-
-template <typename Task>
-constexpr bool hasRun<
-                    Task,
-                    std::enable_if_t<
-                        std::is_same_v<
-                            decltype(Task().run(detail::DummyComputation()), int()),
-                            int
-                        >
-                    >
-> = true;
-
-/// \brief Deterimies whether a type is a valid task
-template <typename Task>
-constexpr bool isTask = hasDepends<Task> && hasRun<Task>;
+} // <-- namespace concepts_detail
 
 } // <-- namespace noa::utils::combine

@@ -30,9 +30,11 @@
 
 #pragma once
 
+#include "concepts_prelude.hh"
+
 namespace noa::utils::combine {
 
-template <typename...> struct DependencyList;
+template <TaskType...> struct DependencyList;
 
 namespace detail {
 
@@ -50,11 +52,11 @@ namespace detail {
     ///
     /// Every computation must have:
     /// * A template `get()` method for getting a specified task reference (with a `const` overload)
-    template <typename... TaskList> struct DummyComputation {
-        template <typename Task>
+    template <TaskType... TaskList> struct DummyComputation {
+        template <TaskType Task>
         Task& get();
 
-        template <typename Task>
+        template <TaskType Task>
         const Task& get() const;
     }; // <-- struct DummyComputation
 
@@ -62,11 +64,15 @@ namespace detail {
     ///
     /// To be a task, a class should have:
     /// * A `Depends` subtype
+    /// * A `run` method that accepts a const computation reference as an argument
+    ///
+    /// Here, in `run` prototype, `Computation` is not constrained to avoid
+    /// circular dependency in a concept
     struct DummyTask {
         using Depends = DependencyList<>;
 
         template <typename Computation>
-        void run(Computation); // No implementation needed or is provided for a dummy example
+        void run(const Computation&); // No implementation needed or is provided for a dummy example
     }; // <-- struct DummyTask
 
 } // <-- namespace detail

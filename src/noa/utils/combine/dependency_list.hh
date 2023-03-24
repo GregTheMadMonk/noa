@@ -28,12 +28,22 @@
 
 #include <type_traits>
 
+#include "concepts_prelude.hh"
 #include "task.hh"
 #include "template_details.hh"
 
 namespace noa::utils::combine {
 
-template <typename...> struct DependencyList;
+template <TaskType...> struct DependencyList;
+
+namespace concepts_detail {
+
+    template <typename DependencyListCandidate>
+    requires requires (DependencyListCandidate dlc) {
+        [] <TaskType... Ts> (DependencyList<Ts...>) {} (dlc);
+    } constexpr bool dependencyListType<DependencyListCandidate> = true;
+
+} // <-- namespace concepts_detai;
 
 namespace detail {
 
@@ -54,6 +64,7 @@ namespace detail {
     struct Uniquify {
         using Type = std::remove_reference_t<decltype((std::declval<DummyT<>>() + ... + std::declval<Tasks>()))>;
     };
+
 } // <-- namespace detail
 
 /**
@@ -69,12 +80,7 @@ namespace detail {
  * * \ref Optinally
  * * \ref ProviderOf (TODO)
  */
-template <typename... Tasks> struct DependencyList {
-    static_assert(
-        (isTask<Tasks> && ... && true),
-        "All DependencyList template arguments are expected to be valid tasks"
-    );
-
+template <TaskType... Tasks> struct DependencyList {
     /// \brief Determines whether a specified task is contained within the dependency list
     ///
     /// \tparam Task task to find

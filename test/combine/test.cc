@@ -7,14 +7,14 @@
 using noa::utils::combine::DependencyList;
 using noa::utils::combine::Nodeps;
 using noa::utils::combine::MakeDynamic;
+using noa::utils::combine::ComputationType;
 
 struct Task1 : public MakeDynamic<Task1> {
     using Depends = Nodeps;
 
     int input;
 
-    template <typename Computation>
-    void run(const Computation& comp) {
+    void run(const ComputationType auto& comp) {
         // std::cout << "Task1 run()" << std::endl;
     }
 };
@@ -24,8 +24,7 @@ struct Task2 : public MakeDynamic<Task2> {
 
     int result;
 
-    template <typename Computation>
-    void run(const Computation& comp) {
+    void run(const ComputationType auto& comp) {
         // std::cout << "Task2 run()" << std::endl;
         result = comp.template get<Task1>().input * 2;
     }
@@ -36,8 +35,7 @@ struct Task3 : public MakeDynamic<Task3> {
 
     int result;
 
-    template <typename Computation>
-    void run(const Computation& comp) {
+    void run(const ComputationType auto& comp) {
         // std::cout << "Task3 run()" << std::endl;
         const auto& task1 = comp.template get<Task1>();
         result = task1.input * task1.input;
@@ -49,8 +47,7 @@ struct Task4 : public MakeDynamic<Task4> {
 
     int result;
 
-    template <typename Computation>
-    void run(const Computation& comp) {
+    void run(const ComputationType auto& comp) {
         // std::cout << "Task4 run()" << std::endl;
         result = comp.template get<Task2>().result + comp.template get<Task3>().result;
     }

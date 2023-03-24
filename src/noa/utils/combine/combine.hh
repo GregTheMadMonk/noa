@@ -32,7 +32,6 @@
  * * Dependency type: **Optionally**
  * * Dependency type: **Either**
  * * Dependency type: **Product**
- * * C++20 🙂
  */
 #pragma once
 

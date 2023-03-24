@@ -50,16 +50,16 @@ static_assert(
 
 static_assert(std::is_same_v<LastVArg<Dummy1<int, char, float>>, float>);
 
-static_assert(!hasDepends<NotATask>,                "Task without a dependency list reported to have one");
-static_assert(hasDepends<HasDependsSubtype>,        "Task dependency list not detected");
-static_assert(!hasDepends<HasWrongDependsSubtype>,  "Task with a wrong dependency list type undetected!");
+static_assert(!HasDepends<NotATask>,                "Task without a dependency list reported to have one");
+static_assert(HasDepends<HasDependsSubtype>,        "Task dependency list not detected");
+static_assert(!HasDepends<HasWrongDependsSubtype>,  "Task with a wrong dependency list type undetected!");
 
-static_assert(!hasRun<HasDependsSubtype>,           "Undetected lack of non-statc `run` method");
-static_assert(!hasRun<RunWrongSignature>,           "Wrong `run` method signature undetected!");
+static_assert(!HasRun<HasDependsSubtype>,           "Undetected lack of non-statc `run` method");
+static_assert(!HasRun<RunWrongSignature>,           "Wrong `run` method signature undetected!");
 
-static_assert(hasDepends<detail::DummyTask>, "DummyTask does not provide a dependency list!");
-static_assert(hasRun<detail::DummyTask>,     "DummyTask does not provide a non-static run() method!");
-static_assert(isTask<detail::DummyTask>,     "DummyTask does not qualify for a Task!");
+static_assert(HasDepends<detail::DummyTask>, "DummyTask does not provide a dependency list!");
+static_assert(HasRun<detail::DummyTask>,     "DummyTask does not provide a non-static run() method!");
+static_assert(TaskType<detail::DummyTask>,     "DummyTask does not qualify for a Task!");
 
 static_assert(DependencyList<>::empty, "Empty DependencyList `empty` member unset");
 static_assert(DependencyList<Task1, Task2>::Depends::empty, "Empty DependencyList dependency undetected");
@@ -92,13 +92,13 @@ static_assert(
     >, "DependencyList::Uniquify: Incorrect result"
 );
 
-static_assert(compHasGet<detail::DummyComputation>, "DummyComputation doesn't have a proper `get` method");
-static_assert(compHasConstGet<detail::DummyComputation>, "DummyComputation doesn't have a proper const `get` method");
-static_assert(isComputation<detail::DummyComputation>, "DummyComputation is not detected as a valid computation");
+static_assert(HasGet<detail::DummyComputation>, "DummyComputation doesn't have a proper `get` method");
+static_assert(HasConstGet<detail::DummyComputation>, "DummyComputation doesn't have a proper const `get` method");
+static_assert(ComputationTemplate<detail::DummyComputation>, "DummyComputation is not detected as a valid computation");
 
-static_assert(compHasGet<detail::DynamicComputationT>, "DynamicComputation doesn't have a proper `get` method");
-static_assert(compHasConstGet<detail::DynamicComputationT>, "DynamicComputation doesn't have a proper const `get` method");
-static_assert(isComputation<detail::DynamicComputationT>, "DynamicComputation is not detected as a valid computation");
+static_assert(HasGet<detail::DynamicComputationT>, "DynamicComputation doesn't have a proper `get` method");
+static_assert(HasConstGet<detail::DynamicComputationT>, "DynamicComputation doesn't have a proper const `get` method");
+static_assert(ComputationTemplate<detail::DynamicComputationT>, "DynamicComputation is not detected as a valid computation");
 
 static_assert(
     std::is_same_v<

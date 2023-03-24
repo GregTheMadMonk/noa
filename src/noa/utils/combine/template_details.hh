@@ -28,9 +28,11 @@
 
 #include <type_traits>
 
+#include "concepts_prelude.hh"
+
 namespace noa::utils::combine {
 
-template <typename...> struct DependencyList;
+template <TaskType...> struct DependencyList;
 
 namespace detail {
 
@@ -49,18 +51,6 @@ namespace detail {
         }
     } // <-- hasVArg()
 
-    /// \brief Determine whether a class is a dependency list
-    ///
-    /// TODO C++20: Replace with a concept
-    template <template <typename...> class DepListCandidate, typename... Tasks>
-    auto isDepListHelper(DepListCandidate<Tasks...>) {
-        if constexpr (std::is_same_v<DepListCandidate<Tasks...>, DependencyList<Tasks...>>) {
-            return std::true_type{};
-        } else {
-            return std::false_type{};
-        }
-    } // <-- isDepListHelper()
-
     /// \brief Get last template parameter (helper)
     template <template <typename...> class Template, typename First, typename... Others>
     auto getLastVArg(Template<First, Others...>) {
@@ -73,20 +63,6 @@ namespace detail {
 
 } // <-- namespace detail
 
-/// \brief DependencyList checker
-///
-/// Either `std::true_type` or `std::false_type`
-///
-/// \tparam DependencyListCandidatetype being checked
-template <typename DependencyListCandidate>
-using IsDependencyList = decltype(detail::isDepListHelper(std::declval<DependencyListCandidate>()));
-
-/// \brief An alias for IsDependencyList<DependencyListCandidate>::value
-///
-/// \tparam DependencyListCandidatetype being checked
-template <typename DependencyListCandidate>
-constexpr bool isDependencyList = IsDependencyList<DependencyListCandidate>::value;
-
 namespace detail {
     /// \brief A helper method that helps to join an arbitrary amount of dependency lists
     template <typename... Tasks1, typename... Tasks2>
@@ -96,12 +72,7 @@ namespace detail {
     ///
     /// The struct is declared inside of a \ref detail namespace in order to have access
     /// to \ref operator+
-    template <typename... DependencyLists> struct DepListJoiner {
-        static_assert(
-            (isDependencyList<DependencyLists> && ...),
-            "All DepListJoiner template parameters are expected to be `DependecyList`s"
-        );
-
+    template <DependencyListType... DependencyLists> struct DepListJoiner {
         using Type = std::remove_reference_t<
             decltype(
                 (std::declval<DependencyLists>() + ... + std::declval<DependencyList<>>())
@@ -116,7 +87,7 @@ namespace detail {
 /// See \ref detail::DepListJoiner
 ///
 /// \tparam DependencyLists an arbitrary number of dependency lists to join
-template <typename... DependencyLists>
+template <DependencyListType... DependencyLists>
 using DepListsJoin = typename detail::DepListJoiner<DependencyLists...>::Type;
 
 /// \brief Get the last of cless'es template arguments

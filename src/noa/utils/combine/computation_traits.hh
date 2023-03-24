@@ -32,41 +32,18 @@
 
 namespace noa::utils::combine {
 
-/// \brief Check for `get` method
-template <template <typename...> class ComputationCandidate, typename = void>
-constexpr bool compHasGet = false;
+namespace concepts_detail {
 
-template <template <typename...> class ComputationCandidate>
-constexpr bool
-compHasGet<
-    ComputationCandidate,
-    std::enable_if_t<
-        std::is_same_v<
-            decltype(std::declval<ComputationCandidate<detail::DummyTask>>().template get<detail::DummyTask>()),
-            detail::DummyTask&
-        >
-    >
-> = true;
+    template <template <typename...> class ComputationCandidate>
+    requires requires (ComputationCandidate<detail::DummyTask> cc) {
+        { cc.template get<detail::DummyTask>() } -> std::same_as<detail::DummyTask&>;
+    } constexpr bool hasGet<ComputationCandidate> = true;
 
-/// \brief Check for const `get` method
-template <template <typename...> class ComputationCandidate, typename = void>
-constexpr bool compHasConstGet = false;
+    template <template <typename...> class ComputationCandidate>
+    requires requires (const ComputationCandidate<detail::DummyTask> cc) {
+        { cc.template get<detail::DummyTask>() } -> std::same_as<const detail::DummyTask&>;
+    } constexpr bool hasConstGet<ComputationCandidate> = true;
 
-template <template <typename...> class ComputationCandidate>
-constexpr bool
-compHasConstGet<
-    ComputationCandidate,
-    std::enable_if_t<
-        std::is_same_v<
-            decltype(
-                std::declval<const ComputationCandidate<detail::DummyTask>>().template get<detail::DummyTask>()
-            ), const detail::DummyTask&
-        >
-    >
-> = true;
-
-/// \brief Does the template type represent a proper computation?
-template <template <typename...> class ComputationCandidate>
-constexpr bool isComputation = compHasGet<ComputationCandidate> && compHasConstGet<ComputationCandidate>;
+} // <-- namespace concepts_detail
 
 } // <-- namespace noa::utils::combine
