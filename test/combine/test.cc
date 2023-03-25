@@ -53,7 +53,40 @@ struct Task4 : public MakeDynamic<Task4> {
     }
 };
 
+struct BenchmarkInitial : public MakeDynamic<BenchmarkInitial> {
+    using Depends = Nodeps;
+
+    int seed[2] = { 0, 1 };
+
+    void run(const ComputationType auto& comp) {}
+};
+
+struct BenchmarkBody : public MakeDynamic<BenchmarkBody> {
+    using Depends = DependencyList<BenchmarkInitial>;
+
+    float value;
+
+    void run(const ComputationType auto& comp) {
+        constexpr std::size_t runs = std::size_t{1} << 20;
+
+        value = 0;
+
+        for (std::size_t i = 0; i < runs; ++i) {
+            value += comp.template get<BenchmarkInitial>().seed[i % 2];
+        }
+    }
+};
+
 constexpr std::size_t runs = std::size_t{1} << 20;
+
+#define BMARK(what) \
+    {\
+        auto start = std::chrono::high_resolution_clock::now();\
+        what();\
+        auto end = std::chrono::high_resolution_clock::now();\
+        auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);\
+        std::cout << "Elapsed: " << ms_int.count() << "ms" << std::endl;\
+    }
 
 // Entry point
 int main(int argc, char** argv) {
@@ -64,17 +97,13 @@ int main(int argc, char** argv) {
     StaticComputation<Task4> comp;
     comp.template get<Task1>().input = 3;
 
-    using std::chrono::high_resolution_clock;
-
     auto start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < runs; ++i) {
-        comp.run();
-    }
-    auto end = std::chrono::high_resolution_clock::now();
-    auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-    std::cout << "Result: input * 2 + input * input = " << comp.template get<Task4>().result << std::endl;
-    std::cout << "Elapsed: " << ms_int.count() << "ms" << std::endl;
+    BMARK([&comp] {
+        for (std::size_t i = 0; i < runs; ++i) {
+            comp.run();
+        }
+        std::cout << "Result: input * 2 + input * input = " << comp.template get<Task4>().result << std::endl;
+    });
 
     std::cout << "DynamicComputation:" << std::endl;
     using noa::utils::combine::DynamicComputation;
@@ -84,15 +113,27 @@ int main(int argc, char** argv) {
     dcomp.update();
     dcomp.template get<Task1>().input = 3;
 
-    start = std::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i < runs; ++i) {
-        dcomp.run();
-    }
-    end = std::chrono::high_resolution_clock::now();
-    ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    BMARK([&dcomp] {
+        for (std::size_t i = 0; i < runs; ++i) {
+            dcomp.run();
+        }
+        std::cout << "Result: input * 2 + input * input = " << dcomp.template get<Task4>().result << std::endl;
+    });
 
-    std::cout << "Result: input * 2 + input * input = " << dcomp.template get<Task4>().result << std::endl;
-    std::cout << "Elapsed: " << ms_int.count() << "ms" << std::endl;
+    StaticComputation<BenchmarkBody> bcomp;
+    BMARK([&bcomp] {
+        bcomp.run();
+        std::cout << "value = " << bcomp.template get<BenchmarkBody>().value << std::endl;
+    });
+
+    DynamicComputation bdcomp;
+    bdcomp.template setTasks<BenchmarkBody>();
+    bdcomp.update();
+
+    BMARK([&bdcomp] {
+        bdcomp.run();
+        std::cout << "value = " << bdcomp.template get<BenchmarkBody>().value << std::endl;
+    });
 
     return 0;
 }
