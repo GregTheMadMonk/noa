@@ -308,16 +308,6 @@ struct Domain {
                                 float offsetY);
 }; // <-- struct Domain
 
-void generate2DGrid(
-    CDomain auto& domain,
-    std::size_t Nx,
-    std::size_t Ny,
-    float dx,
-    float dy,
-    float offsetX = 0,
-    float offsetY = 0
-) = delete;
-
 /// \brief Specialization for Triangle topology
 void generate2DGrid(
     CDomainWithTopology<TNL::Meshes::Topologies::Triangle> auto& domain,
