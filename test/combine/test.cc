@@ -1,5 +1,6 @@
 // Standard library
 #include <chrono>
+#include <cmath>
 #include <iostream>
 
 #include "static_test.hh"
@@ -56,7 +57,7 @@ struct Task4 : public MakeDynamic<Task4> {
 struct BenchmarkInitial : public MakeDynamic<BenchmarkInitial> {
     using Depends = Nodeps;
 
-    int seed[2] = { 0, 1 };
+    const int punch[5] = { 1, 1, 1, 1, 0 };
 
     void run(const ComputationType auto& comp) {}
 };
@@ -64,15 +65,23 @@ struct BenchmarkInitial : public MakeDynamic<BenchmarkInitial> {
 struct BenchmarkBody : public MakeDynamic<BenchmarkBody> {
     using Depends = DependencyList<BenchmarkInitial>;
 
-    float value;
+    std::size_t value;
 
     void run(const ComputationType auto& comp) {
-        constexpr std::size_t runs = std::size_t{1} << 20;
+        static constexpr std::size_t runs = std::size_t{1} << 27;
 
         value = 0;
+        const auto& punch = comp.template get<BenchmarkInitial>().punch;
 
-        for (std::size_t i = 0; i < runs; ++i) {
-            value += comp.template get<BenchmarkInitial>().seed[i % 2];
+        std::size_t pos = 0;
+
+        while (punch[pos] != 0) {
+            value += punch[pos];
+
+            if (value > runs) [[unlikely]] {
+                ++pos;
+                value = 0;
+            }
         }
     }
 };
@@ -120,20 +129,16 @@ int main(int argc, char** argv) {
         std::cout << "Result: input * 2 + input * input = " << dcomp.template get<Task4>().result << std::endl;
     });
 
+    std::cout << "Static:" << std::endl;
     StaticComputation<BenchmarkBody> bcomp;
-    BMARK([&bcomp] {
-        bcomp.run();
-        std::cout << "value = " << bcomp.template get<BenchmarkBody>().value << std::endl;
-    });
+    BMARK(bcomp.run);
 
     DynamicComputation bdcomp;
     bdcomp.template setTasks<BenchmarkBody>();
     bdcomp.update();
 
-    BMARK([&bdcomp] {
-        bdcomp.run();
-        std::cout << "value = " << bdcomp.template get<BenchmarkBody>().value << std::endl;
-    });
+    std::cout << "Dynamic:" << std::endl;
+    BMARK(bdcomp.run);
 
     return 0;
 }
