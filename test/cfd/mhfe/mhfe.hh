@@ -79,7 +79,7 @@ struct Features {
 /// calculate MHFEM system matrices and terms
 ///
 /// Every system specialization should include matrixTerm() and rhsTerm() functions
-template <Features::Enum solverFeatures, __domain_targs__>
+template <Features::Enum solverFeatures, utils::domain::CDomain DomainType>
 struct System {}; // <-- struct System
 
 /// \brief A MHFEM solver class
@@ -103,12 +103,12 @@ template <
 public:
 	// Member types and type aliases
 	/// Domain type
-	using DomainType = __DomainType__;
+	using DomainType = utils::domain::Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>;
 	/// System matrix type
 	using SparseMatrixType	= TNL::Matrices::SparseMatrix<Real, Device, GlobalIndex>;
 	using DenseMatrixType	= TNL::Matrices::DenseMatrix<Real, Device, GlobalIndex>;
 private:
-	using SystemType = System<features_, CellTopology, Device, Real, GlobalIndex, LocalIndex>;
+	using SystemType = System<features_, DomainType>;
 	friend SystemType;
 
 	static constexpr auto features = Features::from(features_); // TODO: Remove this with C++20
@@ -611,10 +611,20 @@ public:
 }; // <-- class Solver
 
 // System specializations
-template <Features::Enum features, __domain_targs_topospec__>
-struct System<features, TNL::Meshes::Topologies::Triangle, Device, Real, GlobalIndex, LocalIndex> {
+template <Features::Enum features, utils::domain::CDomainWithTopology<TNL::Meshes::Topologies::Triangle> DomainType>
+struct System<features, DomainType> {
 	using CellTopology = TNL::Meshes::Topologies::Triangle;
-        using SolverType = Solver<features, CellTopology, Device, Real, GlobalIndex, LocalIndex>;
+    using Device = DomainType::DeviceType;
+    using Real = DomainType::RealType;
+    using GlobalIndex = DomainType::GlobalIndexType;
+    using LocalIndex = DomainType::LocalIndexType;
+    using SolverType = Solver<
+                            features,
+                            CellTopology,
+                            Device,
+                            Real,
+                            GlobalIndex,
+                            LocalIndex>;
 	template <template <typename, typename> typename Method>
 	static inline
         void matrixTerm(SolverType& solver, GlobalIndex cell, GlobalIndex edge, GlobalIndex cellEdges) {

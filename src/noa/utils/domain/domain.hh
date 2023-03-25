@@ -45,23 +45,38 @@
 #include "configtagpermissive.hh"
 #include "layermanager.hh"
 
-// Macros definition
-/// \ref Domain template arguments list
-#define __domain_targs__ \
-        typename CellTopology, typename Device, typename Real, typename GlobalIndex, typename LocalIndex
-/// Full \ref Domain type with template arguments. To be used with \ref __domain_targs__
-#define __DomainType__  \
-        noa::utils::domain::Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>
-/// Same as \ref __domain_targs__, but not including CellTopology
-#define __domain_targs_topospec__ \
-   typename Device, typename Real, typename GlobalIndex, typename LocalIndex
-/// Same as \ref __DomainType__, but accepts cell topology as an argument
-/// (for use with \ref __domain_targs__topospec__)
-#define __DomainTypeTopoSpec__(topology) \
-   noa::utils::domain::Domain<topology, Device, Real, GlobalIndex, LocalIndex>
-
 /// Namespace containing the domain-related code
 namespace noa::utils::domain {
+
+template <typename, typename, typename, typename, typename>
+struct Domain;
+
+/// \brief Concept for all domain types
+template <typename DomainCandidate>
+concept CDomain = requires (DomainCandidate dc) {
+    [] <
+        typename CellTopology,
+        typename Device,
+        typename Real,
+        typename GlobalIndex,
+        typename LocalIndex
+    > (
+        Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>
+    ) {} (dc);
+}; // <-- concept CDomain
+
+/// \brief Concept for any domain of specific topology
+template <typename DomainCandidate, typename CellTopology>
+concept CDomainWithTopology = requires(DomainCandidate dc) {
+    [] <
+        typename Device,
+        typename Real,
+        typename GlobalIndex,
+        typename LocalIndex
+    > (
+        Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>
+    ) {} (dc);
+} && CDomain<DomainCandidate>; // <-- concept CDomainWithTopology
 
 /// \brief Domain stores a TNL mesh and various data over its elements in one place
 /// providing a friendly all-in-one-place interface for solvers.
@@ -284,8 +299,7 @@ struct Domain {
 
         /* ----- DOMAIN MESH GENERATORS ----- */
         // Declare as friends since they're supposed to modify mesh
-        template <typename Device2, typename Real2, typename GlobalIndex2, typename LocalIndex2>
-        friend void generate2DGrid(Domain<TNL::Meshes::Topologies::Triangle, Device2, Real2, GlobalIndex2, LocalIndex2>& domain,
+        friend void generate2DGrid(CDomainWithTopology<CellTopology> auto& domain,
                                 std::size_t Nx,
                                 std::size_t Ny,
                                 float dx,
@@ -294,32 +308,32 @@ struct Domain {
                                 float offsetY);
 }; // <-- struct Domain
 
-/// \brief Generates a uniform 2D grid mesh for the domain. Implementation depends on \p CellTopology2
-template <typename CellTopology2, typename Device2, typename Real2, typename GlobalIndex2, typename LocalIndex2>
-void generate2DGrid(Domain<CellTopology2, Device2, Real2, GlobalIndex2, LocalIndex2>& domain,
-                        std::size_t Nx,
-                        std::size_t Ny,
-                        float dx,
-                        float dy,
-                        float offsetX = 0,
-                        float offsetY = 0) {
-        throw std::runtime_error("generate2DGrid is not implemented for this topology!");
-}
+void generate2DGrid(
+    CDomain auto& domain,
+    std::size_t Nx,
+    std::size_t Ny,
+    float dx,
+    float dy,
+    float offsetX = 0,
+    float offsetY = 0
+) = delete;
 
 /// \brief Specialization for Triangle topology
-template <typename Device2, typename Real2, typename GlobalIndex2, typename LocalIndex2>
-void generate2DGrid(Domain<TNL::Meshes::Topologies::Triangle, Device2, Real2, GlobalIndex2, LocalIndex2>& domain,
-                        std::size_t Nx,
-                        std::size_t Ny,
-                        float dx,
-                        float dy,
-                        float offsetX = 0,
-                        float offsetY = 0) {
+void generate2DGrid(
+    CDomainWithTopology<TNL::Meshes::Topologies::Triangle> auto& domain,
+    std::size_t Nx,
+    std::size_t Ny,
+    float dx,
+    float dy,
+    float offsetX = 0,
+    float offsetY = 0
+) {
         assert(("Mesh data is not empty, cannot create grid!", domain.isClean()));
 
-        using CellTopology = TNL::Meshes::Topologies::Triangle;
-        using DomainType = Domain<CellTopology, Device2, Real2, GlobalIndex2, LocalIndex2>;
-        using MeshType = typename DomainType::MeshType;
+        using CellTopology =    TNL::Meshes::Topologies::Triangle;
+        using DomainType =      std::remove_reference_t<decltype(domain)>;
+        using MeshType =        DomainType::MeshType;
+        using GlobalIndexType = DomainType::GlobalIndexType;
 
         domain.mesh = MeshType();
 
@@ -331,7 +345,7 @@ void generate2DGrid(Domain<TNL::Meshes::Topologies::Triangle, Device2, Real2, Gl
         builder.setEntitiesCount(points, elems);
 
         using PointType = typename MeshType::MeshTraitsType::PointType;
-        const auto pointId = [&] (const int& ix, const int& iy) -> GlobalIndex2 {
+        const auto pointId = [&] (const int& ix, const int& iy) -> GlobalIndexType {
                 return ix + (Nx + 1) * iy;
         };
         const auto fillPoints = [&] (const int& ix, const int& iy) {

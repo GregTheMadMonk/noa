@@ -28,18 +28,23 @@ namespace noa::test::mhfe::geometry {
 /// \param domain - a \ref Domain object reference
 /// \param cell - cell index
 /// \param measure - cell measure
-template <__domain_targs__>
-Real l(__DomainType__& domain, GlobalIndex cell, Real measure) {
-	static_assert(
-		std::is_same_v<CellTopology, nullptr_t>, // Always false, but will display the type of
-							 // CellTopology in the compiler error log
-		"l calculation is not implemented for selected topology"
-	);
-} // <-- l()
+template <utils::domain::CDomain DomainType>
+DomainType::RealType l(
+    DomainType& domain,
+    typename DomainType::GlobalIndexType cell,
+    typename DomainType::RealType measure
+) = delete;
 
 /// \brief Implementation for Triangular topology
-template <__domain_targs_topospec__>
-Real l(__DomainTypeTopoSpec__(TNL::Meshes::Topologies::Triangle)& domain, GlobalIndex cell, Real measure) {
+template <utils::domain::CDomainWithTopology<TNL::Meshes::Topologies::Triangle> DomainType>
+DomainType::RealType l(
+    DomainType& domain,
+    typename DomainType::GlobalIndexType cell,
+    typename DomainType::RealType measure
+) {
+    using RealType       = DomainType::RealType;
+    using LocalIndexType = DomainType::LocalIndexType;
+
 	// Named constants for triangle topology
 	constexpr auto dimCell = 2;
 	constexpr auto dimEdge = 1;
@@ -48,9 +53,9 @@ Real l(__DomainTypeTopoSpec__(TNL::Meshes::Topologies::Triangle)& domain, Global
 
 	auto& mesh = domain.getMesh();
 
-	Real sqSum = 0;
+	RealType sqSum = 0;
 
-	for (LocalIndex k = 0; k < cellEdges; ++k) { // Triangle topology 
+	for (LocalIndexType k = 0; k < cellEdges; ++k) { // Triangle topology 
 		const auto edge = mesh.template getSubentityIndex<dimCell, dimEdge>(cell, k);
 		const auto p1 = mesh.getPoint(mesh.template getSubentityIndex<dimEdge, dimVert>(edge, 0));
 		const auto p2 = mesh.getPoint(mesh.template getSubentityIndex<dimEdge, dimVert>(edge, 1));
@@ -71,22 +76,29 @@ Real l(__DomainTypeTopoSpec__(TNL::Meshes::Topologies::Triangle)& domain, Global
 /// \param cell - cell index
 /// \param measure - cell measure
 /// \param l - `l` coefficient, result of \ref l()
-template <__domain_targs__, typename MatrixType>
-void Binv(const __DomainType__& domain, MatrixType& matrix, GlobalIndex cell, Real measure, Real l) {
-	static_assert(
-		std::is_same_v<CellTopology, nullptr_t>, // Always false, but will display the type of
-							 // CellTopology in the compiler error log
-		"B^{-1} calculation is not implemented for selected topology"
-	);
-} // <-- Binv()
+template <utils::domain::CDomain DomainType, typename MatrixType>
+void Binv(
+    const DomainType& domain,
+    MatrixType& matrix,
+    typename DomainType::GlobalIndexType cell,
+    typename DomainType::RealType measure,
+    typename DomainType::RealType l
+) = delete;
 
 /// \brief Implementation of Triangular topology
-template <__domain_targs_topospec__, typename MatrixType>
-void Binv(const __DomainTypeTopoSpec__(TNL::Meshes::Topologies::Triangle)& domain,
-		MatrixType& matrix, GlobalIndex cell, Real measure, Real l) {
+template <
+    utils::domain::CDomainWithTopology<TNL::Meshes::Topologies::Triangle> DomainType,
+    typename MatrixType
+> void Binv(
+        const DomainType& domain,
+		MatrixType& matrix,
+        typename DomainType::GlobalIndexType cell,
+        typename DomainType::RealType measure,
+        typename DomainType::RealType l
+) {
 	using CellTopology	= TNL::Meshes::Topologies::Triangle;
-	using DomainType	= utils::domain::Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>;
-	using PointType		= typename DomainType::MeshType::PointType;
+	using PointType		= DomainType::MeshType::PointType;
+    using LocalIndexType= DomainType::LocalIndexType;
 
 	PointType r1(0, 0), r2(0, 0);
 
@@ -103,7 +115,7 @@ void Binv(const __DomainTypeTopoSpec__(TNL::Meshes::Topologies::Triangle)& domai
 
 	std::vector<PointType> rv;
 
-	for (LocalIndex k = 0; k < cellEdges; ++k) {
+	for (LocalIndexType k = 0; k < cellEdges; ++k) {
 		const auto edge = mesh.template getSubentityIndex<dimCell, dimEdge>(cell, k);
 		const auto p1 = mesh.getPoint(mesh.template getSubentityIndex<dimEdge, dimVert>(edge, 0));
 		const auto p2 = mesh.getPoint(mesh.template getSubentityIndex<dimEdge, dimVert>(edge, 1));
@@ -118,8 +130,8 @@ void Binv(const __DomainTypeTopoSpec__(TNL::Meshes::Topologies::Triangle)& domai
 		rv.push_back((1 - 2 * (crossZ < 0)) * r);
 	}
 
-	for (LocalIndex i = 0; i < cellEdges; ++i)
-		for (LocalIndex j = 0; j < cellEdges; ++j)
+	for (LocalIndexType i = 0; i < cellEdges; ++i)
+		for (LocalIndexType j = 0; j < cellEdges; ++j)
 			matrix.setElement(i, j, (rv[i], rv[j]) / measure + 1.0 / l / 3.0);
 } // <-- Binv() (Triangle)
 
