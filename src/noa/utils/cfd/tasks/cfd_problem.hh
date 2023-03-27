@@ -26,8 +26,40 @@ struct CFDProblem : public combine::MakeDynamic<CFDProblem<DomainType>> {
     /// \brief Computation domain
     DomainType domain;
 
-    /// \brief Does nothing
-    void run(const combine::ComputationType auto& comp) {}
+    /// \brief Each time CFDProblem is used, it performs a validity check
+    void run(const combine::ComputationType auto& comp) throw(InvalidSetup) {
+        if (!this->valid()) throw InvalidSetup{};
+    } // <-- void CFDProblem::run()
+
+    /// \brief Set up system layers
+    void setup() {
+        // Clear the existing layers
+        if (!this->domain.hasLayers()) {
+        }
+    }
+
+private:
+    /// \brief Validate CFD problem formulation
+    [[nodiscard]] bool valid() {
+        // Check the domain is clean
+        if (this->domain.isClean()) {
+            std::cerr << "The this->domain is empty!" << std::endl;
+            return false;
+        }
+
+        // Check that all boundaries have at least one boundary condition associated with them
+        bool ret = true;
+        this->domain.getMesh().template forBoundary<dimEdge>(
+            [&this->domain, &ret] (auto edge) {
+            }
+        );
+
+        if (!ret) {
+            std::cerr << "Domain boundary conditions missing on one or more boundary edges!";
+        }
+
+        return ret;
+    } // <-- bool CFDProblem::valid()
 }; // <-- struct CFDProblem
 
 } // <-- namespace noa::utils::cfd::tasks

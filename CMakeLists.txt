@@ -43,6 +43,9 @@ set(W_FLAGS "") #"-Wall;-Wextra;-Wpedantic")
 # Native optimisations
 set(NA_OPT_FLAGS "-march=native;-mtune=native")
 
+# Feature flags
+set(FEATURE_FLAGS "-fconcepts-diagnostics-depth=5")
+
 # CUDA modern C++ extensions
 set(MCXX_CUDA "--expt-relaxed-constexpr;--expt-extended-lambda")
 

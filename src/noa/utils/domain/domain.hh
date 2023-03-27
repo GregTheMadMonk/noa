@@ -150,6 +150,9 @@ struct Domain {
         /// Clear layer data
         void clearLayers() { for (auto& layer : layers) layer.clear(); }
 
+        /// Check if the domain contains any layers
+        [[nodiscard]] bool hasLayers() const { return this->layers.size(); }
+
         /// Check if the domain is empty. Equivalent to `!mesh.has_value()`
         bool isClean() const { return !mesh.has_value(); }
 
