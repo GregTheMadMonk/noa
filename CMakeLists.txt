@@ -3,7 +3,7 @@
 ####################################################################################################
 
 # Minimum cmake version
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR) # 3.25.2 adds NVCC C++20 support
 
 # Project
 project(NOA
@@ -36,6 +36,7 @@ endfunction()
 
 # Require C++20
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Warning flags
 set(W_FLAGS "") #"-Wall;-Wextra;-Wpedantic")
@@ -62,7 +63,7 @@ include(check-torch)
 # Set up CUDA if available
 if (BUILD_NOA_CUDA)
     enable_language(CUDA)
-    set(CMAKE_CUDA_STANDARD 17)
+    set(CMAKE_CUDA_STANDARD 20)
     set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 endif ()
 
