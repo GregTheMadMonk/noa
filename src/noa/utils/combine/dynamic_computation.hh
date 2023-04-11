@@ -63,7 +63,7 @@ namespace detail {
         } // <-- setTasks(taskTypes)
 
         /// \brief Set required end tasks from template parameter pack
-        template <TaskType... Tasks>
+        template <CTask... Tasks>
         void setTasks() {
             input.clear();
             (input.push_back(Tasks::index()), ...);

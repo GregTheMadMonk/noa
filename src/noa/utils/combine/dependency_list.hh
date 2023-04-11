@@ -34,13 +34,13 @@
 
 namespace noa::utils::combine {
 
-template <TaskType...> struct DependencyList;
+template <CTask...> struct DependencyList;
 
 namespace concepts_detail {
 
     template <typename DependencyListCandidate>
     requires requires (DependencyListCandidate dlc) {
-        [] <TaskType... Ts> (DependencyList<Ts...>) {} (dlc);
+        [] <CTask... Ts> (DependencyList<Ts...>) {} (dlc);
     } constexpr bool dependencyListType<DependencyListCandidate> = true;
 
 } // <-- namespace concepts_detai;
@@ -80,7 +80,7 @@ namespace detail {
  * * \ref Optinally
  * * \ref ProviderOf (TODO)
  */
-template <TaskType... Tasks> struct DependencyList {
+template <CTask... Tasks> struct DependencyList {
     /// \brief Determines whether a specified task is contained within the dependency list
     ///
     /// \tparam Task task to find

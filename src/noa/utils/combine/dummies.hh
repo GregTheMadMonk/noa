@@ -34,7 +34,7 @@
 
 namespace noa::utils::combine {
 
-template <TaskType...> struct DependencyList;
+template <CTask...> struct DependencyList;
 
 namespace detail {
 
@@ -52,11 +52,11 @@ namespace detail {
     ///
     /// Every computation must have:
     /// * A template `get()` method for getting a specified task reference (with a `const` overload)
-    template <TaskType... TaskList> struct DummyComputation {
-        template <TaskType Task>
+    template <CTask... TaskList> struct DummyComputation {
+        template <CTask Task>
         Task& get();
 
-        template <TaskType Task>
+        template <CTask Task>
         const Task& get() const;
     }; // <-- struct DummyComputation
 

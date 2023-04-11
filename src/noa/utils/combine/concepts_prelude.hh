@@ -48,19 +48,20 @@ namespace concepts_detail {
 /// \brief Checks is the task has a void-returning non-static `run`
 ///        method that can accept a template computation
 template <typename Task>
-concept HasRun = concepts_detail::hasRun<Task>;
+concept CHasRun = concepts_detail::hasRun<Task>;
 
 /// \brief Checks if the task has a `Depends` subtype that is an
 ///        instance of \red DependencyList template
 template <typename Task>
-concept HasDepends = concepts_detail::hasDepends<Task>;
+concept CHasDepends = concepts_detail::hasDepends<Task>;
 
 /// \brief Checks if the class is a valid task
 template <typename TaskCandidate>
-concept TaskType = requires {
-    requires HasRun<TaskCandidate>;
-    requires HasDepends<TaskCandidate>;
-}; // <-- concept TaskType
+concept CTask = requires {
+    requires CHasRun<TaskCandidate>;
+    requires CHasDepends<TaskCandidate>;
+    requires std::default_initializable<TaskCandidate>;
+}; // <-- concept CTask
 
 namespace concepts_detail {
 
@@ -70,7 +71,7 @@ namespace concepts_detail {
 
 /// \brief Checks if a type is an instance of \ref DependencyList template
 template <typename DependencyListCandidate>
-concept DependencyListType = concepts_detail::dependencyListType<DependencyListCandidate>;
+concept CDependencyList = concepts_detail::dependencyListType<DependencyListCandidate>;
 
 namespace concepts_detail {
 
@@ -82,26 +83,26 @@ namespace concepts_detail {
 /// \brief Checks if the class has a valid `get` method for obtaining
 ///        task references
 template <template <typename...> class ComputationCandidate>
-concept HasGet = concepts_detail::hasGet<ComputationCandidate>;
+concept CHasGet = concepts_detail::hasGet<ComputationCandidate>;
 
 /// \brief Checks if the class has a valid const `get` method for obtaining
 ///        task references
 template <template <typename...> class ComputationCandidate>
-concept HasConstGet = concepts_detail::hasConstGet<ComputationCandidate>;
+concept CHasConstGet = concepts_detail::hasConstGet<ComputationCandidate>;
 
 /// \brief Checks if a template specifies a computation template
 template <template <typename...> class ComputationCandidate>
-concept ComputationTemplate = requires {
-    requires HasGet<ComputationCandidate>;
-    requires HasConstGet<ComputationCandidate>;
-}; // <-- concept ComputationTemplate
+concept CComputationTemplate = requires {
+    requires CHasGet<ComputationCandidate>;
+    requires CHasConstGet<ComputationCandidate>;
+}; // <-- concept CComputationTemplate
 
 /// \brief Checks if a type is an instance of a valid computation template
 template <typename ComputationCandidate>
-concept ComputationType = requires (ComputationCandidate cc) {
+concept CComputation = requires (ComputationCandidate cc) {
     [] <template <typename...> class Template, typename... Ts>
-    (Template<Ts...>) requires ComputationTemplate<Template>
+    (Template<Ts...>) requires CComputationTemplate<Template>
     {} (cc);
-}; // <-- concept ComputationType
+}; // <-- concept CComputation
 
 } // <-- namespace noa::utils::combine

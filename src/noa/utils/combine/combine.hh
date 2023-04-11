@@ -58,3 +58,6 @@ namespace noa::utils::combine {
 namespace detail {}
 
 } // <-- namespace noa::utils::combine
+
+// Compile-time test
+#include "test.hh"

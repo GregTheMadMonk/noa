@@ -56,7 +56,7 @@ namespace detail {
 /// be changed.
 ///
 /// \tparam Tasks tasks to be processed. Tasks are ordered as they follow in the list, left-to-right
-template <TaskType... Tasks>
+template <CTask... Tasks>
 struct StaticComputation {
     using TasksOrder = typename detail::Unravel<DependencyList<Tasks...>>::Type;
 
@@ -69,11 +69,11 @@ struct StaticComputation {
     public:
     /// \brief Get a reference to a task state
     template <typename Task>
-    Task& get() { return std::get<Task>(this->state); }
+    constexpr Task& get() { return std::get<Task>(this->state); }
 
     /// \brief Const-overload for the get() function
     template <typename Task>
-    const Task& get() const { return std::get<Task>(this->state); }
+    constexpr const Task& get() const { return std::get<Task>(this->state); }
 
     /// \brief Run tasks sequentially
     void run() {
