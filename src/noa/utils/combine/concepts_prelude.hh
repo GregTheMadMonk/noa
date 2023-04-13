@@ -55,12 +55,21 @@ concept CHasRun = concepts_detail::hasRun<Task>;
 template <typename Task>
 concept CHasDepends = concepts_detail::hasDepends<Task>;
 
+namespace concepts_detail {
+
+    template <typename> constexpr bool constructibleFromComputation = false;
+
+} // <-- namespace concepts_detail
+
 /// \brief Checks if the class is a valid task
 template <typename TaskCandidate>
 concept CTask = requires {
     requires CHasRun<TaskCandidate>;
     requires CHasDepends<TaskCandidate>;
-    requires std::default_initializable<TaskCandidate>;
+    requires (
+        std::default_initializable<TaskCandidate>
+        || concepts_detail::constructibleFromComputation<TaskCandidate>
+    );
 }; // <-- concept CTask
 
 namespace concepts_detail {

@@ -30,6 +30,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "concepts_prelude.hh"
 
 namespace noa::utils::combine {
@@ -47,6 +49,9 @@ namespace detail {
 
     template <template <typename...> class To, template <typename...> class Template, typename... Args>
     To<Args...> vConvert(Template<Args...>);
+
+    template <template <typename...> class Template, typename... Args>
+    Template<std::optional<Args>...> vAddOptional(Template<Args...>);
 
     /// \brief Dummy computation implementation
     ///
@@ -83,5 +88,9 @@ namespace detail {
 /// \tparam Who type to convert
 template <template <typename...> class To, typename Who>
 using VConvert = decltype(detail::vConvert<To>(std::declval<Who>()));
+
+/// \brief Add `std::optional<>` to all variadic template arguments
+template <typename Who>
+using VAddOptional = decltype(detail::vAddOptional(std::declval<Who>()));
 
 } // <-- namespace noa::utils::detail

@@ -54,25 +54,36 @@ namespace detail {
         virtual ~DynamicTaskBase() = default;
     }; // <-- struct DynamicTaskBase
 
-    /// \brief Task factory base class
+    /// \brief Task type tools base class
     ///
-    /// Used for creating tasks from type indices
-    struct TaskFactoryBase {
+    /// Provides tools for creation/handling of tasks of certain types via templated
+    /// derived types
+    struct TaskTypeToolsBase {
         /// \brief Create the task
-        virtual std::unique_ptr<DynamicTaskBase> create() const = 0;
+        virtual std::unique_ptr<DynamicTaskBase> create(DynamicComputation& comp) const = 0;
+        /// \brief Get task dependencies indices
+        virtual std::vector<std::size_t> dependencies() const = 0;
 
-        virtual ~TaskFactoryBase() = default;
-    }; // <-- class TaskFactoryBase
+        virtual ~TaskTypeToolsBase() = default;
+    }; // <-- class TaskTypeToolsBase
 
-    using TaskFactoryPtr = std::unique_ptr<TaskFactoryBase>;
+    using TaskTypeToolsPtr = std::unique_ptr<TaskTypeToolsBase>;
 
-    /// \brief Specific task factory
-    template <typename Task>
-    struct TaskFactory : TaskFactoryBase {
-        std::unique_ptr<DynamicTaskBase> create() const override {
-            return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(new Task())};
+    /// \brief Task type tools specialization
+    template <CTask Task>
+    struct TaskTypeTools : TaskTypeToolsBase {
+        std::unique_ptr<DynamicTaskBase> create(DynamicComputation& comp) const override {
+            if constexpr (std::default_initializable<Task>) {
+                return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(new Task())};
+            } else {
+                return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(new Task(comp))};
+            }
         } // <-- create()
-    }; // <-- class TaskFactory
+
+        std::vector<std::size_t> dependencies() const override {
+            return Task::dependencies();
+        }
+    }; // <-- class TaskTypeTools
 
     /// \brief Unique task index generator
     class DynamicTaskIndexer {
@@ -80,7 +91,7 @@ namespace detail {
         inline static std::size_t val = 0;
 
         /// \brief Task factory
-        inline static std::unordered_map<std::size_t, TaskFactoryPtr> factories;
+        inline static std::unordered_map<std::size_t, TaskTypeToolsPtr> factories;
         public:
         /// \brief Current index
         std::size_t index;
@@ -88,13 +99,18 @@ namespace detail {
         /// \brief Default constructor
         template <typename Task>
         DynamicTaskIndexer(Task* dummy) : index(++val) {
-            factories[index] = std::make_unique<TaskFactory<Task>>();
+            factories[index] = std::make_unique<TaskTypeTools<Task>>();
         }
 
         /// \brief Create a task of a cerain type
-        static std::unique_ptr<DynamicTaskBase> createTask(std::size_t type) {
-            return factories.at(type)->create();
+        static std::unique_ptr<DynamicTaskBase> createTask(std::size_t type, DynamicComputation& dynComp) {
+            return factories.at(type)->create(dynComp);
         } // <-- createTask()
+
+        /// \brief Get task dependencies
+        static std::vector<std::size_t> getDependencies(std::size_t type) {
+            return factories.at(type)->dependencies();
+        }
     }; // <-- class DynamicTaskIndexer
 
 } // <-- namespace detail

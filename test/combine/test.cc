@@ -14,6 +14,8 @@ using noa::utils::combine::CComputation;
 struct Task1 : public MakeDynamic<Task1> {
     using Depends = Nodeps;
 
+    int payload = 56;
+
     int input;
 
     void run(const CComputation auto& comp) {
@@ -25,6 +27,11 @@ struct Task2 : public MakeDynamic<Task2> {
     using Depends = DependencyList<Task1>;
 
     int result;
+
+    Task2(const CComputation auto& comp) {
+        std::cout << "I've just been constructed! Hooray!" << std::endl;
+        std::cout << "Task1 secret payload: " << comp.template get<Task1>().payload << std::endl;
+    }
 
     void run(const CComputation auto& comp) {
         // std::cout << "Task2 run()" << std::endl;

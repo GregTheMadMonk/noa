@@ -23,7 +23,7 @@ struct BenchmarkPart1 : public noa::utils::combine::MakeDynamic<BenchmarkPart1> 
 
     unsigned int input = 0;
 
-    static constexpr std::size_t bufSize = std::size_t{1} << 22;
+    static constexpr std::size_t bufSize = std::size_t{1} << 10;
 
     int buffer[bufSize];
 
