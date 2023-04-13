@@ -29,10 +29,11 @@
 #include <type_traits>
 
 #include "concepts_prelude.hh"
+#include "dummies.hh"
 
 namespace noa::utils::combine {
 
-template <TaskType...> struct DependencyList;
+template <CTask...> struct DependencyList;
 
 namespace detail {
 
@@ -72,7 +73,7 @@ namespace detail {
     ///
     /// The struct is declared inside of a \ref detail namespace in order to have access
     /// to \ref operator+
-    template <DependencyListType... DependencyLists> struct DepListJoiner {
+    template <CDependencyList... DependencyLists> struct DepListJoiner {
         using Type = std::remove_reference_t<
             decltype(
                 (std::declval<DependencyLists>() + ... + std::declval<DependencyList<>>())
@@ -87,7 +88,7 @@ namespace detail {
 /// See \ref detail::DepListJoiner
 ///
 /// \tparam DependencyLists an arbitrary number of dependency lists to join
-template <DependencyListType... DependencyLists>
+template <CDependencyList... DependencyLists>
 using DepListsJoin = typename detail::DepListJoiner<DependencyLists...>::Type;
 
 /// \brief Get the last of cless'es template arguments

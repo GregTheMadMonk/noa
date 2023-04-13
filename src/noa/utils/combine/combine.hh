@@ -26,6 +26,9 @@
  * This file includes all headers required to use Combine task management
  * system.
  *
+ * This file automatically includes Combine compile-time tests. If you don't want
+ * it, define `NOA_COMBINE_NO_STATIC_TEST` before including this header.
+ *
  * ## Combine TODO
  *
  * * **hasRun**: check that the function only accepts a const reference to the computation
@@ -58,3 +61,8 @@ namespace noa::utils::combine {
 namespace detail {}
 
 } // <-- namespace noa::utils::combine
+
+// Compile-time test
+#ifndef NOA_COMBINE_NO_STATIC_TEST
+#include "test.hh"
+#endif

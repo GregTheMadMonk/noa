@@ -30,8 +30,11 @@
 
 #include <tuple>
 
+#include <noa/utils/common_meta.hh>
+
 #include "concepts_prelude.hh"
 #include "dummies.hh"
+#include "task.hh"
 
 namespace noa::utils::combine {
 
@@ -56,30 +59,49 @@ namespace detail {
 /// be changed.
 ///
 /// \tparam Tasks tasks to be processed. Tasks are ordered as they follow in the list, left-to-right
-template <TaskType... Tasks>
+template <CTask... Tasks>
 struct StaticComputation {
     using TasksOrder = typename detail::Unravel<DependencyList<Tasks...>>::Type;
 
     private:
     /// \brief Task states are stored in a tuple
-    using State = VConvert<std::tuple, TasksOrder>;
-    /// \brief Task states
-    State state{};
+    using State = VAddOptional<VConvert<std::tuple, TasksOrder>>;
+    /// \brief Task state
+    State state;
 
     public:
+    /// \brief Default constructor
+    StaticComputation() {
+        std::apply(
+            [this] (auto&& ... tasks) {
+                const auto initTask = [this] <typename TaskType> (std::optional<TaskType>& task) {
+                    // The task would be either default-initializable or initializable from
+                    // reference to a computation
+                    if constexpr (std::default_initializable<TaskType>) {
+                        task = std::move(TaskType());
+                    } else {
+                        task = std::move(TaskType(*this));
+                    }
+                };
+
+                (initTask(tasks), ...);
+            }, this->state
+        );
+    }
+
     /// \brief Get a reference to a task state
     template <typename Task>
-    Task& get() { return std::get<Task>(this->state); }
+    constexpr Task& get() { return *std::get<std::optional<Task>>(this->state); }
 
     /// \brief Const-overload for the get() function
     template <typename Task>
-    const Task& get() const { return std::get<Task>(this->state); }
+    constexpr const Task& get() const { return *std::get<std::optional<Task>>(this->state); }
 
     /// \brief Run tasks sequentially
     void run() {
         std::apply(
             [this] (auto&& ... tasks) {
-                (tasks.run(*this), ...);
+                ((*tasks).run(*this), ...);
             }, this->state
         );
     } // <-- void run()

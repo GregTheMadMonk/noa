@@ -63,7 +63,7 @@ namespace detail {
         } // <-- setTasks(taskTypes)
 
         /// \brief Set required end tasks from template parameter pack
-        template <TaskType... Tasks>
+        template <CTask... Tasks>
         void setTasks() {
             input.clear();
             (input.push_back(Tasks::index()), ...);
@@ -73,42 +73,38 @@ namespace detail {
         void update() {
             this->tasks.clear();
 
-            for (std::size_t type : input) {
-                this->tasks.push_back(detail::DynamicTaskIndexer::createTask(type));
-            }
+            std::vector<std::size_t> typesOrder;
+            std::copy(input.begin(), input.end(), std::back_inserter(typesOrder));
 
             std::size_t offset = 1;
-            while (offset != this->tasks.size() + 1) {
-                const std::size_t index = this->tasks.size() - offset;
-                const auto depends = this->tasks.at(index)->depends();
+            while (offset != typesOrder.size() + 1) {
+                const std::size_t index = typesOrder.size() - offset;
+                const auto depends = detail::DynamicTaskIndexer::getDependencies(typesOrder.at(index));
 
+                // If the new dependency is alrady present in the list, move it to the start
                 for (std::size_t newTask : depends) {
-                    const auto it = std::find_if(
-                        this->tasks.begin(),
-                        this->tasks.end(),
-                        [newTask] (const auto& tp) { return tp->type() == newTask; }
-                    );
+                    const auto it = std::find(typesOrder.begin(), typesOrder.end(), newTask);
 
-                    // If the new dependecny is already present in the list, move it to the start
-                    if (it != this->tasks.end()) {
+                    if (it != typesOrder.end()) {
                         auto shifter = it;
-                        while (shifter != this->tasks.begin()) {
+                        while (shifter != typesOrder.begin()) {
                             std::swap(*shifter, *std::prev(shifter));
                             --shifter;
                         }
                     } else {
                         // Else insert to the front
-                        this->tasks.insert(this->tasks.begin(), detail::DynamicTaskIndexer::createTask(newTask));
+                        typesOrder.insert(typesOrder.begin(), newTask);
                     }
                 }
 
-                offset++;
+                ++offset;
             }
 
-            // Populate task map
+            // Initialize tasks and populate the map
             this->taskMap.clear();
-            for (std::size_t i = 0; i < this->tasks.size(); ++i) {
-                this->taskMap[this->tasks.at(i)->type()] = i;
+            for (std::size_t type : typesOrder) {
+                this->taskMap[type] = this->tasks.size();
+                this->tasks.push_back(detail::DynamicTaskIndexer::createTask(type, *this));
             }
         } // <-- update()
 

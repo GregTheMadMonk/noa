@@ -30,11 +30,13 @@
 
 #pragma once
 
+#include <optional>
+
 #include "concepts_prelude.hh"
 
 namespace noa::utils::combine {
 
-template <TaskType...> struct DependencyList;
+template <CTask...> struct DependencyList;
 
 namespace detail {
 
@@ -48,15 +50,18 @@ namespace detail {
     template <template <typename...> class To, template <typename...> class Template, typename... Args>
     To<Args...> vConvert(Template<Args...>);
 
+    template <template <typename...> class Template, typename... Args>
+    Template<std::optional<Args>...> vAddOptional(Template<Args...>);
+
     /// \brief Dummy computation implementation
     ///
     /// Every computation must have:
     /// * A template `get()` method for getting a specified task reference (with a `const` overload)
-    template <TaskType... TaskList> struct DummyComputation {
-        template <TaskType Task>
+    template <CTask... TaskList> struct DummyComputation {
+        template <CTask Task>
         Task& get();
 
-        template <TaskType Task>
+        template <CTask Task>
         const Task& get() const;
     }; // <-- struct DummyComputation
 
@@ -83,5 +88,9 @@ namespace detail {
 /// \tparam Who type to convert
 template <template <typename...> class To, typename Who>
 using VConvert = decltype(detail::vConvert<To>(std::declval<Who>()));
+
+/// \brief Add `std::optional<>` to all variadic template arguments
+template <typename Who>
+using VAddOptional = decltype(detail::vAddOptional(std::declval<Who>()));
 
 } // <-- namespace noa::utils::detail

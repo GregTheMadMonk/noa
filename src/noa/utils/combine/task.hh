@@ -49,6 +49,9 @@ namespace concepts_detail {
         { t.run(std::declval<detail::DummyComputation<>>()) } -> std::same_as<void>;
     } constexpr bool hasRun<Task> = true;
 
+    template <std::constructible_from<detail::DummyComputation<>> Task>
+    constexpr bool constructibleFromComputation<Task> = true;
+
 } // <-- namespace concepts_detail
 
 } // <-- namespace noa::utils::combine

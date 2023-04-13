@@ -67,8 +67,13 @@ class MakeDynamic : public detail::DynamicTaskBase {
 
     /// \brief Get dependencies type indices
     std::vector<std::size_t> depends() const noexcept override {
-        return dependencyHelper(typename Task::Depends{});
+        return dependencies();
     } // <-- depends()
+
+    /// \brief Get dependencies type indices from type name
+    static std::vector<std::size_t> dependencies() noexcept {
+        return dependencyHelper(typename Task::Depends{});
+    } // <-- dependencies()
 }; // <-- class MakeDynamic
 
 } // <-- namespace noa::utils::combine
