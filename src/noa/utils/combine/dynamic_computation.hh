@@ -126,7 +126,7 @@ namespace detail {
         template <typename Task>
         const Task& get() const {
             const auto& index = this->taskMap.at(Task::index());
-            return *dynamic_cast<Task*>(this->tasks[index].get());
+            return *dynamic_cast<const Task*>(this->tasks[index].get());
         } // <-- const Task& get() const
     }; // <-- class DynamicComputationT
 

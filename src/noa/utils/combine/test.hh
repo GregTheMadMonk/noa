@@ -18,40 +18,31 @@ namespace noa::utils::combine::test {
 // A dummy template
 template <typename...> struct Dummy1 {};
 
-// Does not satisfy any criteria to be a valid task
-struct NotATask {};
-// Has a proper dependency list suntype but nothing else
-struct HasDependsSubtype {
-    using Depends = Nodeps;
-};
-// Has a `Depends` subtype which is not an instance of `DependencyList`
-struct HasWrongDependsSubtype {
-    using Depends = Dummy1<>;
-};
-// Have a `run` method with a wrong signature
-struct HasWrongRunSignature1 {
-    void run();
-};
-struct HasWrongRunSignature2 {
-    int run(const CComputation auto&);
-};
-
 // Testing tasks
-struct Task1 : detail::DummyTask {};
-struct Task2 : detail::DummyTask {};
-struct Task3 : detail::DummyTask {};
+struct Task1 { void run(); };
+static_assert(CTask<Task1>, "Task1 is not a valid task");
+struct Task2 { void run(); };
+struct Task3 { void run(); };
 
-struct Task4 : detail::DummyTask {
-    using Depends = DependencyList<Task1>;
+struct Task4 {
+    void run(const Task1&) {}
+};
+static_assert(CTask<Task4>, "Task4 is not a valid task");
+
+struct Task5 {
+    void run(const Task2&) {}
 };
 
-struct Task5 : detail::DummyTask {
-    using Depends = DependencyList<Task2>;
+struct Task6 {
+    void run(Task1, Task3&, const Task5&) {}
 };
-
-struct Task6 : detail::DummyTask {
-    using Depends = DependencyList<Task1, Task3, Task5>;
-};
+static_assert(CTask<Task6>, "Task6 is not a valid task");
+static_assert(
+    std::same_as<
+        GetDependencies<Task6>,
+        DependencyList<Task1, Task3, Task5>
+    >, "Task6 GetDependencies failed"
+);
 
 // Test LastVArg
 static_assert(
@@ -61,51 +52,7 @@ static_assert(
     >, "LastVArg test failed"
 );
 
-// Test VConvert
-static_assert(
-    std::is_same_v<
-        VConvert<detail::DummyT, Dummy1<int, char, float>>,
-        detail::DummyT<int, char, float>
-    >, "VConvert test failed"
-);
-
 // Test concepts
-// Test CHasDepends
-static_assert(
-    !CHasDepends<NotATask>,
-    "CHasDepends: Task without a dependency list reported to have one"
-);
-static_assert(
-    CHasDepends<HasDependsSubtype>,
-    "CHasDepends: dependency list not detected on a type"
-);
-static_assert(
-    !CHasDepends<HasWrongDependsSubtype>,
-    "CHasDepends: dependency list type mismatch undetected"
-);
-static_assert(
-    CHasDepends<detail::DummyTask>,
-    "CHasDepends: DummyTask's valid `Depends` subtype undetected"
-);
-
-// Test CHasRun
-static_assert(
-    !CHasRun<HasDependsSubtype>,
-    "CHasRun: true on a type without a `run` method"
-);
-static_assert(
-    !CHasRun<HasWrongRunSignature1>,
-    "CHasRun: true on a type with a wrong `run` method signature (no agument)"
-);
-static_assert(
-    !CHasRun<HasWrongRunSignature2>,
-    "CHasRun: true on a type with a wrong `run` method signature (non-void return type)"
-);
-static_assert(
-    CHasRun<detail::DummyTask>,
-    "CHasRun: DummyTask's `run` method is not recognized"
-);
-
 // Test CTask
 static_assert(
     CTask<detail::DummyTask>,

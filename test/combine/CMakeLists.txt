@@ -10,3 +10,4 @@ add_executable(test_combine test.cc)
 
 # Link libraries
 target_link_libraries(test_combine PRIVATE ${PROJECT_NAME} gflags)
+target_compile_options(test_combine PRIVATE "-fconcepts-diagnostics-depth=4")

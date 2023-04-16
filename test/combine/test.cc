@@ -6,26 +6,20 @@
 
 #include "bench.hh"
 
-using noa::utils::combine::DependencyList;
-using noa::utils::combine::Nodeps;
 using noa::utils::combine::MakeDynamic;
 using noa::utils::combine::CComputation;
 
 struct Task1 : public MakeDynamic<Task1> {
-    using Depends = Nodeps;
-
     int payload = 56;
 
     int input;
 
-    void run(const CComputation auto& comp) {
+    void run() {
         // std::cout << "Task1 run()" << std::endl;
     }
 };
 
 struct Task2 : public MakeDynamic<Task2> {
-    using Depends = DependencyList<Task1>;
-
     int result;
 
     Task2(const CComputation auto& comp) {
@@ -33,32 +27,27 @@ struct Task2 : public MakeDynamic<Task2> {
         std::cout << "Task1 secret payload: " << comp.template get<Task1>().payload << std::endl;
     }
 
-    void run(const CComputation auto& comp) {
+    void run(const Task1& task1) {
         // std::cout << "Task2 run()" << std::endl;
-        result = comp.template get<Task1>().input * 2;
+        result = task1.input * 2;
     }
 };
 
 struct Task3 : public MakeDynamic<Task3> {
-    using Depends = DependencyList<Task1>;
-
     int result;
 
-    void run(const CComputation auto& comp) {
+    void run(const Task1& task1) {
         // std::cout << "Task3 run()" << std::endl;
-        const auto& task1 = comp.template get<Task1>();
         result = task1.input * task1.input;
     }
 };
 
 struct Task4 : public MakeDynamic<Task4> {
-    using Depends = DependencyList<Task2, Task3>;
-
     int result;
 
-    void run(const CComputation auto& comp) {
+    void run(const Task2& task2, const Task3& task3) {
         // std::cout << "Task4 run()" << std::endl;
-        result = comp.template get<Task2>().result + comp.template get<Task3>().result;
+        result = task2.result + task3.result;
     }
 };
 

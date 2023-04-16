@@ -43,7 +43,7 @@ namespace detail {
     /// \brief Base class for all dynamically-dispatched tasks
     struct DynamicTaskBase {
         /// \brief A virtual run() caller
-        virtual void runDynamic(const DynamicComputation&) = 0;
+        virtual void runDynamic(DynamicComputation&) = 0;
 
         /// \brief Type index getter
         virtual std::size_t type() const noexcept = 0;

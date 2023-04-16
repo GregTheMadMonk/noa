@@ -35,25 +35,9 @@
 
 #pragma once
 
+#include <noa/utils/common_meta.hh>
+
 namespace noa::utils::combine {
-
-/// \brief Namespace for detail structures used by concepts
-namespace concepts_detail {
-
-    template <typename> constexpr bool hasRun = false;
-    template <typename> constexpr bool hasDepends = false;
-
-} // <-- namespace concepts_detail
-
-/// \brief Checks is the task has a void-returning non-static `run`
-///        method that can accept a template computation
-template <typename Task>
-concept CHasRun = concepts_detail::hasRun<Task>;
-
-/// \brief Checks if the task has a `Depends` subtype that is an
-///        instance of \red DependencyList template
-template <typename Task>
-concept CHasDepends = concepts_detail::hasDepends<Task>;
 
 namespace concepts_detail {
 
@@ -64,8 +48,7 @@ namespace concepts_detail {
 /// \brief Checks if the class is a valid task
 template <typename TaskCandidate>
 concept CTask = requires {
-    requires CHasRun<TaskCandidate>;
-    requires CHasDepends<TaskCandidate>;
+    requires meta::CVTInstance<meta::GetArgTypes<&TaskCandidate::run>, std::tuple>;
     requires (
         std::default_initializable<TaskCandidate>
         || concepts_detail::constructibleFromComputation<TaskCandidate>

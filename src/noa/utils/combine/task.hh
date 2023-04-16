@@ -39,19 +39,32 @@ namespace noa::utils::combine {
 
 namespace concepts_detail {
 
-    template <typename Task>
-    requires requires (typename Task::Depends dl) {
-        [] <typename... Ts> (DependencyList<Ts...>) {} (dl);
-    } constexpr bool hasDepends<Task> = true;
-
-    template <typename Task>
-    requires requires (Task t) {
-        { t.run(std::declval<detail::DummyComputation<>>()) } -> std::same_as<void>;
-    } constexpr bool hasRun<Task> = true;
-
     template <std::constructible_from<detail::DummyComputation<>&> Task>
     constexpr bool constructibleFromComputation<Task> = true;
 
 } // <-- namespace concepts_detail
+
+/// \brief Task dependency list
+template <CTask Task>
+using GetDependencies = meta::VTCast<DependencyList, meta::VTRemoveCVR<meta::GetArgTypes<&Task::run>>>;
+
+template <typename Task, CComputation Computation>
+struct TaskInvoker {
+    void invoke(Task& task, Computation comp) {
+    }
+};
+
+/// \brief Invoke task and pass required dependencies
+template <typename Task, CComputation Computation>
+void invokeTask(Task& task, Computation& comp) {
+    static constexpr auto captureDependencies = [] <CTask... Tasks> (Computation& comp, DependencyList<Tasks...>) -> std::tuple<Tasks&...> {
+        return std::tie(comp.template get<Tasks>()...);
+    };
+
+    std::apply(
+        [&task] (auto& ... tasks) { task.run(tasks...); },
+        captureDependencies(comp, GetDependencies<Task>{})
+    );
+}
 
 } // <-- namespace noa::utils::combine

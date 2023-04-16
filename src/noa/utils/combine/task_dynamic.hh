@@ -55,8 +55,8 @@ class MakeDynamic : public detail::DynamicTaskBase {
     // of instantiation
 
     /// \brief Calls a `run` method on itself
-    void runDynamic(const DynamicComputation& comp) override {
-        dynamic_cast<Task*>(this)->run(comp);
+    void runDynamic(DynamicComputation& comp) override {
+        invokeTask(*dynamic_cast<Task*>(this), comp);
     } // <-- void runDynamic()
 
     /// \brief Get type index from type name
@@ -72,7 +72,7 @@ class MakeDynamic : public detail::DynamicTaskBase {
 
     /// \brief Get dependencies type indices from type name
     static std::vector<std::size_t> dependencies() noexcept {
-        return dependencyHelper(typename Task::Depends{});
+        return dependencyHelper(GetDependencies<Task>{});
     } // <-- dependencies()
 }; // <-- class MakeDynamic
 
@@ -80,10 +80,7 @@ namespace detail {
 
     // Define DummyTask
     struct DummyTask : public MakeDynamic<DummyTask> {
-        using Depends = DependencyList<>;
-
-        template <typename Computation>
-        void run(const Computation&) {}
+        void run() {}
     }; // <-- struct DummyTask
 
 }

@@ -65,7 +65,7 @@ struct StaticComputation {
 
     private:
     /// \brief Task states are stored in a tuple
-    using State = VAddOptional<VConvert<std::tuple, TasksOrder>>;
+    using State = meta::VTApply<std::optional, meta::VTCast<std::tuple, TasksOrder>>;
     /// \brief Task state
     State state;
 
@@ -101,7 +101,7 @@ struct StaticComputation {
     void run() {
         std::apply(
             [this] (auto&& ... tasks) {
-                (tasks->run(*this), ...);
+                (invokeTask(*tasks, *this), ...);
             }, this->state
         );
     } // <-- void run()
