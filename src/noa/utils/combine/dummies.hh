@@ -73,12 +73,9 @@ namespace detail {
     ///
     /// Here, in `run` prototype, `Computation` is not constrained to avoid
     /// circular dependency in a concept
-    struct DummyTask {
-        using Depends = DependencyList<>;
-
-        template <typename Computation>
-        void run(const Computation&); // No implementation needed or is provided for a dummy example
-    }; // <-- struct DummyTask
+    ///
+    /// Defined in task_dynamic.hh
+    struct DummyTask;
 
 } // <-- namespace detail
 

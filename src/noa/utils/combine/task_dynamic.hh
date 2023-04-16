@@ -76,4 +76,16 @@ class MakeDynamic : public detail::DynamicTaskBase {
     } // <-- dependencies()
 }; // <-- class MakeDynamic
 
+namespace detail {
+
+    // Define DummyTask
+    struct DummyTask : public MakeDynamic<DummyTask> {
+        using Depends = DependencyList<>;
+
+        template <typename Computation>
+        void run(const Computation&) {}
+    }; // <-- struct DummyTask
+
+}
+
 } // <-- namespace noa::utils::combine

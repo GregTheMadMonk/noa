@@ -100,14 +100,18 @@ int main(int argc, char** argv) {
 
     std::cout << "Static:" << std::endl;
     StaticComputation<BenchmarkBody> bcomp;
+    bcomp.template get<BenchmarkPart1>().input = seed;
     BMARK(bcomp.run);
+    std::cout << "Result: " << bcomp.template get<BenchmarkBody>().result << std::endl;
 
     DynamicComputation bdcomp;
     bdcomp.template setTasks<BenchmarkBody>();
     bdcomp.update();
+    bdcomp.template get<BenchmarkPart1>().input = seed;
 
     std::cout << "Dynamic:" << std::endl;
     BMARK(bdcomp.run);
+    std::cout << "Result: " << bdcomp.template get<BenchmarkBody>().result << std::endl;
 
     return 0;
 }

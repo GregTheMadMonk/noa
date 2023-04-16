@@ -101,7 +101,7 @@ struct StaticComputation {
     void run() {
         std::apply(
             [this] (auto&& ... tasks) {
-                ((*tasks).run(*this), ...);
+                (tasks->run(*this), ...);
             }, this->state
         );
     } // <-- void run()
