@@ -86,14 +86,14 @@ namespace detail {
     class DynamicTaskIndexer {
         /// \brief Next index to dispatch
         inline static std::size_t val = 0;
+        /// \brief Current index
+        std::size_t index;
 
         /// \brief Task factory
         inline static std::unordered_map<std::size_t, TaskTypeToolsPtr> factories;
         /// \brief Task names
         inline static std::unordered_map<std::string, std::size_t>      names;
         public:
-        /// \brief Current index
-        std::size_t index;
 
         /// \brief Default constructor
         template <typename Task>
@@ -103,6 +103,9 @@ namespace detail {
                 names[Task::name] = index;
             }
         }
+        
+        /// \brief Index getter
+        std::size_t getIndex() { return index; }
 
         /// \brief Create a task of a cerain type
         static std::unique_ptr<DynamicTaskBase> createTask(std::size_t type, DynamicComputation& dynComp) {

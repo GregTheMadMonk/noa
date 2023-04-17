@@ -60,10 +60,10 @@ class MakeDynamic : public detail::DynamicTaskBase {
     } // <-- void runDynamic()
 
     /// \brief Get type index from type name
-    static std::size_t index() noexcept { return indexer.index; }
+    static std::size_t index() noexcept { return indexer.getIndex(); }
 
     /// \brief Get type index from a dynamically polymorphic reference/pointer
-    std::size_t type() const noexcept override { return indexer.index; }
+    std::size_t type() const noexcept override { return indexer.getIndex(); }
 
     /// \brief Get dependencies type indices
     std::vector<std::size_t> depends() const noexcept override {
