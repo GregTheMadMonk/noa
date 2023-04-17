@@ -37,6 +37,7 @@ namespace detail {
 }
 
 using DynamicComputation = detail::DynamicComputationT<>;
+const auto& getTaskNames();
 
 namespace detail {
 
@@ -88,6 +89,8 @@ namespace detail {
 
         /// \brief Task factory
         inline static std::unordered_map<std::size_t, TaskTypeToolsPtr> factories;
+        /// \brief Task names
+        inline static std::unordered_map<std::string, std::size_t>      names;
         public:
         /// \brief Current index
         std::size_t index;
@@ -96,6 +99,9 @@ namespace detail {
         template <typename Task>
         DynamicTaskIndexer(Task* dummy) : index(++val) {
             factories[index] = std::make_unique<TaskTypeTools<Task>>();
+            if constexpr (CHasName<Task>) {
+                names[Task::name] = index;
+            }
         }
 
         /// \brief Create a task of a cerain type
@@ -107,8 +113,13 @@ namespace detail {
         static std::vector<std::size_t> getDependencies(std::size_t type) {
             return factories.at(type)->dependencies();
         }
+
+        friend const auto& ::noa::utils::combine::getTaskNames();
     }; // <-- class DynamicTaskIndexer
 
 } // <-- namespace detail
+
+/// \brief Get task type name->index map
+const auto& getTaskNames() { return detail::DynamicTaskIndexer::names; }
 
 } // <-- namespace noa::utils::combine

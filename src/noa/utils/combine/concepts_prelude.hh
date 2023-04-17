@@ -45,6 +45,10 @@ concept CTask = requires {
     requires meta::CVTInstance<meta::GetArgTypes<&TaskCandidate::run>, std::tuple>;
 }; // <-- concept CTask
 
+/// \brief Does the task have a name
+template <typename Task>
+concept CHasName = CTask<Task> && std::convertible_to<decltype(Task::name), const char* const>;
+
 namespace concepts_detail {
 
     template <typename> constexpr bool dependencyListType = false;

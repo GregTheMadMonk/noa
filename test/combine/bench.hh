@@ -37,7 +37,7 @@ struct BenchmarkPart1 : public noa::utils::combine::MakeDynamic<BenchmarkPart1> 
 
     long sumNear(std::size_t i) const {
         long ret = 0;
-        static constexpr auto window = std::size_t{1} << 8;
+        static constexpr auto window = std::size_t{1} << 15;
         const std::size_t min = (i > window - 1) ? (i - window) : 0;
         const std::size_t max = (i < bufSize - window + 1) ? (i + window) : bufSize;
         for (std::size_t j = min; j < max; ++j) {
@@ -54,19 +54,8 @@ struct BenchmarkBody : public noa::utils::combine::MakeDynamic<BenchmarkBody> {
     void run(BenchmarkPart1& pt1) {
         result = 0;
 
-        const auto sumNear = [pt1] (std::size_t i) {
-            long ret = 0;
-            static constexpr auto window = std::size_t{1} << 13;
-            const std::size_t min = (i > window - 1) ? (i - window) : 0;
-            const std::size_t max = (i < pt1.bufSize - window + 1) ? (i + window) : pt1.bufSize;
-            for (std::size_t j = min; j < max; ++j) {
-                ret += pt1.buffer[j];
-            }
-            return ret;
-        };
-
         for (std::size_t i = 0; i < BenchmarkPart1::bufSize; ++i) {
-            result += sumNear(i);
+            result += pt1.sumNear(i);
         }
     } // <-- BenchmarkBody::run
 }; // <-- struct BenchmarkBody

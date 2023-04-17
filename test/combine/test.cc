@@ -34,6 +34,8 @@ struct Task2 : public MakeDynamic<Task2> {
 };
 
 struct Task3 : public MakeDynamic<Task3> {
+    static constexpr auto name = "task3";
+
     int result;
 
     void run(const Task1& task1) {
@@ -43,6 +45,8 @@ struct Task3 : public MakeDynamic<Task3> {
 };
 
 struct Task4 : public MakeDynamic<Task4> {
+    static constexpr auto name = "task4";
+
     int result;
 
     void run(const Task2& task2, const Task3& task3) {
@@ -56,6 +60,11 @@ constexpr std::size_t runs = std::size_t{1} << 25;
 // Entry point
 int main(int argc, char** argv) {
     std::cout << "\'Combine\' (NOA task manager) functional tests." << std::endl;
+
+    std::cout << "Dynamic task names database:" << std::endl;
+    for (const auto& [ name, index ] : noa::utils::combine::getTaskNames()) {
+        std::cout << name << " -> " << index << std::endl;
+    }
 
     std::cout << "StaticComputation:" << std::endl;
     using noa::utils::combine::StaticComputation;
@@ -73,8 +82,7 @@ int main(int argc, char** argv) {
     using noa::utils::combine::DynamicComputation;
     DynamicComputation dcomp;
     const std::size_t task4Index = Task4::index(); // No `constexpr`! Fully run-time
-    dcomp.setTasks({ task4Index });
-    dcomp.update();
+    dcomp.setTasks({ "task4" });
     dcomp.template get<Task1>().input = 3;
 
     BMARK([&dcomp] {
@@ -95,7 +103,6 @@ int main(int argc, char** argv) {
 
     DynamicComputation bdcomp;
     bdcomp.template setTasks<BenchmarkBody>();
-    bdcomp.update();
     bdcomp.template get<BenchmarkPart1>().input = seed;
 
     std::cout << "Dynamic:" << std::endl;

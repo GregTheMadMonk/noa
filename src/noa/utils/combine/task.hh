@@ -30,6 +30,7 @@
 #pragma once
 
 #include <type_traits>
+#include <typeinfo>
 
 #include "concepts_prelude.hh"
 #include "dummies.hh"
@@ -83,7 +84,7 @@ Task* newTask(Computation& comp) {
             detail::captureDependencies(comp, GetConstructorDependencies<Task>{})
         )
     );
-} // <-- constructTask()
+} // <-- newTask()
 
 /// \brief Invoke task and pass required dependencies
 template <CTask Task, CComputation Computation>

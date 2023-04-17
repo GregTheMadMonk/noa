@@ -60,13 +60,22 @@ namespace detail {
         /// \brief Set required end tasks from type indices
         void setTasks(const std::vector<std::size_t>& taskTypes) {
             input = taskTypes;
+            update();
         } // <-- setTasks(taskTypes)
+
+        /// \brief Set required end tasks from names
+        void setTasks(const std::vector<std::string>& taskNames) {
+            input.clear();
+            for (const auto& name : taskNames) input.push_back(getTaskNames().at(name));
+            update();
+        } // <-- setTasks(taskNames)
 
         /// \brief Set required end tasks from template parameter pack
         template <CTask... Tasks>
         void setTasks() {
             input.clear();
             (input.push_back(Tasks::index()), ...);
+            update();
         } // <-- setTasks()
 
         /// \brief Update task queue with input
