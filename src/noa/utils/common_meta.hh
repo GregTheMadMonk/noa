@@ -14,19 +14,17 @@ namespace noa::utils::meta {
 
 namespace detail {
 
-    #warning "This is a workaround for a g++ bug that doesn't allow us to use a lambda in GetSingleArg"
-    template <
-        template <typename> class Template,
-        typename Argument
-    > Argument getSingleArg(Template<Argument>);
+    template <typename T>
+    struct GetSingleArgImpl {};
+
+    template <template <typename> typename T, typename Arg>
+    struct GetSingleArgImpl<T<Arg>> { using Type = Arg; };
 
 } // <-- namespace detail
 
 /// \brief Get a single template argument
 template <typename T>
-using GetSingleArg = decltype(
-    detail::getSingleArg(std::declval<T>())
-); // <-- using GetSingleArg
+using GetSingleArg = detail::GetSingleArgImpl<T>::Type;
 
 /// \brief Compile-time testing
 namespace test {
@@ -71,6 +69,99 @@ namespace detail {
 /// * `void f(double) {}; static_assert(std::same_as<GetArgTypes<f>, std::tuple<double>);`
 template <auto callable, template <typename...> class To = std::tuple>
 using GetArgTypes = decltype(detail::getArgTypes(callable));
+
+namespace detail {
+
+    template <typename Arg>
+    struct ArgTag {};
+
+    template <typename Class, std::size_t num>
+    struct Tag {
+        friend auto loophole(Tag<Class, num>);
+    };
+
+    template <typename Class, typename Arg, std::size_t num>
+    struct TagDef {
+        friend auto loophole(Tag<Class, num>) { return ArgTag<Arg>{}; }
+        constexpr friend int cloophole(Tag<Class, num>) { return 0; }
+    };
+
+    template <typename Class, typename Arg, std::size_t num>
+    requires std::same_as<Class, std::remove_cv_t<std::remove_reference_t<Arg>>> || std::same_as<Class, void>
+    struct TagDef<Class, Arg, num> {};
+
+    /// \brief Placeholder structure, implicitly convertible to any type except `Ban`
+    ///
+    /// \tparam Ban ban casting to this type or its references
+    template <std::size_t index = 0, typename Ban = void>
+    struct Placeholder {
+        using PTag = Tag<Ban, index>;
+
+        template <typename To, std::size_t = sizeof(TagDef<Ban, To, index>)>
+        requires (!std::same_as<std::remove_cv_t<std::remove_reference_t<To>>, Ban>)
+        constexpr operator To&();
+        template <typename To, std::size_t = sizeof(TagDef<Ban, To, index>)>
+        requires (!std::same_as<std::remove_cv_t<std::remove_reference_t<To>>, Ban>)
+        constexpr operator To&&();
+    };
+
+    template <typename Class, typename... Args>
+    constexpr std::size_t getConstructorArgsNum() {
+        if constexpr (std::constructible_from<Class, Args...>) {
+            return sizeof...(Args);
+        } else {
+            return getConstructorArgsNum<Class, Args..., Placeholder<sizeof...(Args), Class>>();
+        }
+    }
+
+    template <typename Class, typename... Args>
+    struct GetConstructorArgs {
+        using Type = GetConstructorArgs<Class, Args..., Placeholder<sizeof...(Args), Class>>::Type;
+    };
+
+    template <typename Class, typename... Args>
+    requires std::constructible_from<Class, Args...>
+    struct GetConstructorArgs<Class, Args...> {
+        using Type = std::tuple<GetSingleArg<decltype(loophole(std::declval<typename Args::PTag>()))>...>;
+    };
+
+} // <-- namespace detail
+
+/// \brief Get class constructor argument list
+///
+/// Fetches the arguments of the constructor with the smallest amount of arguments that
+/// is not a move- or copy- constructor
+///
+/// Does not preserve reference types. Does, however, preserve const-qualifiers.
+///
+/// An implementation inspired by https://stackoverflow.com/a/54493136
+template <typename Class>
+using GetConstructorArgTypes = detail::GetConstructorArgs<Class>::Type;
+
+namespace test {
+
+    struct TestCArgs {
+        TestCArgs(int, const float&, char&&);
+    };
+
+    static_assert(
+        std::constructible_from<TestCArgs, detail::Placeholder<>, detail::Placeholder<>, detail::Placeholder<>>,
+        "Placeholder test failed"
+    );
+
+    static_assert(
+        detail::getConstructorArgsNum<TestCArgs>() == 3,
+        "getConstructorArgsNum test failed"
+    );
+
+    static_assert(
+        std::same_as<
+            detail::GetConstructorArgs<TestCArgs>::Type,
+            std::tuple<int, const float, char>
+        >, "detail::GetConstructorArgs test failed"
+    );
+
+} // <-- namespace test
 
 namespace detail {
 

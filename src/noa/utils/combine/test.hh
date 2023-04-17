@@ -25,9 +25,16 @@ struct Task2 { void run(); };
 struct Task3 { void run(); };
 
 struct Task4 {
-    void run(const Task1&) {}
+    Task4(const Task1&) {}
+    void run() {}
 };
 static_assert(CTask<Task4>, "Task4 is not a valid task");
+static_assert(
+    std::same_as<
+        GetDependencies<Task4>,
+        DependencyList<Task1>
+    >, "Task4 constructor dependency detection failed"
+);
 
 struct Task5 {
     void run(const Task2&) {}

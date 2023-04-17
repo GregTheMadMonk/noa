@@ -22,9 +22,9 @@ struct Task1 : public MakeDynamic<Task1> {
 struct Task2 : public MakeDynamic<Task2> {
     int result;
 
-    Task2(const CComputation auto& comp) {
+    Task2(const Task1& task1) {
         std::cout << "I've just been constructed! Hooray!" << std::endl;
-        std::cout << "Task1 secret payload: " << comp.template get<Task1>().payload << std::endl;
+        std::cout << "Task1 secret payload: " << task1.payload << std::endl;
     }
 
     void run(const Task1& task1) {

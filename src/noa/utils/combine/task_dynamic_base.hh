@@ -73,11 +73,7 @@ namespace detail {
     template <CTask Task>
     struct TaskTypeTools : TaskTypeToolsBase {
         std::unique_ptr<DynamicTaskBase> create(DynamicComputation& comp) const override {
-            if constexpr (std::default_initializable<Task>) {
-                return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(new Task())};
-            } else {
-                return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(new Task(comp))};
-            }
+            return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(newTask<Task>(comp))};
         } // <-- create()
 
         std::vector<std::size_t> dependencies() const override {

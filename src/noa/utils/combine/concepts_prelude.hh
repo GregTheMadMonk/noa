@@ -39,20 +39,10 @@
 
 namespace noa::utils::combine {
 
-namespace concepts_detail {
-
-    template <typename> constexpr bool constructibleFromComputation = false;
-
-} // <-- namespace concepts_detail
-
 /// \brief Checks if the class is a valid task
 template <typename TaskCandidate>
 concept CTask = requires {
     requires meta::CVTInstance<meta::GetArgTypes<&TaskCandidate::run>, std::tuple>;
-    requires (
-        std::default_initializable<TaskCandidate>
-        || concepts_detail::constructibleFromComputation<TaskCandidate>
-    );
 }; // <-- concept CTask
 
 namespace concepts_detail {
