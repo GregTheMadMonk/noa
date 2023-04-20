@@ -30,6 +30,7 @@
 #pragma once
 
 #include <type_traits>
+#include <typeinfo>
 
 #include "concepts_prelude.hh"
 #include "dummies.hh"
@@ -37,21 +38,61 @@
 
 namespace noa::utils::combine {
 
-namespace concepts_detail {
+/// \brief Get dependencies generated from task's `run` method
+template <CTask Task>
+using GetRunDependencies = meta::VTCast<
+    DependencyList,
+    meta::VTRemoveCVR<meta::GetArgTypes<&Task::run>>
+>;
 
-    template <typename Task>
-    requires requires (typename Task::Depends dl) {
-        [] <typename... Ts> (DependencyList<Ts...>) {} (dl);
-    } constexpr bool hasDepends<Task> = true;
+/// \brief Get dependencies generated from a task's constructor
+template <CTask Task>
+using GetConstructorDependencies = meta::VTCast<
+    DependencyList,
+    meta::VTRemoveCVR<meta::GetConstructorArgTypes<Task>>
+>;
 
-    template <typename Task>
-    requires requires (Task t) {
-        { t.run(std::declval<detail::DummyComputation<>>()) } -> std::same_as<void>;
-    } constexpr bool hasRun<Task> = true;
+/// \brief Task dependency list
+template <CTask Task>
+using GetDependencies = DepListsJoin<
+    GetConstructorDependencies<Task>,
+    GetRunDependencies<Task>
+>;
 
-    template <std::constructible_from<detail::DummyComputation<>&> Task>
-    constexpr bool constructibleFromComputation<Task> = true;
+namespace detail {
+    template <CComputation Computation, CTask... Tasks>
+    std::tuple<Tasks&...> captureDependencies(Computation& comp, DependencyList<Tasks...>) {
+        return std::tie(comp.template get<Tasks>()...);
+    };
+}
 
-} // <-- namespace concepts_detail
+/// \brief Construct task and pass required dependencies into its constructor
+template <CTask Task, CComputation Computation>
+Task constructTask(Computation& comp) {
+    return std::apply(
+        [] (auto& ... tasks) { return Task(tasks...); },
+        detail::captureDependencies(comp, GetConstructorDependencies<Task>{})
+    );
+} // <-- constructTask()
+
+/// \brief Construct task via `new` and pass required dependencies into its constructor
+template <CTask Task, CComputation Computation>
+Task* newTask(Computation& comp) {
+    return std::move(
+        std::apply(
+            [] (auto& ... tasks) { return new Task(tasks...); },
+            detail::captureDependencies(comp, GetConstructorDependencies<Task>{})
+        )
+    );
+} // <-- newTask()
+
+/// \brief Invoke task and pass required dependencies
+template <CTask Task, CComputation Computation>
+void invokeTask(Task& task, Computation& comp) {
+    std::apply(
+        [&task] (auto& ... tasks) { task.run(tasks...); },
+        detail::captureDependencies(comp, GetRunDependencies<Task>{})
+    );
+} // <-- invokeTask()
 
 } // <-- namespace noa::utils::combine

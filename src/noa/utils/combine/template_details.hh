@@ -74,11 +74,9 @@ namespace detail {
     /// The struct is declared inside of a \ref detail namespace in order to have access
     /// to \ref operator+
     template <CDependencyList... DependencyLists> struct DepListJoiner {
-        using Type = std::remove_reference_t<
-            decltype(
-                (std::declval<DependencyLists>() + ... + std::declval<DependencyList<>>())
-            )
-        >;
+        using Type = decltype(
+            (std::declval<DependencyLists>() + ... + std::declval<DependencyList<>>())
+        );
     };
 
 } // <-- namespace detail

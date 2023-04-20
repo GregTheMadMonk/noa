@@ -60,13 +60,22 @@ namespace detail {
         /// \brief Set required end tasks from type indices
         void setTasks(const std::vector<std::size_t>& taskTypes) {
             input = taskTypes;
+            update();
         } // <-- setTasks(taskTypes)
+
+        /// \brief Set required end tasks from names
+        void setTasks(const std::vector<std::string>& taskNames) {
+            input.clear();
+            for (const auto& name : taskNames) input.push_back(getTaskNames().at(name));
+            update();
+        } // <-- setTasks(taskNames)
 
         /// \brief Set required end tasks from template parameter pack
         template <CTask... Tasks>
         void setTasks() {
             input.clear();
             (input.push_back(Tasks::index()), ...);
+            update();
         } // <-- setTasks()
 
         /// \brief Update task queue with input
@@ -74,7 +83,8 @@ namespace detail {
             this->tasks.clear();
 
             std::vector<std::size_t> typesOrder;
-            std::copy(input.begin(), input.end(), std::back_inserter(typesOrder));
+            const auto input_end = std::unique(input.begin(), input.end());
+            std::copy(input.begin(), input_end, std::back_inserter(typesOrder));
 
             std::size_t offset = 1;
             while (offset != typesOrder.size() + 1) {
@@ -126,7 +136,7 @@ namespace detail {
         template <typename Task>
         const Task& get() const {
             const auto& index = this->taskMap.at(Task::index());
-            return *dynamic_cast<Task*>(this->tasks[index].get());
+            return *dynamic_cast<const Task*>(this->tasks[index].get());
         } // <-- const Task& get() const
     }; // <-- class DynamicComputationT
 

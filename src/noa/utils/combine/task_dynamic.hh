@@ -55,15 +55,15 @@ class MakeDynamic : public detail::DynamicTaskBase {
     // of instantiation
 
     /// \brief Calls a `run` method on itself
-    void runDynamic(const DynamicComputation& comp) override {
-        dynamic_cast<Task*>(this)->run(comp);
+    void runDynamic(DynamicComputation& comp) override {
+        invokeTask(*dynamic_cast<Task*>(this), comp);
     } // <-- void runDynamic()
 
     /// \brief Get type index from type name
-    static std::size_t index() noexcept { return indexer.index; }
+    static std::size_t index() noexcept { return indexer.getIndex(); }
 
     /// \brief Get type index from a dynamically polymorphic reference/pointer
-    std::size_t type() const noexcept override { return indexer.index; }
+    std::size_t type() const noexcept override { return indexer.getIndex(); }
 
     /// \brief Get dependencies type indices
     std::vector<std::size_t> depends() const noexcept override {
@@ -72,8 +72,17 @@ class MakeDynamic : public detail::DynamicTaskBase {
 
     /// \brief Get dependencies type indices from type name
     static std::vector<std::size_t> dependencies() noexcept {
-        return dependencyHelper(typename Task::Depends{});
+        return dependencyHelper(GetDependencies<Task>{});
     } // <-- dependencies()
 }; // <-- class MakeDynamic
+
+namespace detail {
+
+    // Define DummyTask
+    struct DummyTask : public MakeDynamic<DummyTask> {
+        void run() {}
+    }; // <-- struct DummyTask
+
+}
 
 } // <-- namespace noa::utils::combine

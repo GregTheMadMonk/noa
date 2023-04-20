@@ -47,12 +47,6 @@ namespace detail {
         using Transform = Template<Args...>;
     };
 
-    template <template <typename...> class To, template <typename...> class Template, typename... Args>
-    To<Args...> vConvert(Template<Args...>);
-
-    template <template <typename...> class Template, typename... Args>
-    Template<std::optional<Args>...> vAddOptional(Template<Args...>);
-
     /// \brief Dummy computation implementation
     ///
     /// Every computation must have:
@@ -67,30 +61,9 @@ namespace detail {
 
     /// \brief Dummy task implementation
     ///
-    /// To be a task, a class should have:
-    /// * A `Depends` subtype
-    /// * A `run` method that accepts a const computation reference as an argument
-    ///
-    /// Here, in `run` prototype, `Computation` is not constrained to avoid
-    /// circular dependency in a concept
-    struct DummyTask {
-        using Depends = DependencyList<>;
-
-        template <typename Computation>
-        void run(const Computation&); // No implementation needed or is provided for a dummy example
-    }; // <-- struct DummyTask
+    /// Defined in task_dynamic.hh
+    struct DummyTask;
 
 } // <-- namespace detail
-
-/// \brief Convert one variadic template into another
-///
-/// \tparam To target variadic template
-/// \tparam Who type to convert
-template <template <typename...> class To, typename Who>
-using VConvert = decltype(detail::vConvert<To>(std::declval<Who>()));
-
-/// \brief Add `std::optional<>` to all variadic template arguments
-template <typename Who>
-using VAddOptional = decltype(detail::vAddOptional(std::declval<Who>()));
 
 } // <-- namespace noa::utils::detail

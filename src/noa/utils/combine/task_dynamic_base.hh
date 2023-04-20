@@ -37,13 +37,14 @@ namespace detail {
 }
 
 using DynamicComputation = detail::DynamicComputationT<>;
+const auto& getTaskNames();
 
 namespace detail {
 
     /// \brief Base class for all dynamically-dispatched tasks
     struct DynamicTaskBase {
         /// \brief A virtual run() caller
-        virtual void runDynamic(const DynamicComputation&) = 0;
+        virtual void runDynamic(DynamicComputation&) = 0;
 
         /// \brief Type index getter
         virtual std::size_t type() const noexcept = 0;
@@ -73,11 +74,7 @@ namespace detail {
     template <CTask Task>
     struct TaskTypeTools : TaskTypeToolsBase {
         std::unique_ptr<DynamicTaskBase> create(DynamicComputation& comp) const override {
-            if constexpr (std::default_initializable<Task>) {
-                return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(new Task())};
-            } else {
-                return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(new Task(comp))};
-            }
+            return std::unique_ptr<DynamicTaskBase>{dynamic_cast<DynamicTaskBase*>(newTask<Task>(comp))};
         } // <-- create()
 
         std::vector<std::size_t> dependencies() const override {
@@ -89,18 +86,26 @@ namespace detail {
     class DynamicTaskIndexer {
         /// \brief Next index to dispatch
         inline static std::size_t val = 0;
+        /// \brief Current index
+        std::size_t index;
 
         /// \brief Task factory
         inline static std::unordered_map<std::size_t, TaskTypeToolsPtr> factories;
+        /// \brief Task names
+        inline static std::unordered_map<std::string, std::size_t>      names;
         public:
-        /// \brief Current index
-        std::size_t index;
 
         /// \brief Default constructor
         template <typename Task>
         DynamicTaskIndexer(Task* dummy) : index(++val) {
             factories[index] = std::make_unique<TaskTypeTools<Task>>();
+            if constexpr (CHasName<Task>) {
+                names[Task::name] = index;
+            }
         }
+        
+        /// \brief Index getter
+        std::size_t getIndex() { return index; }
 
         /// \brief Create a task of a cerain type
         static std::unique_ptr<DynamicTaskBase> createTask(std::size_t type, DynamicComputation& dynComp) {
@@ -111,8 +116,13 @@ namespace detail {
         static std::vector<std::size_t> getDependencies(std::size_t type) {
             return factories.at(type)->dependencies();
         }
+
+        friend const auto& ::noa::utils::combine::getTaskNames();
     }; // <-- class DynamicTaskIndexer
 
 } // <-- namespace detail
+
+/// \brief Get task type name->index map
+const auto& getTaskNames() { return detail::DynamicTaskIndexer::names; }
 
 } // <-- namespace noa::utils::combine

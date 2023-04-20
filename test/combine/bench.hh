@@ -5,6 +5,7 @@
 
 // Standard library
 #include <chrono>
+#include <vector>
 
 // NOA headers
 #include <noa/utils/combine/combine.hh>
@@ -19,23 +20,26 @@
     }
 
 struct BenchmarkPart1 : public noa::utils::combine::MakeDynamic<BenchmarkPart1> {
-    using Depends = noa::utils::combine::Nodeps;
-
     unsigned int input = 0;
 
-    static constexpr std::size_t bufSize = std::size_t{1} << 10;
+    static constexpr std::size_t bufSize = std::size_t{1} << 22;
 
-    int buffer[bufSize];
+    std::vector<int> buffer;
 
-    void run(const noa::utils::combine::CComputation auto& comp) {
+    BenchmarkPart1() {
+        buffer = std::vector<int>(bufSize);
+    }
+
+    void run() {
         std::srand(input);
-        for (std::size_t i = 0; i < bufSize; ++i) buffer[i] = std::rand();
+        for (auto& v : buffer) v = std::rand();
     } // <-- BenchmarkBody::run
 
     long sumNear(std::size_t i) const {
         long ret = 0;
-        const std::size_t min = (i > 2) ? (i - 3) : 0;
-        const std::size_t max = (i < bufSize - 2) ? (i + 3) : bufSize;
+        static constexpr auto window = std::size_t{1} << 15;
+        const std::size_t min = (i > window - 1) ? (i - window) : 0;
+        const std::size_t max = (i < bufSize - window + 1) ? (i + window) : bufSize;
         for (std::size_t j = min; j < max; ++j) {
             ret += buffer[j];
         }
@@ -45,13 +49,11 @@ struct BenchmarkPart1 : public noa::utils::combine::MakeDynamic<BenchmarkPart1> 
 
 /// \brief Combine benchmark body
 struct BenchmarkBody : public noa::utils::combine::MakeDynamic<BenchmarkBody> {
-    using Depends = noa::utils::combine::DependencyList<BenchmarkPart1>;
-
     long result;
 
-    void run(const noa::utils::combine::CComputation auto& comp) {
+    void run(BenchmarkPart1& pt1) {
         result = 0;
-        const auto& pt1 = comp.template get<BenchmarkPart1>();
+
         for (std::size_t i = 0; i < BenchmarkPart1::bufSize; ++i) {
             result += pt1.sumNear(i);
         }

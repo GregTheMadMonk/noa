@@ -65,7 +65,7 @@ struct StaticComputation {
 
     private:
     /// \brief Task states are stored in a tuple
-    using State = VAddOptional<VConvert<std::tuple, TasksOrder>>;
+    using State = meta::VTApply<std::optional, meta::VTCast<std::tuple, TasksOrder>>;
     /// \brief Task state
     State state;
 
@@ -75,13 +75,7 @@ struct StaticComputation {
         std::apply(
             [this] (auto&& ... tasks) {
                 const auto initTask = [this] <typename TaskType> (std::optional<TaskType>& task) {
-                    // The task would be either default-initializable or initializable from
-                    // reference to a computation
-                    if constexpr (std::default_initializable<TaskType>) {
-                        task = std::move(TaskType());
-                    } else {
-                        task = std::move(TaskType(*this));
-                    }
+                    task = std::move(constructTask<TaskType>(*this));
                 };
 
                 (initTask(tasks), ...);
@@ -101,7 +95,7 @@ struct StaticComputation {
     void run() {
         std::apply(
             [this] (auto&& ... tasks) {
-                ((*tasks).run(*this), ...);
+                (invokeTask(*tasks, *this), ...);
             }, this->state
         );
     } // <-- void run()
