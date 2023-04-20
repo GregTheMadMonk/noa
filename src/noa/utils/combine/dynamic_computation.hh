@@ -83,7 +83,8 @@ namespace detail {
             this->tasks.clear();
 
             std::vector<std::size_t> typesOrder;
-            std::copy(input.begin(), input.end(), std::back_inserter(typesOrder));
+            const auto input_end = std::unique(input.begin(), input.end());
+            std::copy(input.begin(), input_end, std::back_inserter(typesOrder));
 
             std::size_t offset = 1;
             while (offset != typesOrder.size() + 1) {
