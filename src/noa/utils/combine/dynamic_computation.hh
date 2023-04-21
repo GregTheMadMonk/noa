@@ -70,6 +70,22 @@ namespace detail {
             update();
         } // <-- setTasks(taskNames)
 
+        /// \brief Set required end tasks from type indices
+        ///
+        /// Overload for std::initializer_list to avoid abiguity between
+        /// std::vector<std::string> and std::vector<std::size_t> constructors
+        void setTasks(const std::initializer_list<std::size_t>& taskNamesList) {
+            setTasks(std::vector<std::size_t>{taskNamesList});
+        } // <-- setTasks(taskNamesList)
+
+        /// \brief Set required end tasks from task names
+        ///
+        /// Overload for std::initializer_list to avoid abiguity between
+        /// std::vector<std::string> and std::vector<std::size_t> constructors
+        void setTasks(const std::initializer_list<std::string>& taskNamesList) {
+            setTasks(std::vector<std::string>{taskNamesList});
+        } // <-- setTasks(taskNamesList)
+
         /// \brief Set required end tasks from template parameter pack
         template <CTask... Tasks>
         void setTasks() {
