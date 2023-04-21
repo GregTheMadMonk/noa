@@ -78,11 +78,9 @@ Task constructTask(Computation& comp) {
 /// \brief Construct task via `new` and pass required dependencies into its constructor
 template <CTask Task, CComputation Computation>
 Task* newTask(Computation& comp) {
-    return std::move(
-        std::apply(
-            [] (auto& ... tasks) { return new Task(tasks...); },
-            detail::captureDependencies(comp, GetConstructorDependencies<Task>{})
-        )
+    return std::apply(
+        [] (auto& ... tasks) { return new Task(tasks...); },
+        detail::captureDependencies(comp, GetConstructorDependencies<Task>{})
     );
 } // <-- newTask()
 
