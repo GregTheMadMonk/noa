@@ -14,6 +14,12 @@ struct Task1 : public MakeDynamic<Task1> {
 
     int input;
 
+    Task1() = default;
+    Task1(const Task1&) = delete;
+    Task1(Task1&&) = default;
+    Task1& operator=(const Task1&) = delete;
+    Task1& operator=(Task1&&) = default;
+
     void run() {
         // std::cout << "Task1 run()" << std::endl;
     }
@@ -56,6 +62,10 @@ struct Task4 : public MakeDynamic<Task4> {
 };
 
 constexpr std::size_t runs = std::size_t{1} << 25;
+
+static_assert(noa::utils::combine::CTask<Task1>);
+static_assert(noa::utils::combine::CTask<Task2>);
+static_assert(noa::utils::combine::CTask<Task3>);
 
 // Entry point
 int main(int argc, char** argv) {
