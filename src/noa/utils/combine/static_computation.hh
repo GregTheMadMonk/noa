@@ -75,7 +75,7 @@ struct StaticComputation {
         std::apply(
             [this] (auto&& ... tasks) {
                 const auto initTask = [this] <typename TaskType> (std::optional<TaskType>& task) {
-                    task = std::move(constructTask<TaskType>(*this));
+                    task.emplace(std::move(constructTask<TaskType>(*this)));
                 };
 
                 (initTask(tasks), ...);

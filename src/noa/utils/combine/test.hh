@@ -21,8 +21,22 @@ template <typename...> struct Dummy1 {};
 // Testing tasks
 struct Task1 { void run(); };
 static_assert(CTask<Task1>, "Task1 is not a valid task");
-struct Task2 { void run(); };
-struct Task3 { void run(); };
+struct Task2 { // Non-copyable task
+    Task2() {}
+
+    Task2(const Task2&) = delete;
+    Task2& operator=(const Task2&) = delete;
+
+    void run();
+};
+struct Task3 {
+    Task3() {}
+
+    Task3(Task3&&) = delete;
+    Task3& operator=(Task3&&) = delete;
+
+    void run();
+};
 
 struct Task4 {
     Task4(const Task1&) {}
