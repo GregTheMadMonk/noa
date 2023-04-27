@@ -94,7 +94,7 @@ concept CComputationTemplate = requires {
 template <typename ComputationCandidate>
 concept CComputation = requires (ComputationCandidate cc) {
     [] <template <typename...> class Template, typename... Ts>
-    (Template<Ts...>) requires CComputationTemplate<Template>
+    (const Template<Ts...>&) requires CComputationTemplate<Template>
     {} (cc);
 }; // <-- concept CComputation
 

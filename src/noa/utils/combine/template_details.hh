@@ -44,7 +44,7 @@ namespace detail {
     /// \tparam Arg argument in question
     /// \tparam Template<Args...> template in question
     template <typename Arg, template <typename...> class Template, typename... Args>
-    auto hasVArg(Template<Args...>) {
+    auto hasVArg(const Template<Args...>&) {
         if constexpr ((std::is_same_v<Arg, Args> || ...)) {
             return std::true_type{};
         } else {
@@ -54,7 +54,7 @@ namespace detail {
 
     /// \brief Get last template parameter (helper)
     template <template <typename...> class Template, typename First, typename... Others>
-    auto getLastVArg(Template<First, Others...>) {
+    auto getLastVArg(const Template<First, Others...>&) {
         if constexpr (sizeof...(Others) == 0) {
             return First{};
         } else {

@@ -54,7 +54,7 @@ namespace detail {
     template <typename Functor>
     requires requires {
         { &Functor::operator() };
-    } decltype(getArgTypes(&Functor::operator())) getArgTypes(Functor);
+    } decltype(getArgTypes(&Functor::operator())) getArgTypes(const Functor&);
 
 } // <-- namespace detail
 
@@ -166,7 +166,7 @@ namespace test {
 namespace detail {
 
     template <template <typename...> class To, template <typename...> class Template, typename... Args>
-    To<Args...> vtCast(Template<Args...>);
+    To<Args...> vtCast(const Template<Args...>&);
 
 } // <-- namespace detail
 
@@ -193,7 +193,7 @@ namespace test {
 namespace detail {
 
     template <template <typename> class Who, template <typename...> class Template, typename... Args>
-    Template<Who<Args>...> vtApply(Template<Args...>);
+    Template<Who<Args>...> vtApply(const Template<Args...>&);
 
 } // <-- namespace detail
 
@@ -248,7 +248,7 @@ namespace test {
 template <typename T, template <typename...> class Template>
 concept CVTInstance = requires (T t) {
     {
-        [] <typename... Args> (Template<Args...>) -> Template<Args...> {} (t)
+        [] <typename... Args> (const Template<Args...>&) -> Template<Args...> {} (t)
     } -> std::same_as<T>;
 };
 
