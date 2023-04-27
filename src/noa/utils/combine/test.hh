@@ -26,17 +26,12 @@ struct Task2 { // Non-copyable task
 
     Task2(const Task2&) = delete;
     Task2& operator=(const Task2&) = delete;
+    Task2(Task2&&) = default;
+    Task2& operator=(Task2&&) = default;
 
     void run();
 };
-struct Task3 {
-    Task3() {}
-
-    Task3(Task3&&) = delete;
-    Task3& operator=(Task3&&) = delete;
-
-    void run();
-};
+struct Task3 { void run(); };
 
 struct Task4 {
     Task4(const Task1&) {}

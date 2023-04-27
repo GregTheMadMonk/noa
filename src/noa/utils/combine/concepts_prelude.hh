@@ -40,9 +40,16 @@
 namespace noa::utils::combine {
 
 /// \brief Checks if the class is a valid task
+///
+/// A type is a valid task type if:
 template <typename TaskCandidate>
 concept CTask = requires {
+    /// * it has a constructor that is not a move- or copy- constructor
+    requires meta::CVTInstance<meta::GetConstructorArgTypes<TaskCandidate>, std::tuple>;
+    /// * it has a `run` method
     requires meta::CVTInstance<meta::GetArgTypes<&TaskCandidate::run>, std::tuple>;
+    /// * it is movable
+    requires std::movable<TaskCandidate>;
 }; // <-- concept CTask
 
 /// \brief Does the task have a name
