@@ -51,7 +51,7 @@ namespace detail {
     ///
     /// Serves as a helper for removing duplicate tasks from the list
     template <typename Task, typename... Tasks>
-    auto operator+(DummyT<Tasks...>, Task)
+    auto operator+(DummyT<Tasks...>, const Task&)
     ->
     std::conditional_t<
         (std::is_same_v<Tasks, Task> || ...),
