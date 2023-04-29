@@ -32,6 +32,9 @@
 // TNL headers
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
 
+// NOA headers
+#include <noa/utils/exceptions.hh>
+
 namespace noa::utils::domain {
 
 /// The following macro switches on variant stored data type and performs a templated action
@@ -76,14 +79,14 @@ namespace noa::utils::domain {
 template <typename Device = TNL::Devices::Host, typename Index = std::size_t>
 struct Layer {
         /* ----- PUBLIC TYPE ALIASES ----- */
-        // Types should be declared inside the `Layer` struct because they depend on layer
-        // template parameters
+        /// Types should be declared inside the `Layer` struct because they depend on layer
+        /// template parameters
         template <typename DataType> using Vector = TNL::Containers::Vector<DataType, Device, Index>;
 
-        // TNL::Meshes::Readers::MeshReader stores data baked in mesh in an
-        // std::vector. We want to use TNL Vectors to possibly store layers
-        // on different devices, so we also need to deine our own std::variant
-        // for TNL Vectors instead of using TNL::Meshes::Readers::MeshReader::VariantVector
+        /// TNL::Meshes::Readers::MeshReader stores data baked in mesh in an
+        /// std::vector. We want to use TNL Vectors to possibly store layers
+        /// on different devices, so we also need to deine our own std::variant
+        /// for TNL Vectors instead of using TNL::Meshes::Readers::MeshReader::VariantVector
         using VariantVector = std::variant < Vector< std::int8_t >,
                                                 Vector< std::uint8_t >,
                                                 Vector< std::int16_t >,
@@ -102,15 +105,22 @@ struct Layer {
 
         public:
         /* ----- PUBLIC DATA MEMBERS ----- */
-        std::string     alias = "";             // Alternative layer name
-        bool            exportHint = false;     // Should this Layer be saved (only a hint, all Layers could still be saved)
+        /// \brief Alternative layer name
+        std::string alias = "";
+        /// \brief Should this layer be saved (only a hint, all layers could still be saved)
+        bool exportHint = false;
+
         /* ----- PUBLIC CONSTRUCTOR ----- */
+        /// \brief Layer constructor. Calls \ref init()
         template <typename DataType>
         Layer(const Index& newSize, const DataType& value = DataType()) {
                 init(newSize, value);
         }
         /* ----- PUBLIC METHODS ----- */
-        // Initialize layer data and fill with values
+        /// \brief (Re-)Initialize layer data and fill it with values
+        ///
+        /// \param newSize - layer size
+        /// \param value   - initializer value for all layer elements
         template <typename DataType>
         void init(const Index& newSize, const DataType& value = DataType()) {
                 size = newSize;
@@ -193,8 +203,15 @@ struct Layer {
 template <typename Device = TNL::Devices::Host, typename Index = int>
 struct LayerManager {
         /* ----- PUBLIC TYPE ALIASES ----- */
+        /// \brief Layer type corresponding to this layer manager type
         using LayerType = Layer<Device, Index>;
+        /// \brief Layer vector type
         template <typename DataType> using Vector = typename LayerType::template Vector<DataType>;
+
+        /// \brief Device type
+        using DeviceType = Device;
+        /// \brief Index type
+        using IndexType = Index;
 
         protected:
         /* ----- PROTECTED DATA MEMBERS ----- */
@@ -204,12 +221,12 @@ struct LayerManager {
 
         public:
         /* ----- PUBLIC METHODS ----- */
-        // Sets size for all stored layers
+        /// Sets size for all stored layers
         void setSize(const Index& newSize) {
                 size = newSize;
                 for (auto& layer : layers) layer.second.setSize(size);
         }
-        // Return the number of stored layers
+        /// Return the number of stored layers
         std::size_t count() const { return layers.size(); }
 
         /// Layer map start iterator
@@ -217,19 +234,30 @@ struct LayerManager {
         /// Layer map end iterator
         auto end() { return this->layers.end(); }
 
-        // Removes all layers
+        /// Remove all layers
         void clear() {
                 while (!layers.empty()) layers.erase(layers.begin());
         }
 
-        // Adds a layer storing a certain data type and returns its index
+        /// Add a layer storing a certain data type and returns its index
         template <typename DataType>
         LayerType& add(const std::size_t& alias, const DataType& value = DataType()) {
                 layers.emplace(alias, LayerType(size, value));
                 return layers.at(alias);
         }
 
-        // Returns selected layer's data
+        /// Get the first non-taken layer key
+        std::size_t getNextLayerIndex() const {
+            for (std::size_t idx = 0; idx < std::numeric_limits<std::size_t>::max(); ++idx) {
+                if (!layers.contains(idx)) {
+                    return idx;
+                }
+            }
+
+            throw errors::FallthroughError{};
+        } // <-- getNextLayerIndex()
+
+        /// Return selected layer's data
         template <typename DataType>
         Vector<DataType>& get(const std::size_t& index) {
                 return layers.at(index).template get<DataType>();
@@ -240,7 +268,7 @@ struct LayerManager {
                 return layers.at(index).template get<DataType>();
         }
 
-        // Returns selected layer (`Layer` object instead of data)
+        /// Return selected layer (`Layer` object instead of data)
         LayerType& getLayer(const std::size_t& index) {
                 return layers.at(index);
         }
@@ -249,5 +277,11 @@ struct LayerManager {
                 return layers.at(index);
         }
 }; // <-- struct LayerManager
+
+/// \brief Concept for all LayerManager instantiations
+template <typename LayerManagerCandidate>
+concept CLayerManager = requires (LayerManagerCandidate lmc) {
+    [] <typename Device, typename Index> (LayerManager<Device, Index>) {} (lmc);
+}; // <-- concept CLayerManager
 
 } // <-- namespace noa::utils::domain

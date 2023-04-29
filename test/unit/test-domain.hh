@@ -27,9 +27,7 @@ TEST(DOMAIN, SaveLoadDomain) {
 	constexpr auto N = 10;
 	utils::domain::generate2DGrid(domain, N, N, 1.0, 1.0);
 
-	constexpr auto dimCell = domain.getMeshDimension();
-
-	auto& cellLayers = domain.getLayers(dimCell);
+	auto& cellLayers = domain.getLayers(DomainType::dimCell);
 
 	auto& l1 = cellLayers.template add<float>(0, 3.1415f);
 	l1.alias = "Float Layer";
@@ -49,20 +47,61 @@ TEST(DOMAIN, SaveLoadDomain) {
 	DomainType domain2;
 	domain2.loadFrom(test_domain_file, { { "Float Layer", 0 }, { "Double Layer", 1 }, { "Integer Layer", 2 } });
 
-	ASSERT_EQ(domain.getMesh().template getEntitiesCount<dimCell>(), domain2.getMesh().template getEntitiesCount<dimCell>());
+	ASSERT_EQ(
+        domain.getMesh().template getEntitiesCount<DomainType::dimCell>(),
+        domain2.getMesh().template getEntitiesCount<DomainType::dimCell>()
+    );
 
 	std::size_t i = 0;
-	ASSERT_EQ(cellLayers.getLayer(i).alias, domain2.getLayers(dimCell).getLayer(i).alias);
-	ASSERT_EQ(cellLayers.template get<float>(i), domain2.getLayers(dimCell).template get<float>(i));
+	ASSERT_EQ(cellLayers.getLayer(i).alias, domain2.getLayers(DomainType::dimCell).getLayer(i).alias);
+	ASSERT_EQ(cellLayers.template get<float>(i), domain2.getLayers(DomainType::dimCell).template get<float>(i));
 	i = 1;
-	ASSERT_EQ(cellLayers.getLayer(i).alias, domain2.getLayers(dimCell).getLayer(i).alias);
-	ASSERT_EQ(cellLayers.template get<double>(i), domain2.getLayers(dimCell).template get<double>(i));
+	ASSERT_EQ(cellLayers.getLayer(i).alias, domain2.getLayers(DomainType::dimCell).getLayer(i).alias);
+	ASSERT_EQ(cellLayers.template get<double>(i), domain2.getLayers(DomainType::dimCell).template get<double>(i));
 	i = 2;
-	ASSERT_EQ(cellLayers.getLayer(i).alias, domain2.getLayers(dimCell).getLayer(i).alias);
-	ASSERT_EQ(cellLayers.template get<int>(i), domain2.getLayers(dimCell).template get<int>(i));
+	ASSERT_EQ(cellLayers.getLayer(i).alias, domain2.getLayers(DomainType::dimCell).getLayer(i).alias);
+	ASSERT_EQ(cellLayers.template get<int>(i), domain2.getLayers(DomainType::dimCell).template get<int>(i));
 
 	constexpr auto test_domain_file_2 = "domain-test-save-load-2.vtu";
 	domain2.write(test_domain_file_2);
 
 	ASSERT_EQ(utils::compare_files(test_domain_file, test_domain_file_2), true);
+}
+
+TEST(DOMAIN, CopyMoveDomain) {
+	using namespace noa;
+
+	using DomainType = utils::domain::Domain<TNL::Meshes::Topologies::Triangle>;
+	DomainType domain;
+
+	constexpr auto N = 10;
+	utils::domain::generate2DGrid(domain, N, N, 1.0, 1.0);
+
+	auto& cellLayers = domain.getLayers(DomainType::dimCell);
+
+	cellLayers.template add<float>(0, 3.1415f);
+
+    DomainType domainCopy = domain;
+
+    ASSERT_EQ(
+        domain.getMesh().getEntitiesCount<DomainType::dimCell>(),
+        domainCopy.getMesh().getEntitiesCount<DomainType::dimCell>()
+    );
+
+    ASSERT_EQ(
+        domain.getLayers(DomainType::dimCell).template get<float>(0).getView(),
+        domainCopy.getLayers(DomainType::dimCell).template get<float>(0).getView()
+    );
+
+    DomainType domainMoved = std::move(domain);
+
+    ASSERT_EQ(
+        domainMoved.getMesh().getEntitiesCount<DomainType::dimCell>(),
+        domainCopy.getMesh().getEntitiesCount<DomainType::dimCell>()
+    );
+
+    ASSERT_EQ(
+        domainMoved.getLayers(DomainType::dimCell).template get<float>(0).getView(),
+        domainCopy.getLayers(DomainType::dimCell).template get<float>(0).getView()
+    );
 }

@@ -6,6 +6,9 @@
  */
 
 #include "methods.hh"
+#include "tasks/cfd_problem.hh"
+#include "tasks/mhfe.hh"
+#include "tasks/gradev.hh"
 
 /// \brief Namespace for everything related to CFD
 namespace noa::utils::cfd {

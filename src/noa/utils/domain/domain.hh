@@ -43,40 +43,12 @@
 
 // Local headers
 #include "configtagpermissive.hh"
+#include "domain_concepts.hh"
 #include "layermanager.hh"
+#include "layer_view_base.hh"
 
 /// Namespace containing the domain-related code
 namespace noa::utils::domain {
-
-template <typename, typename, typename, typename, typename>
-struct Domain;
-
-/// \brief Concept for all domain types
-template <typename DomainCandidate>
-concept CDomain = requires (DomainCandidate dc) {
-    [] <
-        typename CellTopology,
-        typename Device,
-        typename Real,
-        typename GlobalIndex,
-        typename LocalIndex
-    > (
-        Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>
-    ) {} (dc);
-}; // <-- concept CDomain
-
-/// \brief Concept for any domain of specific topology
-template <typename DomainCandidate, typename CellTopology>
-concept CDomainWithTopology = requires(DomainCandidate dc) {
-    [] <
-        typename Device,
-        typename Real,
-        typename GlobalIndex,
-        typename LocalIndex
-    > (
-        Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>
-    ) {} (dc);
-} && CDomain<DomainCandidate>; // <-- concept CDomainWithTopology
 
 /// \brief Domain stores a TNL mesh and various data over its elements in one place
 /// providing a friendly all-in-one-place interface for solvers.
@@ -108,7 +80,12 @@ struct Domain {
         using PointType         = typename MeshType::PointType;
 
         /// Get mesh dimensions
-        static constexpr int getMeshDimension() { return MeshType::getMeshDimension(); }
+        [[deprecated]] static constexpr auto getMeshDimension() { return MeshType::getMeshDimension(); }
+
+        /// \brief Mesh cell dimension
+        static constexpr auto dimCell = MeshType::getMeshDimension();
+        /// \brief Mesh edge dimension
+        static constexpr auto dimEdge = dimCell - 1;
 
         protected:
         /* ----- PROTECTED DATA MEMBERS ----- */
@@ -117,9 +94,14 @@ struct Domain {
         /// Mesh data layers
         std::vector<LayerManagerType> layers;
 
+        /// \brief LayerViewBase is our firend!
+        friend class detail::LayerViewBase<Domain>;
+        /// \brief Layer views bound to this domain
+        std::vector<detail::LayerViewBase<Domain>*> layerViews;
+
         /* ----- PROTECTED METHODS ----- */
         /// Updates all layer sizes from mesh entities count
-        template <int fromDimension = getMeshDimension()>
+        template <int fromDimension = dimCell>
         void updateLayerSizes() {
                 const auto size = isClean() ? 0 : mesh.value().template getEntitiesCount<fromDimension>();
                 layers.at(fromDimension).setSize(size);
@@ -131,7 +113,54 @@ struct Domain {
         /// Constructor
         Domain() {
                 // If default-constructed, generate layers for each of the meshes dimensions
-                layers = std::vector<LayerManagerType>(getMeshDimension() + 1);
+                layers = std::vector<LayerManagerType>(dimCell + 1);
+        }
+
+        /// \brief Copy-constructor
+        ///
+        /// Calls copy-assignment
+        Domain(const Domain& other) {
+            *this = other;
+        } // <-- Domain(const Domain&)
+
+        /// \brief Move-constructor
+        ///
+        /// Calls move-assignment
+        Domain(Domain&& other) {
+            *this = std::move(other);
+        } // <-- Domain(Domain&&)
+
+        /// \brief Copy-assignment
+        ///
+        /// Copying is implemented trivially except that the bound layer views
+        /// aren't copied into new layer
+        Domain& operator=(const Domain& other) {
+            this->mesh = other.mesh;
+            this->layers = other.layers;
+
+            return *this;
+        } // <-- operator=(const Domain&)
+
+        /// \brief Move-assignment
+        ///
+        /// Implmented trivially except for the layer views. Layer views need to
+        /// be unbound from the previous domain and re-bound into the new one
+        Domain& operator=(Domain&& other) {
+            this->mesh = std::move(other.mesh);
+            this->layers = std::move(other.layers);
+
+            while (!other.layerViews.empty()) {
+                other.layerViews.at(0)->bindTo(*this);
+            }
+
+            return *this;
+        } // <-- operator=(Domain&&)
+
+        /// \brief Destructor
+        ///
+        /// Unbinds views
+        ~Domain() {
+            for (auto* view : layerViews) view->unbindFrom();
         }
 
         /// \brief Clear mesh data
@@ -154,7 +183,15 @@ struct Domain {
         [[nodiscard]] bool hasLayers() const { return this->layers.size(); }
 
         /// Check if the domain is empty. Equivalent to `!mesh.has_value()`
-        bool isClean() const { return !mesh.has_value(); }
+        [[nodiscard]] bool isClean() const { return !mesh.has_value(); }
+
+        /// Check if all of the domain's bound layer views are valid
+        [[nodiscard]] bool allViewsAreValid() const {
+            for (const auto* view : this->layerViews) {
+                if (!view->isValid()) return false;
+            }
+            return true;
+        } // <-- bool allViewsAreValid()
 
         /// Get mesh as a constant reference
         const MeshType& getMesh() const { return mesh.value(); }
@@ -171,6 +208,16 @@ struct Domain {
         }
         const LayerManagerType& getLayers(const std::size_t& dimension) const {
                 return layers.at(dimension);
+        }
+
+        /// \brief Set domain mesh
+        ///
+        /// Updates all layers according to new mesh sizes
+        void setMesh(const MeshType& newMesh) {
+            mesh = newMesh;
+            updateLayerSizes();
+
+            for (auto* view : layerViews) view->bindTo(*this);
         }
 
         /// \brief Cell layers requested for loadFrom() function
@@ -191,8 +238,7 @@ struct Domain {
         template <typename DataType, typename FromType>
         void load_layer(std::size_t key, const FromType& from) {
                 const auto& fromT = std::get<std::vector<DataType>>(from);
-                auto& toT = this->getLayers(this->getMeshDimension()).
-                                                template add<DataType>(key).template get<DataType>();
+                auto& toT = this->getLayers(dimCell).template add<DataType>(key).template get<DataType>();
 
                 for (std::size_t i = 0; i < fromT.size(); ++i)
                         toT[i] = fromT[i];
@@ -203,71 +249,70 @@ struct Domain {
         /// \param filename - path to mesh file
         /// \param layersRequest - a list of requested cell layers
         ///
-        /// Only supports loading of the cell layers (layers for dimension reported by getMeshDimension()).
+        /// Only supports loading of the cell layers (layers for cell dimension, \ref dimCell).
         /// Layers are loaded in order in which they were specified in \p layersRequest.
         void loadFrom(const Path& filename, const LayersRequest& layersRequest = {}) {
-		if (!isClean())
-			throw std::runtime_error("Mesh data is not empty, cannot load!");
+            if (!isClean())
+                throw std::runtime_error("Mesh data is not empty, cannot load!");
 
-                if (!std::filesystem::exists(filename))
-                        throw std::runtime_error("Mesh file not found: " + filename.string() + "!");
+            if (!std::filesystem::exists(filename))
+                    throw std::runtime_error("Mesh file not found: " + filename.string() + "!");
 
-                auto loader = [&] (auto& reader, auto&& loadedMesh) {
-                        using LoadedTypeRef = decltype(loadedMesh);
-                        using LoadedType = typename std::remove_reference<LoadedTypeRef>::type;
+            auto loader = [&] (auto& reader, auto&& loadedMesh) {
+                    using LoadedTypeRef = decltype(loadedMesh);
+                    using LoadedType = typename std::remove_reference<LoadedTypeRef>::type;
 
-                        if constexpr (std::is_same_v<MeshType, LoadedType>) {
-                                mesh = loadedMesh;
-                                updateLayerSizes();
-                        } else throw std::runtime_error("Read mesh type differs from expected!");
+                    if constexpr (std::is_same_v<MeshType, LoadedType>) {
+                        this->setMesh(loadedMesh);
+                    } else throw std::runtime_error("Read mesh type differs from expected!");
 
-                        // Load cell layers
-                        for (auto& [ name, index ] : layersRequest) {
-                                const auto data = reader.readCellData(name);
+                    // Load cell layers
+                    for (auto& [ name, index ] : layersRequest) {
+                            const auto data = reader.readCellData(name);
 
-                                switch (data.index()) {
-                                        case 0: /* int8_t */
-                                                load_layer<std::int8_t>(index, data);
-                                                break;
-                                        case 1: /* uint8_t */
-                                                load_layer<std::uint8_t>(index, data);
-                                                break;
-                                        case 2: /* int16_t */
-                                                load_layer<std::int16_t>(index, data);
-                                                break;
-                                        case 3: /* uint16_t */
-                                                load_layer<std::uint16_t>(index, data);
-                                                break;
-                                        case 4: /* int32_t */
-                                                load_layer<std::int32_t>(index, data);
-                                                break;
-                                        case 5: /* uint32_t */
-                                                load_layer<std::uint32_t>(index, data);
-                                                break;
-                                        case 6: /* int64_t */
-                                                load_layer<std::int64_t>(index, data);
-                                                break;
-                                        case 7: /* uint64_t */
-                                                load_layer<std::uint64_t>(index, data);
-                                                break;
-                                        case 8: /* float */
-                                                load_layer<float>(index, data);
-                                                break;
-                                        case 9: /* double */
-                                                load_layer<double>(index, data);
-                                                break;
-                                }
+                            switch (data.index()) {
+                                    case 0: /* int8_t */
+                                            load_layer<std::int8_t>(index, data);
+                                            break;
+                                    case 1: /* uint8_t */
+                                            load_layer<std::uint8_t>(index, data);
+                                            break;
+                                    case 2: /* int16_t */
+                                            load_layer<std::int16_t>(index, data);
+                                            break;
+                                    case 3: /* uint16_t */
+                                            load_layer<std::uint16_t>(index, data);
+                                            break;
+                                    case 4: /* int32_t */
+                                            load_layer<std::int32_t>(index, data);
+                                            break;
+                                    case 5: /* uint32_t */
+                                            load_layer<std::uint32_t>(index, data);
+                                            break;
+                                    case 6: /* int64_t */
+                                            load_layer<std::int64_t>(index, data);
+                                            break;
+                                    case 7: /* uint64_t */
+                                            load_layer<std::uint64_t>(index, data);
+                                            break;
+                                    case 8: /* float */
+                                            load_layer<float>(index, data);
+                                            break;
+                                    case 9: /* double */
+                                            load_layer<double>(index, data);
+                                            break;
+                            }
 
-                                this->getLayers(this->getMeshDimension()).getLayer(index).alias = name;
-                                this->getLayers(this->getMeshDimension()).getLayer(index).exportHint = true;
-                        }
+                            this->getLayers(dimCell).getLayer(index).alias = name;
+                            this->getLayers(dimCell).getLayer(index).exportHint = true;
+                    }
 
-                        return true;
-                };
+                    return true;
+            };
 
-                using ConfigTag = ConfigTagPermissive<CellTopology>;
-                if (!TNL::Meshes::resolveAndLoadMesh<ConfigTag, TNL::Devices::Host>(loader, filename, "auto"))
-                        throw std::runtime_error("Could not load mesh (resolveAndLoadMesh returned `false`)!");
+            using ConfigTag = ConfigTagPermissive<CellTopology>;
+            if (!TNL::Meshes::resolveAndLoadMesh<ConfigTag, TNL::Devices::Host>(loader, filename, "auto"))
+                throw std::runtime_error("Could not load mesh (resolveAndLoadMesh returned `false`)!");
         }
 
         /// Write Domain to a file
@@ -284,14 +329,14 @@ struct Domain {
         /// Write domain to an ostream
         void writeStream(std::ostream& stream) {
                 MeshWriter writer(stream);
-                writer.template writeEntities<getMeshDimension()>(mesh.value());
+                writer.template writeEntities<dimCell>(mesh.value());
 
                 // Write layers
-                for (int dim = 0; dim <= getMeshDimension(); ++dim)
+                for (int dim = 0; dim <= dimCell; ++dim)
                         for (auto it : layers.at(dim)) {
                                 const auto& layer = it.second;
                                 if (!layer.exportHint) continue;
-                                if (dim == getMeshDimension())
+                                if (dim == dimCell)
                                         layer.writeCellData(writer, "cell_layer_" + std::to_string(it.first));
                                 else if (dim == 0)
                                         layer.writePointData(writer, "point_layer_" + std::to_string(it.first));

@@ -21,10 +21,9 @@ struct GradEv; // Incomplete
 /// TODO: Could this be generalized for all 2D cases?
 template <domain::CDomainWithTopology<TNL::Meshes::Topologies::Triangle> DomainType>
 struct GradEv<DomainType> : public combine::MakeDynamic<GradEv<DomainType>> {
-    /// \brief Only implemented for LMHFE
-    using Depends = combine::DependencyList< MHFE<methods::LMHFE<DomainType>> >;
+    using MHFEType = MHFE<methods::LMHFE<DomainType>>;
 
-    void run(const combine::ComputationType auto& comp) {
+    void run(const MHFEType& mhfe) {
     } // <-- void GradEv::run()
 }; // <-- struct GradEv (Triangle)
 
