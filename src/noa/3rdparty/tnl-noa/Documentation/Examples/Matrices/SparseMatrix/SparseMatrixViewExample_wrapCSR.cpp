@@ -1,5 +1,4 @@
 #include <iostream>
-#include <TNL/Algorithms/ParallelFor.h>
 #include <TNL/Matrices/DenseMatrix.h>
 #include <TNL/Matrices/MatrixWrapping.h>
 #include <TNL/Devices/Host.h>
@@ -38,7 +37,7 @@ int main( int argc, char* argv[] )
    std::cout << "Wraping matrix view on host: " << std::endl;
    wrapMatrixView< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Wraping matrix view on CUDA device: " << std::endl;
    wrapMatrixView< TNL::Devices::Cuda >();
 #endif

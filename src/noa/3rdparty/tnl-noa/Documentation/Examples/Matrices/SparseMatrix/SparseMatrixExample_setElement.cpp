@@ -1,5 +1,5 @@
 #include <iostream>
-#include <TNL/Algorithms/ParallelFor.h>
+#include <TNL/Algorithms/parallelFor.h>
 #include <TNL/Matrices/SparseMatrix.h>
 #include <TNL/Devices/Host.h>
 #include <TNL/Devices/Cuda.h>
@@ -10,7 +10,8 @@ template< typename Device >
 void setElements()
 {
    auto rowCapacities = { 1, 1, 1, 1, 1 };
-   TNL::Pointers::SharedPointer< TNL::Matrices::SparseMatrix< double, Device > > matrix( rowCapacities, 5 );
+   using MatrixType = TNL::Matrices::SparseMatrix< double, Device >;
+   TNL::Pointers::SharedPointer< MatrixType > matrix( rowCapacities, 5 );
 
    /***
     * Calling the method setElements from host (CPU).
@@ -24,8 +25,9 @@ void setElements()
    /***
     * This lambda function will run on the native device of the matrix which can be CPU or GPU.
     */
+   MatrixType* matrix_device = &matrix.template modifyData< Device >();
    auto f = [=] __cuda_callable__ ( int i ) mutable {
-      matrix->setElement( i, i, -i );
+      matrix_device->setElement( i, i, -i );
    };
 
    /***
@@ -34,7 +36,7 @@ void setElements()
     * SparseMatrixView::getRow example for details.
     */
    TNL::Pointers::synchronizeSmartPointersOnDevice< Device >();
-   TNL::Algorithms::ParallelFor< Device >::exec( 0, 5, f );
+   TNL::Algorithms::parallelFor< Device >( 0, 5, f );
 
    std::cout << "Matrix set from its native device:" << std::endl;
    std::cout << *matrix << std::endl;
@@ -45,7 +47,7 @@ int main( int argc, char* argv[] )
    std::cout << "Set elements on host:" << std::endl;
    setElements< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Set elements on CUDA device:" << std::endl;
    setElements< TNL::Devices::Cuda >();
 #endif

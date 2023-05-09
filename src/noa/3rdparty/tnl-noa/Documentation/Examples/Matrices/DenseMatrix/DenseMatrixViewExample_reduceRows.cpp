@@ -20,9 +20,8 @@ void reduceRows()
    TNL::Containers::Vector< double, Device > rowMax( matrix.getRows() );
 
    /***
-    * Prepare vector view and matrix view for lambdas.
+    * Prepare vector view for lambdas.
     */
-   const auto matrixView = matrix.getConstView();
    auto rowMaxView = rowMax.getView();
 
    /***
@@ -59,7 +58,7 @@ int main( int argc, char* argv[] )
    std::cout << "Rows reduction on host:" << std::endl;
    reduceRows< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Rows reduction on CUDA device:" << std::endl;
    reduceRows< TNL::Devices::Cuda >();
 #endif

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <functional>
-#include <TNL/Algorithms/ParallelFor.h>
 #include <TNL/Matrices/TridiagonalMatrix.h>
 #include <TNL/Devices/Host.h>
 #include <TNL/Devices/Cuda.h>
@@ -25,8 +24,9 @@ void getRowExample()
    /***
     * Fetch lambda function returns diagonal element in each row.
     */
+   const MatrixType* matrix_device = &matrix.template modifyData< Device >();
    auto fetch = [=] __cuda_callable__ ( int rowIdx ) mutable -> double {
-      auto row = matrix->getRow( rowIdx );
+      auto row = matrix_device->getRow( rowIdx );
       return row.getValue( 2 ); // get value from subdiagonal with index 2, i.e. the main diagonal
    };
 
@@ -50,7 +50,7 @@ int main( int argc, char* argv[] )
    std::cout << "Getting matrix rows on host: " << std::endl;
    getRowExample< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Getting matrix rows on CUDA device: " << std::endl;
    getRowExample< TNL::Devices::Cuda >();
 #endif

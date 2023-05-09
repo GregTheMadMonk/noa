@@ -2,7 +2,6 @@
 #include <memory>
 #include <chrono>
 #include <thread>
-#include <TNL/Algorithms/ParallelFor.h>
 #include <TNL/Matrices/SparseMatrix.h>
 #include <TNL/Devices/Sequential.h>
 #include <TNL/Devices/Cuda.h>
@@ -89,9 +88,9 @@ void iterativeLinearSolverExample()
 int main( int argc, char* argv[] )
 {
    std::cout << "Solving linear system on host: " << std::endl;
-   iterativeLinearSolverExample< TNL::Devices::Host >();
+   iterativeLinearSolverExample< TNL::Devices::Sequential >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Solving linear system on CUDA device: " << std::endl;
    iterativeLinearSolverExample< TNL::Devices::Cuda >();
 #endif

@@ -16,33 +16,44 @@ set( LONG_EXAMPLES
    SparseMatrixSetup_Benchmark
 )
 
-if( BUILD_CUDA )
+if( TNL_BUILD_CUDA )
    foreach( target IN ITEMS ${COMMON_EXAMPLES} )
-      cuda_add_executable( ${target}-cuda ${target}.cu OPTIONS )
-      add_custom_command( COMMAND ${target}-cuda > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out OUTPUT ${target}.out )
-      set( CUDA_OUTPUTS ${CUDA_OUTPUTS} ${target}.out )
+      add_executable( ${target} ${target}.cu )
+      target_link_libraries( ${target} PUBLIC TNL::TNL_CUDA )
+      add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          DEPENDS ${target} )
+      set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
    endforeach()
    foreach( target IN ITEMS ${LONG_EXAMPLES} )
-      cuda_add_executable( ${target}-cuda ${target}.cu OPTIONS )
-      #add_custom_command( COMMAND ${target}-cuda > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out OUTPUT ${target}.out )
-      #set( CUDA_OUTPUTS ${CUDA_OUTPUTS} ${target}.out )
+      add_executable( ${target} ${target}.cu )
+      target_link_libraries( ${target} PUBLIC TNL::TNL_CUDA )
+      #add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+      #                    OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+      #                    DEPENDS ${target} )
+      #set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
    endforeach()
 else()
    foreach( target IN ITEMS ${COMMON_EXAMPLES} )
       add_executable( ${target} ${target}.cpp )
-      add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out OUTPUT ${target}.out )
-      set( HOST_OUTPUTS ${HOST_OUTPUTS} ${target}.out )
+      target_link_libraries( ${target} PUBLIC TNL::TNL_CXX )
+      add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          DEPENDS ${target} )
+      set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
    endforeach()
    foreach( target IN ITEMS ${LONG_EXAMPLES} )
       add_executable( ${target} ${target}.cpp )
-      #add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out OUTPUT ${target}.out )
-      #set( HOST_OUTPUTS ${HOST_OUTPUTS} ${target}.out )
+      target_link_libraries( ${target} PUBLIC TNL::TNL_CXX )
+      #add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+      #                    OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+      #                    DEPENDS ${target} )
+      #set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
    endforeach()
 endif()
 
 
-IF( BUILD_CUDA )
-   ADD_CUSTOM_TARGET( RunTutorialsMatricesExamples-cuda ALL DEPENDS ${CUDA_OUTPUTS} )
-ELSE()
-   ADD_CUSTOM_TARGET( RunTutorialsMatricesExamples ALL DEPENDS ${HOST_OUTPUTS} )
-ENDIF()
+add_custom_target( RunTutorialsMatricesExamples ALL DEPENDS ${DOC_OUTPUTS} )
+
+# add the dependency to the main target
+add_dependencies( run-doc-examples RunTutorialsMatricesExamples )

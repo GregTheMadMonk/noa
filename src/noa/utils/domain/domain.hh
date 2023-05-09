@@ -30,7 +30,7 @@
 #include <optional>
 
 // TNL headers
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DefaultConfig.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Mesh.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshBuilder.h>
@@ -384,36 +384,50 @@ void generate2DGrid(
 
         using PointType = typename MeshType::MeshTraitsType::PointType;
         const auto pointId = [&] (const int& ix, const int& iy) -> GlobalIndexType {
-                return ix + (Nx + 1) * iy;
+            return ix + (Nx + 1) * iy;
         };
-        const auto fillPoints = [&] (const int& ix, const int& iy) {
-                builder.setPoint(pointId(ix, iy), PointType(ix * dx + offsetX, iy * dy + offsetY));
+        const auto fillPoints = [&] (const TNL::Containers::StaticArray<2, std::size_t>& pointIdx) {
+            const auto& ix = pointIdx[0];
+            const auto& iy = pointIdx[1];
+            builder.setPoint(pointId(ix, iy), PointType(ix * dx + offsetX, iy * dy + offsetY));
         };
 #ifdef HAVE_OPENMP
         using HostDevice = TNL::Devices::Sequential;
 #else
         using HostDevice = TNL::Devices::Host;
 #endif
-        TNL::Algorithms::ParallelFor2D<HostDevice>::exec(std::size_t{0}, std::size_t{0}, Nx + 1, Ny + 1, fillPoints);
+        TNL::Algorithms::parallelFor<HostDevice>(
+            TNL::Containers::StaticArray<2, std::size_t>{0,      0      },
+            TNL::Containers::StaticArray<2, std::size_t>{Nx + 1, Ny + 1 },
+            fillPoints
+        );
 
-        const auto fillElems = [&] (const int& ix, const int& iy, const int& u) {
-                const auto cell = 2 * (ix + Nx * iy) + u;
-                auto seed = builder.getCellSeed(cell);
+        const auto fillElems = [&] (const TNL::Containers::StaticArray<3, std::size_t>& elemIdx) {
+            const auto& ix = elemIdx[0];
+            const auto& iy = elemIdx[1];
+            const auto& u  = elemIdx[2];
 
-                switch (u) {
-                        case 1:
-                                seed.setCornerId(0, pointId(ix, iy));
-                                seed.setCornerId(1, pointId(ix, iy + 1));
-                                seed.setCornerId(2, pointId(ix + 1, iy));
-                                break;
-                        case 0:
-                                seed.setCornerId(0, pointId(ix + 1, iy + 1));
-                                seed.setCornerId(1, pointId(ix + 1, iy));
-                                seed.setCornerId(2, pointId(ix, iy + 1));
-                                break;
-                }
+            const auto cell = 2 * (ix + Nx * iy) + u;
+            auto seed = builder.getCellSeed(cell);
+
+            switch (u) {
+                    case 1:
+                            seed.setCornerId(0, pointId(ix, iy));
+                            seed.setCornerId(1, pointId(ix, iy + 1));
+                            seed.setCornerId(2, pointId(ix + 1, iy));
+                            break;
+                    case 0:
+                            seed.setCornerId(0, pointId(ix + 1, iy + 1));
+                            seed.setCornerId(1, pointId(ix + 1, iy));
+                            seed.setCornerId(2, pointId(ix, iy + 1));
+                            break;
+            }
         };
-        TNL::Algorithms::ParallelFor3D<HostDevice>::exec(std::size_t{0}, std::size_t{0}, std::size_t{0}, Nx, Ny, std::size_t{2}, fillElems);
+        TNL::Algorithms::parallelFor<HostDevice>(
+            TNL::Containers::StaticArray<3, std::size_t>{0,  0,  0},
+            TNL::Containers::StaticArray<3, std::size_t>{Nx, Ny, 2},
+            fillElems
+        );
 
         builder.build(domain.mesh.value());
 

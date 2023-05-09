@@ -1,4 +1,5 @@
 #include <iostream>
+#include <TNL/Algorithms/parallelFor.h>
 #include <TNL/Matrices/LambdaMatrix.h>
 #include <TNL/Matrices/DenseMatrix.h>
 #include <TNL/Devices/Host.h>
@@ -61,7 +62,6 @@ void getRowExample()
    };
    auto matrix = TNL::Matrices::LambdaMatrixFactory< double, Device, int >::create(
       matrixSize, matrixSize, matrixElements, rowLengths );
-   using MatrixType = decltype( matrix );
 
    TNL::Matrices::DenseMatrix< double, Device > denseMatrix( matrixSize, matrixSize );
    denseMatrix.setValue( 0.0 );
@@ -72,7 +72,7 @@ void getRowExample()
       for( int localIdx = 0; localIdx < row.getSize(); localIdx++ )
          dense_row.setValue( row.getColumnIndex( localIdx ), row.getValue( localIdx ) );
    };
-   TNL::Algorithms::ParallelFor< Device >::exec( 0, matrixSize, f );
+   TNL::Algorithms::parallelFor< Device >( 0, matrixSize, f );
 
    std::cout << "Laplace operator lambda matrix: " << std::endl << matrix << std::endl;
    std::cout << "Laplace operator dense matrix: " << std::endl << denseMatrix << std::endl;
@@ -83,7 +83,7 @@ int main( int argc, char* argv[] )
    std::cout << "Running example on CPU ... " << std::endl;
    getRowExample< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Running example on CUDA GPU ... " << std::endl;
    getRowExample< TNL::Devices::Cuda >();
 #endif

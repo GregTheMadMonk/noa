@@ -1,5 +1,4 @@
 #include <iostream>
-#include <TNL/Algorithms/ParallelFor.h>
 #include <TNL/Matrices/SparseMatrix.h>
 #include <TNL/Devices/Host.h>
 #include <TNL/Devices/Cuda.h>
@@ -59,7 +58,7 @@ int main( int argc, char* argv[] )
    std::cout << "Getting matrix rows on host: " << std::endl;
    forRowsExample< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Getting matrix rows on CUDA device: " << std::endl;
    forRowsExample< TNL::Devices::Cuda >();
 #endif

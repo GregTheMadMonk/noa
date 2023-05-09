@@ -11,9 +11,9 @@ TNL is based on the following core concepts:
    (TODO: rename to `Executor` or something like that)
    - Device is responsible for the execution of algorithms in a specific way.
    - Algorithms can be specialized by the `Device` template parameter.
-3. \ref TNL::Containers::Algorithms "Algorithms"
+3. \ref TNL::Algorithms "Algorithms"
    - Basic (container-free) algorithms specialized by `Device`/`Executor`.
-   - `ParallelFor`, `Reduction`, `MultiReduction`, `ArrayOperations`, ...
+   - `parallelFor`, `reduce`, `MultiReduction`, `sort`, ...
 4. \ref TNL::Containers "Containers"
    - Classes for general data structures.
      (TODO: alternatively use "Dense" and "Sparse", because a dense matrix can
@@ -32,7 +32,7 @@ TNL is based on the following core concepts:
 6. Smart pointers
    - TODO
 
-TODO: formalize the concepts involving lambda functions (e.g. in `Reduction`)
+TODO: formalize the concepts involving lambda functions (e.g. in `reduce`)
 
 ## Programming principles
 

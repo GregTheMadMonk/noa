@@ -16,7 +16,7 @@ TNL offers the following ODE solvers:
 1. \ref TNL::Solvers::ODE::Euler - the Euler method with the 1-st order of accuracy.
 2. \ref TNL::Solvers::ODE::Merson - the Runge-Kutta-Merson solver with the 4-th order of accuracy and adaptive choice of the time step.
 
-Each solver has its static counterpart which can be run even in the GPU kernels which means that it can be combined with \ref TNL::Algorithms::ParallelFor for example. The static ODE solvers are the following:
+Each solver has its static counterpart which can be run even in the GPU kernels which means that it can be combined with \ref TNL::Algorithms::parallelFor for example. The static ODE solvers are the following:
 
 1. \ref TNL::Solvers::ODE::StaticEuler - the Euler method with the 1-st order of accuracy.
 2. \ref TNL::Solvers::ODE::StaticMerson - the Runge-Kutta-Merson solver with the 4-th order of accuracy and adaptive choice of the time step.
@@ -34,7 +34,7 @@ This problem can be solved as follows:
 
 \includelineno Solvers/ODE/StaticODESolver-SineExample.h
 
-We first define the type `Real` representing the floating-point arithmetics, which is `double` in this case (line 4). In the main function, we define the type of the ODE solver ( `ODESolver`, line 8). We choose \ref TNL::Solvers::ODE::StaticEuler. We define the variable `final_t` (line 9) representing the size of the time interval \f$ (0,T)\f$, next we define the integration time step `tau` (line 10) and the variable `output_time_step` (line 11) representing checkpoints in which we will print value of the solution \f$ x(t)\f$. On the line 13, we create an instance of the `ODESolver` and set the integration time step (line 14) and the initial time of the solver (line 15). Next we create variable `u` representing the solution of the given ODE and we initiate it with the initial condition \f$ u(0) = 0\f$ (line 16). On the lines 17-25, we iterate over the interval \f$ (0,T) \f$ with step given by the frequency of the checkpoints given by the variable `output_time_steps`. On the line 19, we let the solver to iterate until the next checkpoint or the end of the interval \f$(0,T) \f$ depending on what occurs first (it is expressed by `TNL::min( solver.getTime() + output_time_step, final_t )`). On the lines 20-22, we define the lambda function `f` representing the right-hand side of the ODE being solved. The lambda function receives the following arguments:
+We first define the type `Real` representing the floating-point arithmetics, which is `double` in this case (line 4). In the main function, we define the type of the ODE solver (`ODESolver`, line 8). We choose \ref TNL::Solvers::ODE::StaticEuler. We define the variable `final_t` (line 9) representing the size of the time interval \f$ (0,T)\f$, next we define the integration time step `tau` (line 10) and the variable `output_time_step` (line 11) representing checkpoints in which we will print value of the solution \f$ x(t)\f$. On the line 13, we create an instance of the `ODESolver` and set the integration time step (line 14) and the initial time of the solver (line 15). Next we create variable `u` representing the solution of the given ODE and we initiate it with the initial condition \f$ u(0) = 0\f$ (line 16). On the lines 17-25, we iterate over the interval \f$ (0,T) \f$ with step given by the frequency of the checkpoints given by the variable `output_time_steps`. On the line 19, we let the solver to iterate until the next checkpoint or the end of the interval \f$(0,T) \f$ depending on what occurs first (it is expressed by `TNL::min( solver.getTime() + output_time_step, final_t )`). On the lines 20-22, we define the lambda function `f` representing the right-hand side of the ODE being solved. The lambda function receives the following arguments:
 
 * `t` is the current value of the time variable \f$ t \in (0,T)\f$,
 * `tau` is the current integration time step,
@@ -66,14 +66,14 @@ In the next example, we demonstrate use of the static ODE solver to solve a syst
 \f[ \frac{dz}{dt} = xy - \beta z,\ \rm{ on }\ (0,T) \f]
 \f[ \vec u(0) = (x(0),y(0),z(0)) = \vec u_{ini} \f]
 
-for given constants \f$ \sigma, \rho \f$ and \f$ \beta \f$. The solution \f$ \vec u(t) = (x(t), y(t), z(t)) \in R^3 \f$ is represented by three-dimensional static vector ( \ref TNL::Containers::StaticVector). The solver looks as follows:
+for given constants \f$ \sigma, \rho \f$ and \f$ \beta \f$. The solution \f$ \vec u(t) = (x(t), y(t), z(t)) \in R^3 \f$ is represented by three-dimensional static vector (\ref TNL::Containers::StaticVector). The solver looks as follows:
 
 \includelineno Solvers/ODE/StaticODESolver-LorenzExample.h
 
 The code is very similar to the previous example. There are the following differences:
 
 1. We define the type of the variable `u` representing the solution \f$ \vec u(t) \f$ as \ref TNL::Containers::StaticVector< 3, Real > (line 9) which is reflected even in the definition of the ODE solver (\ref TNL::Solvers::ODE::StaticEuler< Vector > , line 10) and the variable `u` (line 21).
-2. In addition to the parameters of the solver ( `final_t`, `tau` and `output_time_step`, lines 14-16) we define parameters of the Lorenz system (`sigma`, `rho` and `beta`, lines 14-16).
+2. In addition to the parameters of the solver (`final_t`, `tau` and `output_time_step`, lines 14-16) we define parameters of the Lorenz system (`sigma`, `rho` and `beta`, lines 14-16).
 3. The initial condition \f$ \vec u(0) = (1,2,3) \f$ is set on the line 21.
 4. In the lambda function representing the right-hand side of the Lorenz system (lines 25-32), we first define auxiliary aliases `x` ,`y` and `z` (lines 26-28) to make the code easier to read. The main right-hand side of the Lorenz system is implemented on the lines (29-31).
 5. In the line 3, we print all components of the vector `u`.
@@ -103,7 +103,7 @@ The script has very similar structure as in the previous example. The result loo
 
 ## Combining static ODE solvers with parallel for
 
-The static solvers can be used inside of lambda functions for \ref TNL::Algorithms::ParallelFor for example. This can be useful when we need to solve large number of independent ODE problems, for example for parametric analysis. We demonstrate it on the two examples we have described above.
+The static solvers can be used inside of lambda functions for \ref TNL::Algorithms::parallelFor for example. This can be useful when we need to solve large number of independent ODE problems, for example for parametric analysis. We demonstrate it on the two examples we have described above.
 
 ### Solving scalar problems in parallel
 
@@ -173,7 +173,7 @@ It is very similar to the previous one. There are just the following changes:
 
 1. On the line 17, we define minimal values for the parameters \f$ \sigma, \beta \f$ and \f$ \rho \f$. On the line 18, we define how many different values we will consider for each parameter. The size of equidistant steps in the parameter variations is defined on the line 19. The interval for parameters variations is set to \f$ [0,30] \f$ (line 19 as well).
 2. On the line 23, we allocate vector `results` into which we will store the solution of the Lorenz problem for various parameters.
-3. Next we define the lambda function `f` representing the right-hand side of the Lorenz problem (lines 25-33) and the lambda function `solve` representing the ODE solver for the Lorenz problem with particular setup of the parameters (lines 34-52). This lambda function is processed by \ref TNL::Algorithms::ParallelFor3D called on the line 53. Therefore the lambda function `solve` receives three indexes `i`, `j` and `k` which are used to compute particular values of the parameters \f$ \sigma_i, \rho_j, \beta_k \f$ which are represented by variables `sigma_i`, `rho_j` and `beta_k` (lines 35-37). These parameters must be passed to the lambda function `f` explicitly (line 48). The reason is the same as in the previous example - nvcc (version 10.1) does not accept a lambda function defined within another lambda function.
+3. Next we define the lambda function `f` representing the right-hand side of the Lorenz problem (lines 25-33) and the lambda function `solve` representing the ODE solver for the Lorenz problem with particular setup of the parameters (lines 34-52). This lambda function is processed by \ref TNL::Algorithms::parallelFor called on the line 53. Therefore the lambda function `solve` receives three indexes `i`, `j` and `k` which are used to compute particular values of the parameters \f$ \sigma_i, \rho_j, \beta_k \f$ which are represented by variables `sigma_i`, `rho_j` and `beta_k` (lines 35-37). These parameters must be passed to the lambda function `f` explicitly (line 48). The reason is the same as in the previous example - nvcc (version 10.1) does not accept a lambda function defined within another lambda function.
 4. The initial condition for the Lorenz problem is set to vector \f$ (1,1,1) \f$ (line 42). Finally, we start the time loop (lines 45-51) and we store the state of the solution into the vector `results` using related vector view `results_view` in the time intervals given by the variable `output_time_step`.
 5. When all ODEs ares solved, we copy all the solutions from the vector `results` into an output file.
 
@@ -241,7 +241,7 @@ What are the main differences compared to the Lorenz model?
 
 1. The size of the Lorenz model is fixed. It is equal to three since \f$ (\sigma, \rho, \beta) \in R^3 \f$ which is small vector of fixed size and it can be represented by the static vector \ref TNL::Containers::StaticVector< 3, Real >. On the other hand, the size of the ODE system arising in the discretization by the [method of lines](https://en.wikipedia.org/wiki/Method_of_lines) depends not on the problem we solve but on the desired accuracy - the larger \f$ n \f$ the more accurate numerical approximation we get. The number of nodes \f$ n \f$ used for the space discretisation defines the number of parameters defining the mesh function. These parameters are also referred as [degrees of freedom, DOFs](https://en.wikipedia.org/wiki/Degrees_of_freedom). Therefore the size of the system can be large and it is better to employ dynamic vector \ref TNL::Containers::Vector for the solution.
 2. The size of the Lorenz model is small and so the evaluation of its right-hand side can be done sequentially by one thread. The size of the ODE system can be very large and evaluating the right-hand side asks for being performed in parallel.
-3. The dynamic vector \ref TNL::Containers::Vector allocates data dynamically and therefore it cannot be created within a GPU kernel which means the ODE solvers cannot be created in the GPU kernel either. For this reason, the lambda function `f` evaluating the right-hand side of the ODE system is always executed on the host and it calls \ref TNL::Algorithms::ParallelFor to evaluate the right-hand side of the ODE system.
+3. The dynamic vector \ref TNL::Containers::Vector allocates data dynamically and therefore it cannot be created within a GPU kernel which means the ODE solvers cannot be created in the GPU kernel either. For this reason, the lambda function `f` evaluating the right-hand side of the ODE system is always executed on the host and it calls \ref TNL::Algorithms::parallelFor to evaluate the right-hand side of the ODE system.
 
 ### Basic setup
 
@@ -278,19 +278,19 @@ u_{ini}(x) = \left\{
 
 Next we write the initial condition to a file (lines 37-39) using the function `write`  which we will describe later. On the lines (44-46) we create instance of the ODE solver `solver`, we set the integration time step `tau` of the solver (\ref TNL::Solvers::ODE::ExplicitSolver::setTau ) and we set the initial time to zero (\ref TNL::Solvers::ODE::ExplicitSolver::setTime).
 
-Finally, we proceed to the time loop (lines 52-64) but before we prepare counter of the states to be written into files (`output_idx`). The time loop uses the time variable within the ODE solver (\ref TNL::Solvers::ODE::ExplicitSolver::getTime ) and it iterates until we reach the end of the time interval \f$ [0, T] \f$ given by the variable `final_t`. On the line 54, we set the stop time of the ODE solver (\ref TNL::Solvers::ODE::ExplicitSolver::setStopTime ) to the next checkpoint for storing the state of the heat equation or the end of the time interval depending on what comes first. Next we define the lambda function `f` expressing the discretization of the second derivative of \f$ u \f$ by the central finite difference and the boundary conditions. The function receives the following parameters:
+Finally, we proceed to the time loop (lines 51-64) but before we prepare counter of the states to be written into files (`output_idx`). The time loop uses the time variable within the ODE solver (\ref TNL::Solvers::ODE::ExplicitSolver::getTime ) and it iterates until we reach the end of the time interval \f$ [0, T] \f$ given by the variable `final_t`. On the line 53, we set the stop time of the ODE solver (\ref TNL::Solvers::ODE::ExplicitSolver::setStopTime ) to the next checkpoint for storing the state of the heat equation or the end of the time interval depending on what comes first. Next we define the lambda function `f` expressing the discretization of the second derivative of \f$ u \f$ by the central finite difference and the boundary conditions. The function receives the following parameters:
 
 1. `i` is the index of the node and the related ODE arising from the method of lines. In fact, we have to evaluate the update of \f$ u_i^k \f$ to get to the next time level \f$ u_i^{k+1} \f$.
 2. `u` is vector view representing the state \f$ u_i^k \f$ of the heat equation on the \f$ k- \f$ time level.
 3. `fu` is vector of updates or time derivatives in the method of lines which will bring \f$ u \f$ to the next time level.
 
-As we mentioned above, since `nvcc` does not accept lambda functions defined within another lambda function, we have to define `f` separately and pass the parameters `u` and `fu` explicitly (see the line 62).
+As we mentioned above, since `nvcc` does not accept lambda functions defined within another lambda function, we have to define `f` separately and pass the parameters `u` and `fu` explicitly (see the line 61).
 
-Now look at the code of the lambda function `f`. Since the solution \f$ u \f$ does not change on the boundaries, we return zero on the boundary nodes (lines 56-57) and we evaluate the central difference for approximation of the second derivative on the interior nodes (line 59).
+Now look at the code of the lambda function `f`. Since the solution \f$ u \f$ does not change on the boundaries, we return zero on the boundary nodes (lines 55-56) and we evaluate the central difference for approximation of the second derivative on the interior nodes (line 58).
 
-Next we define the lambda function `time_stepping` (lines ) which is responsible for computing of the updates for all nodes \f$ i = 0, \ldots n-1 \f$. It is done by means of \ref TNL::Algorithms::ParallelFor which iterates over all the nodes and calling the function `f` on each of them. It passes the vector views `u` and `fu` explicitly to `f` for the reasons we have mentioned above.
+Next we define the lambda function `time_stepping` (lines ) which is responsible for computing of the updates for all nodes \f$ i = 0, \ldots n-1 \f$. It is done by means of \ref TNL::Algorithms::parallelFor which iterates over all the nodes and calling the function `f` on each of them. It passes the vector views `u` and `fu` explicitly to `f` for the reasons we have mentioned above.
 
-Finally, we run the ODE solver (\ref TNL::Solvers::ODE::Euler::solve ) (line 63) and we pass `u` as the current state of the heat equation and `f` the lambda function controlling the time evolution to the method `solve`. On the line 64, we store the current state to a file.
+Finally, we run the ODE solver (\ref TNL::Solvers::ODE::Euler::solve ) (line 62) and we pass `u` as the current state of the heat equation and `f` the lambda function controlling the time evolution to the method `solve`. On the line 63, we store the current state to a file.
 
 The function `write` which we use for writing the solution of the heat equation reads as follows:
 
@@ -342,8 +342,8 @@ In this section we will show how to connect ODE solver with the solver monitor. 
 There are the following differences compared to the previous example:
 
 1. We have to include a header file with the iterative solver monitor (line 5).
-2. We have to setup the solver monitor (lines 45-50). First, we define the monitor type (line 45) and we create an instance of the monitor (line 46). Next we create a separate thread for the monitor (line 47), set the refresh rate to 10 milliseconds (line 48), turn on the verbose mode (line 49) and set the solver stage name (line 50). On the line 58, we connect the monitor with the solver using method \ref TNL::Solvers::IterativeSolver::setSolverMonitor. We stop the monitor after the ODE solver finishes by calling \ref TNL::Solvers::IterativeSolverMonitor::stopMainLoop in the line 78.
+2. We have to setup the solver monitor (lines 45-50). First, we define the monitor type (line 45) and we create an instance of the monitor (line 46). Next we create a separate thread for the monitor (line 47), set the refresh rate to 10 milliseconds (line 48), turn on the verbose mode (line 49) and set the solver stage name (line 50). On the line 58, we connect the monitor with the solver using method \ref TNL::Solvers::IterativeSolver::setSolverMonitor. We stop the monitor after the ODE solver finishes by calling \ref TNL::Solvers::IterativeSolverMonitor::stopMainLoop in the line 77.
 
 The result looks as follows:
 
-\include /ODESolver-HeatEquationWithMonitorExample.out
+\include ODESolver-HeatEquationWithMonitorExample.out

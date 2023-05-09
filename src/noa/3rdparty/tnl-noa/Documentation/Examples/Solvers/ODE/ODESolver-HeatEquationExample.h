@@ -48,7 +48,6 @@ void solveHeatEquation( const char* file_name )
    /***
     * Time loop
     */
-   Index output_idx( 1 );
    while( solver.getTime() < final_t )
    {
       solver.setStopTime( TNL::min( solver.getTime() + output_time_step, final_t ) );
@@ -59,7 +58,7 @@ void solveHeatEquation( const char* file_name )
              fu[ i ] = h_sqr_inv * (  u[ i - 1 ] - 2.0 * u[ i ] + u[ i + 1 ] );
           };
       auto time_stepping = [=] ( const Real& t, const Real& tau, const VectorView& u, VectorView& fu ) {
-         TNL::Algorithms::ParallelFor< Device >::exec( 0, n, f, u, fu ); };
+         TNL::Algorithms::parallelFor< Device >( 0, n, f, u, fu ); };
       solver.solve( u, time_stepping );
       write( file, u, n, h, solver.getTime() ); // write the current state to a file
    }
@@ -71,7 +70,7 @@ int main( int argc, char* argv[] )
    file_name += "/ODESolver-HeatEquationExample-result.out";
 
    solveHeatEquation< TNL::Devices::Host >( file_name.getString() );
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    solveHeatEquation< TNL::Devices::Cuda >( file_name.getString() );
 #endif
 }

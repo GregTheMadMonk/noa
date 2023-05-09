@@ -7,7 +7,7 @@
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/CSRView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/CSR.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/LambdaAdapter.h>
@@ -136,7 +136,7 @@ CSRView< Device, Index, Kernel >::forElements( IndexType begin, IndexType end, F
       for( IndexType globalIdx = begin; globalIdx < end; globalIdx++ )
          f( segmentIdx, localIdx++, globalIdx );
    };
-   Algorithms::ParallelFor< Device >::exec( begin, end, l );
+   Algorithms::parallelFor< Device >( begin, end, l );
 }
 
 template< typename Device, typename Index, typename Kernel >
@@ -158,7 +158,7 @@ CSRView< Device, Index, Kernel >::forSegments( IndexType begin, IndexType end, F
       auto segment = view.getSegmentView( segmentIdx );
       function( segment );
    };
-   TNL::Algorithms::ParallelFor< DeviceType >::exec( begin, end, f );
+   Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Device, typename Index, typename Kernel >

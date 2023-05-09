@@ -33,9 +33,11 @@ several modules:
   \ref TNL::Matrices "sparse matrices",
   \ref TNL::Solvers::Linear "Krylov solvers" and
   \ref TNL::Solvers::Linear::Preconditioners "preconditioners".
-   - Sparse matrix formats: CSR, Ellpack, Sliced Ellpack, tridiagonal,
-     multidiagonal
-   - Krylov solvers: CG, BiCGstab, GMRES, CWYGMRES, TFQMR
+   - Sparse matrix formats: CSR, Ellpack, Sliced Ellpack, Chunked Ellpack, Bisection Ellpack,
+     tridiagonal, multidiagonal
+   - Lambda matrices (matrix elements are defined by C++ lambda functions)
+   - Stationary solvers: Jacobi, SOR
+   - Krylov solvers: CG, BiCGstab, BiCGstab(l), GMRES, TFQMR, IDR(s)
    - Preconditioners: Jacobi, ILU(0) (CPU only), ILUT (CPU only)
 - \ref TNL::Meshes "Meshes".
   TNL provides data structures for the representation of structured or
@@ -52,19 +54,20 @@ See also [Comparison with other libraries](comparison-with-other-libraries.md).
 TNL also provides several optional components:
 
 - TNL header files in the
-  [src/TNL](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/TNL)
+  [src/TNL](https://gitlab.com/tnl-project/tnl/tree/main/src/TNL)
   directory.
 - Various pre-processing and post-processing tools in the
-  [src/Tools](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Tools)
+  [src/Tools](https://gitlab.com/tnl-project/tnl/tree/main/src/Tools)
   directory.
-- Python bindings and scripts in the
-  [src/Python](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Python)
-  directory.
+- Various utilities implemented in Python in the
+  [src/Python](https://gitlab.com/tnl-project/tnl/tree/main/src/Python)
+  directory. Additionally, Python bindings for the C++ code are provided in
+  the separate [PyTNL](https://gitlab.com/tnl-project/pytnl) repository.
 - Examples of various numerical solvers in the
-  [src/Examples](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Examples)
+  [src/Examples](https://gitlab.com/tnl-project/tnl/tree/main/src/Examples)
   directory.
 - Benchmarks in the
-  [src/Benchmarks](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Benchmarks)
+  [src/Benchmarks](https://gitlab.com/tnl-project/tnl/tree/main/src/Benchmarks)
   directory.
 
 These components can be individually enabled or disabled and installed by a
@@ -96,16 +99,16 @@ In the following, we review the available installation methods:
 
    You can clone the git repository via HTTPS:
 
-       git clone https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev.git
+       git clone https://gitlab.com/tnl-project/tnl.git
 
    or via SSH:
 
-       git clone gitlab@mmg-gitlab.fjfi.cvut.cz:tnl/tnl-dev.git
+       git clone git@gitlab.com:tnl-project/tnl.git
 
    Then execute the `install` script to copy the header files to the final
    location (`~/.local/include` by default):
 
-       cd tnl-dev
+       cd tnl
        ./install
 
    However, we also recommend to install at least the `tools` [optional
@@ -120,7 +123,7 @@ In the following, we review the available installation methods:
    To include TNL as a git submodule in another project, e.g. in the `libs/tnl`
    location, execute the following command in the git repository:
 
-       git submodule add https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev.git libs/tnl
+       git submodule add https://gitlab.com/tnl-project/tnl.git libs/tnl
 
    See the [git submodules tutorial](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
    for details.
@@ -134,16 +137,16 @@ In order to use TNL, you need to install a compatible compiler, a parallel
 computing platform, and (optionally) some libraries.
 
 - __Supported compilers:__
-  You need a compiler which supports the [C++14](
-  https://en.wikipedia.org/wiki/C%2B%2B14) standard, for example [GCC](
-  https://gcc.gnu.org/) 5.0 or later or [Clang](http://clang.llvm.org/) 3.4 or
+  You need a compiler which supports the [C++17](
+  https://en.wikipedia.org/wiki/C%2B%2B17) standard, for example [GCC](
+  https://gcc.gnu.org/) 8.0 or later or [Clang](http://clang.llvm.org/) 7 or
   later.
 
 - __Parallel computing platforms:__
   TNL can be used with one or more of the following platforms:
     - [OpenMP](https://en.wikipedia.org/wiki/OpenMP) -- for computations on
       shared-memory multiprocessor platforms.
-    - [CUDA](https://docs.nvidia.com/cuda/index.html) 9.0 or later -- for
+    - [CUDA](https://docs.nvidia.com/cuda/index.html) 11.0 or later -- for
       computations on Nvidia GPUs.
     - [MPI](https://en.wikipedia.org/wiki/Message_Passing_Interface) -- TNL can
       a library implementing the MPI-3 standard for distributed computing (e.g.
@@ -173,10 +176,20 @@ computing platform, and (optionally) some libraries.
       <td> If TinyXML2 is not found as a system library, the `install` script
            will download, compile and install TinyXML2 along with TNL. </td>
   </tr>
+  <tr><td> [CGAL](https://github.com/CGAL/cgal/) </td>
+      <td> Additional mesh ordering algorithms for `tnl-reorder-mesh` and `tnl-plot-mesh-ordering` </td>
+      <td> `-DHAVE_CGAL` </td>
+      <td> Only used for the compilation of these tools. </td>
+  </tr>
   <tr><td> [Metis](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) </td>
       <td> `tnl-decompose-mesh` </td>
       <td> </td>
       <td> Only used for the compilation of the `tnl-decompose-mesh` tool. </td>
+  </tr>
+  <tr><td> [Hypre](https://github.com/hypre-space/hypre) </td>
+      <td> \ref Hypre "Wrappers for Hypre solvers" </td>
+      <td> `-DHAVE_HYPRE -lHYPRE` </td>
+      <td> Attention should be paid to Hypre build options, e.g. `--enable-bigint`. </td>
   </tr>
   <tr><td> [libpng](http://www.libpng.org/pub/png/libpng.html) </td>
       <td> \ref TNL::Images "Image processing" classes </td>
@@ -196,9 +209,8 @@ computing platform, and (optionally) some libraries.
   </table>
 
 - __Other language toolchains/interpreters:__
-    - Python – install an interpreter for using the Python scripts from TNL and
-      the corresponding development package (depending on your operating system)
-      for building the Python bindings.
+    - Python – install an interpreter for using the Python scripts included in
+      TNL.
 
 ### Optional components   {#optional-components}
 
@@ -219,33 +231,36 @@ of targets that can be selected from the following list:
 - `tests`: Compile unit tests in the `src/UnitTests` directory (except tests for
   matrix formats, which have a separate target).
 - `matrix-tests`: Compile unit tests for matrix formats.
-- `python`: Compile the Python bindings.
 - `doc`: Generate the documentation.
 
 Additionally, `[options]` can be replaced with a list of options with the `--`
 prefix that can be viewed by running `./install --help`.
 
-Note that [CMake](https://cmake.org/) 3.13 or later is required when using the
+Note that [CMake](https://cmake.org/) 3.24 or later is required when using the
 `install` script.
 
 ## Usage   {#usage}
 
 TNL can be used with various build systems if you configure the compiler flags
-as explained below. See also an [example project](
-https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/example-project) providing a simple
-`Makefile`.
+as explained below. See also our [example projects](
+https://gitlab.com/tnl-project/example-projects). If you use the CMake build
+system, there are two options:
+
+1. Install TNL system-wide or in your user home directory where CMake can find
+   it, and use `find_package(TNL)` in your project.
+2. Add a git submodule for TNL to your project and include it with
+   `add_subdirectory(libs/tnl)` in the `CMakeLists.txt` file.
 
 ### C++ compiler flags
 
-- Enable the C++14 standard: `-std=c++14`
+- Enable the C++17 standard: `-std=c++17`
 - Configure the include path: `-I /path/to/include`
     - If you installed TNL with the install script, the include path is
       `<prefix>/include`, where `<prefix>` is the installation path (it is
       `~/.local` by default).
     - If you want to include from the git repository directly, you need to
-      specify two include paths: `<git_repo>/src` and `<git_repo/src/3rdparty`,
-      where `<git_repo>` is the path where you have cloned the TNL git
-      repository.
+      specify `<git_repo>/src` as an include paths, where `<git_repo>` is the
+      path where you have cloned the TNL git repository.
     - Instead of using the `-I` flag, you can set the `CPATH` environment
       variable to a colon-delimited list of include paths. Note that this may
       affect the build systems of other projects as well. For example:
@@ -255,26 +270,28 @@ https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/example-project) providing a simple
 - Enable optimizations: `-O3 -DNDEBUG` (you can also add
   `-march=native -mtune=native` to enable CPU-specific optimizations).
 - Of course, there are many other useful compiler flags. See, for example, our
-  [CMakeLists.txt](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/-/blob/develop/CMakeLists.txt)
+  [CMakeLists.txt](https://gitlab.com/tnl-project/tnl/-/blob/main/CMakeLists.txt)
   file for flags that we use when developing TNL (there are flags for e.g.
   hiding some useless compiler warnings).
 
 ### Compiler flags for parallel computing
 
-To enable parallel computing platforms in TNL, additional compiler flags are
-needed. They can be enabled by defining a corresponding C preprocessor macro
-which has the form `HAVE_<PLATFORM>`, i.e.:
+Parallel computing platforms in TNL may be enabled automatically when using the
+appropriate compiler, or additional compiler flags may be needed.
 
-- `-D HAVE_OPENMP` enables OpenMP (also `-fopenmp` is usually needed to enable
-  OpenMP support in the compiler)
-- `-D HAVE_CUDA` enables CUDA (the compiler must actually support CUDA, use e.g.
-  `nvcc` or `clang++`)
-    - For `nvcc`, the following experimental flags are also required:
-      `--expt-relaxed-constexpr --expt-extended-lambda`
-- `-D HAVE_MPI` enables MPI (use a compiler wrapper such as `mpicxx` or link
-  manually against the MPI libraries)
+- CUDA support is automatically enabled when the `nvcc` or `clang++` compiler
+  is used to compile a `.cu` file. This is detected by the `__CUDACC__`
+  proprocessor macro.
+    - For `nvcc`, the following flags are also required:
+      `--expt-relaxed-constexpr --extended-lambda`
+- OpenMP support must be enabled by defining the `HAVE_OPENMP` preprocessor
+  macro (e.g. with `-D HAVE_OPENMP`). Also `-fopenmp` is usually needed to
+  enable OpenMP support in the compiler.
+- MPI support must be enabled by defining the `HAVE_MPI` preprocessor macro
+  (e.g. with `-D HAVE_MPI`). Use a compiler wrapper such as `mpicxx` or link
+  manually against the MPI libraries.
 
-### Environment variables
+### Environment variables   {#environment-variables}
 
 If you installed some TNL tools or examples using the `install` script, we
 recommend you to configure several environment variables for convenience. If you

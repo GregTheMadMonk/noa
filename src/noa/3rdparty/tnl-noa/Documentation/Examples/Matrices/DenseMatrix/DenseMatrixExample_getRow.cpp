@@ -1,5 +1,5 @@
 #include <iostream>
-#include <TNL/Algorithms/ParallelFor.h>
+#include <TNL/Algorithms/parallelFor.h>
 #include <TNL/Matrices/DenseMatrix.h>
 #include <TNL/Devices/Host.h>
 #include <TNL/Devices/Cuda.h>
@@ -11,8 +11,9 @@ void getRowExample()
    using MatrixType = TNL::Matrices::DenseMatrix< double, Device >;
    TNL::Pointers::SharedPointer< MatrixType > matrix( 5, 5 );
 
+   MatrixType* matrix_device = &matrix.template modifyData< Device >();
    auto f = [=] __cuda_callable__ ( int rowIdx ) mutable {
-      auto row = matrix->getRow( rowIdx );
+      auto row = matrix_device->getRow( rowIdx );
       row.setValue( rowIdx, 10 * ( rowIdx + 1 ) );
    };
 
@@ -26,7 +27,7 @@ void getRowExample()
    /***
     * Set the matrix elements.
     */
-   TNL::Algorithms::ParallelFor< Device >::exec( 0, matrix->getRows(), f );
+   TNL::Algorithms::parallelFor< Device >( 0, matrix->getRows(), f );
    std::cout << matrix << std::endl;
 }
 
@@ -35,7 +36,7 @@ int main( int argc, char* argv[] )
    std::cout << "Getting matrix rows on host: " << std::endl;
    getRowExample< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Getting matrix rows on CUDA device: " << std::endl;
    getRowExample< TNL::Devices::Cuda >();
 #endif

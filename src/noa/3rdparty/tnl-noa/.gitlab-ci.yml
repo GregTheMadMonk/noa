@@ -1,0 +1,612 @@
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+
+default:
+    image: "archlinux/devel-tnl:latest"
+    tags:
+        - docker
+    retry:
+        max: 1
+        when:
+            - api_failure
+            - runner_system_failure
+            - stuck_or_timeout_failure
+
+stages:
+    - lint
+    - build
+    - build:cuda-nvcc
+    - build:cuda-clang
+    - build:gcc
+    - build:clang
+    - build:doc
+    - deploy
+
+# https://docs.gitlab.com/ee/ci/yaml/workflow.html
+workflow:
+    rules:
+        # run a pipeline in the merge request context
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        # don't run a branch pipeline on push when there is an open merge request
+        - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+          when: never
+        # otherwise run a branch pipeline
+        - if: $CI_COMMIT_BRANCH
+
+# default flags for cmake
+.default_cmake_flags_def: &default_cmake_flags
+    # architectures
+    USE_CUDA: "no"
+    CUDA_ARCH: "native"
+    # MPI is selectively added to targets, so there is no point to have separate jobs without MPI
+    USE_MPI: "yes"
+    USE_OPENMP: "yes"
+    # build targets
+    BUILD_TESTS: "no"
+    BUILD_MATRIX_TESTS: "no"
+    BUILD_COVERAGE: "no"
+    BUILD_DOC: "no"
+    BUILD_BENCHMARKS: "no"
+    BUILD_EXAMPLES: "no"
+    BUILD_TOOLS: "no"
+    CMAKE_CXX_FLAGS: ""
+    CMAKE_CUDA_FLAGS: ""
+    CMAKE_EXE_LINKER_FLAGS: ""
+    CMAKE_SHARED_LINKER_FLAGS: ""
+
+# base for Clang builds
+.clang:
+    stage: build:clang
+    variables:
+        CXX: clang++
+        CC: clang
+        CUDA_HOST_COMPILER: clang++
+        # also use LLVM's libc++ instead of GCC's libstdc++ (which is used by default)
+        CMAKE_CXX_FLAGS: "-stdlib=libc++"
+        # use the LLVM linker and link to libc++
+        CMAKE_EXE_LINKER_FLAGS: "-fuse-ld=lld -lc++ -lc++abi"
+        CMAKE_SHARED_LINKER_FLAGS: "-fuse-ld=lld -lc++ -lc++abi"
+
+# base for Clang CUDA builds
+.clang_cuda:
+    stage: build:cuda-clang
+    extends: .clang
+    variables:
+        CUDACXX: clang++
+        CUDAHOSTCXX: clang++
+        CMAKE_CUDA_FLAGS: "-stdlib=libc++"
+        # FIXME: this is just a fallback since cmake can't detect the native architecture when using clang
+        CUDA_ARCH: 61
+
+# template for environment setup before build
+.env_setup:
+    script:
+        # make sure that $PATH and other essential variables are set correctly
+        - source /etc/profile
+        # all cores including hyperthreading
+#        - export NUM_CORES=$(grep "core id" /proc/cpuinfo | wc -l)
+        # all pyhsical cores
+        - export NUM_CORES=$(grep "core id" /proc/cpuinfo | sort -u | wc -l)
+        # respect $NINJAFLAGS from the outer environment if it is set
+        - if [[ ${NINJAFLAGS} == "" ]]; then
+                export NINJAFLAGS="-j$NUM_CORES";
+          fi
+        - export CTEST_OUTPUT_ON_FAILURE=1
+        - export CTEST_PARALLEL_LEVEL=4
+        - export OMP_NUM_THREADS=4
+        # running as root does not matter inside Docker containers
+        - export OMPI_ALLOW_RUN_AS_ROOT=1
+        - export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+        # fall back to arch 7.0 when the builder has no GPU to avoid building for all GPU architectures
+        - if ! nvidia-smi --list-gpus > /dev/null; then
+                CUDA_ARCH=70;
+          fi
+
+# template for build jobs
+.build_template:
+    # don't wait for jobs in previous stages to complete before starting this job
+    needs: []
+    script:
+        - !reference [.env_setup, script]
+        - cmake -B "./build/$CI_JOB_NAME" -S . -G Ninja
+                -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+                -DCMAKE_INSTALL_PREFIX="$(pwd)/install_prefix/$CI_JOB_NAME"
+                -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS}"
+                -DCMAKE_CUDA_FLAGS="${CMAKE_CUDA_FLAGS}"
+                -DCMAKE_EXE_LINKER_FLAGS="${CMAKE_EXE_LINKER_FLAGS}"
+                -DCMAKE_SHARED_LINKER_FLAGS="${CMAKE_SHARED_LINKER_FLAGS}"
+                -DTNL_USE_OPENMP=${USE_OPENMP}
+                -DTNL_USE_MPI=${USE_MPI}
+                -DTNL_USE_CUDA=${USE_CUDA}
+                -DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCH}
+                -DTNL_BUILD_TESTS=${BUILD_TESTS}
+                -DTNL_BUILD_MATRIX_TESTS=${BUILD_MATRIX_TESTS}
+                -DTNL_BUILD_DOC=${BUILD_DOC}
+                -DTNL_BUILD_COVERAGE=${BUILD_COVERAGE}
+                -DTNL_BUILD_BENCHMARKS=${BUILD_BENCHMARKS}
+                -DTNL_BUILD_EXAMPLES=${BUILD_EXAMPLES}
+                -DTNL_BUILD_TOOLS=${BUILD_TOOLS}
+                -DTNL_USE_CI_FLAGS=yes
+        # "install" implies the "all" target
+        - ninja -C "./build/$CI_JOB_NAME" ${NINJAFLAGS} install
+        - if [[ ${BUILD_TESTS} == "yes" ]] || [[ ${BUILD_MATRIX_TESTS} == "yes" ]]; then
+                ninja -C "./build/$CI_JOB_NAME" test;
+          fi
+    variables:
+        <<: *default_cmake_flags
+        BUILD_TYPE: Debug
+    rules:
+        - changes:
+            - src/**/*.{h,hpp,cpp,cu}
+            - "**/CMakeLists.txt"
+            - cmake/*
+            - .gitlab-ci.yml
+    interruptible: true
+
+# template for collecting code coverage
+.coverage_template:
+    # NOTE: gcovr is very slow, maybe it could be solved with fastcov:
+    # https://github.com/gcovr/gcovr/issues/289
+    # https://github.com/RPGillespie6/fastcov
+    # NOTE: when enabling, the BUILD_COVERAGE env var must be switched to yes
+    #after_script:
+    #    - mkdir coverage_html
+    #    - if [[ ${CXX} == "clang++" ]]; then
+    #            GCOV_COMMAND="llvm-cov gcov";
+    #      else
+    #            GCOV_COMMAND="gcov";
+    #      fi
+    #    - gcovr --print-summary --html-details coverage_html/coverage.html --xml coverage.xml --xml-pretty --gcov-executable "${GCOV_COMMAND}" --exclude-unreachable-branches --root "${CI_PROJECT_DIR}" --filter "${CI_PROJECT_DIR}/src/TNL/"
+    coverage: /^\s*lines:\s*\d+.\d+\%/
+    artifacts:
+        name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+        expire_in: 7 days
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: coverage.xml
+            junit: "build/$CI_JOB_NAME/tests-report.xml"
+        paths:
+            - coverage_html/
+
+# template for registering tests-report.xml as an artifact
+.tests_report_template:
+    artifacts:
+        name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+        expire_in: 7 days
+        reports:
+            junit: "build/$CI_JOB_NAME/tests-report.xml"
+
+# Dummy build job to ensure that a pipeline is created for a merge request, even
+# when there were no changes.
+dummy build job:
+    stage: build
+    script: echo "dummy"
+    only:
+        - merge_requests
+    except:
+        changes:
+            # .build_template
+            - src/**/*.{h,hpp,cpp,cu}
+            - "**/CMakeLists.txt"
+            - cmake/*
+            - .gitlab-ci.yml
+            # build documentation
+            - Documentation/**/*
+
+# Cuda builds are specified first because they take more time than host-only builds,
+# which can be allocated on hosts whitout GPUs.
+# Similarly, release builds are launched first to avoid the tail effect (they take
+# significantly more time than debug builds).
+
+cuda-nvcc_tests_Debug:
+    extends:
+        - .build_template
+        - .coverage_template
+    stage: build:cuda-nvcc
+    tags:
+        - docker
+        - nvidia
+    variables:
+        <<: *default_cmake_flags
+        USE_CUDA: "yes"
+        BUILD_TYPE: Debug
+        BUILD_TESTS: "yes"
+
+cuda-nvcc_tests_Release:
+    extends:
+        - .build_template
+        - .tests_report_template
+    stage: build:cuda-nvcc
+    tags:
+        - docker
+        - nvidia
+    variables:
+        <<: *default_cmake_flags
+        USE_CUDA: "yes"
+        BUILD_TYPE: Release
+        BUILD_TESTS: "yes"
+
+
+cuda-nvcc_matrix_tests_Debug:
+    extends:
+        - .build_template
+        - .coverage_template
+    stage: build:cuda-nvcc
+    tags:
+        - docker
+        - nvidia
+    variables:
+        <<: *default_cmake_flags
+        USE_CUDA: "yes"
+        BUILD_TYPE: Debug
+        BUILD_MATRIX_TESTS: "yes"
+
+cuda-nvcc_matrix_tests_Release:
+    extends:
+        - .build_template
+        - .tests_report_template
+    stage: build:cuda-nvcc
+    tags:
+        - docker
+        - nvidia
+    variables:
+        <<: *default_cmake_flags
+        USE_CUDA: "yes"
+        BUILD_TYPE: Release
+        BUILD_MATRIX_TESTS: "yes"
+
+
+cuda-nvcc_nontests_Debug:
+    extends: .build_template
+    stage: build:cuda-nvcc
+    variables:
+        <<: *default_cmake_flags
+        USE_CUDA: "yes"
+        BUILD_TYPE: Debug
+        BUILD_EXAMPLES: "yes"
+        BUILD_BENCHMARKS: "yes"
+        BUILD_TOOLS: "yes"
+
+cuda-nvcc_nontests_Release:
+    extends: .build_template
+    stage: build:cuda-nvcc
+    variables:
+        <<: *default_cmake_flags
+        USE_CUDA: "yes"
+        BUILD_TYPE: Release
+        BUILD_EXAMPLES: "yes"
+        BUILD_BENCHMARKS: "yes"
+        BUILD_TOOLS: "yes"
+
+
+
+cuda-clang_tests_Debug:
+    extends:
+        - cuda-nvcc_tests_Debug
+        - .clang_cuda
+
+cuda-clang_tests_Release:
+    extends:
+        - cuda-nvcc_tests_Release
+        - .clang_cuda
+
+cuda-clang_matrix_tests_Debug:
+    extends:
+        - cuda-nvcc_matrix_tests_Debug
+        - .clang_cuda
+
+cuda-clang_matrix_tests_Release:
+    extends:
+        - cuda-nvcc_matrix_tests_Release
+        - .clang_cuda
+
+cuda-clang_nontests_Debug:
+    extends:
+        - cuda-nvcc_nontests_Debug
+        - .clang_cuda
+
+cuda-clang_nontests_Release:
+    extends:
+        - cuda-nvcc_nontests_Release
+        - .clang_cuda
+
+
+
+
+
+
+gcc_tests_Debug:
+    extends:
+        - .build_template
+        - .coverage_template
+    stage: build:gcc
+    variables:
+        <<: *default_cmake_flags
+        BUILD_TYPE: Debug
+        BUILD_TESTS: "yes"
+
+gcc_tests_Release:
+    extends:
+        - .build_template
+        - .tests_report_template
+    stage: build:gcc
+    variables:
+        <<: *default_cmake_flags
+        BUILD_TYPE: Release
+        BUILD_TESTS: "yes"
+
+gcc_matrix_tests_Debug:
+    extends:
+        - .build_template
+        - .coverage_template
+    stage: build:gcc
+    variables:
+        <<: *default_cmake_flags
+        BUILD_TYPE: Debug
+        BUILD_MATRIX_TESTS: "yes"
+
+gcc_matrix_tests_Release:
+    extends:
+        - .build_template
+        - .tests_report_template
+    stage: build:gcc
+    variables:
+        <<: *default_cmake_flags
+        BUILD_TYPE: Release
+        BUILD_MATRIX_TESTS: "yes"
+
+gcc_nontests_Debug:
+    extends: .build_template
+    stage: build:gcc
+    variables:
+        <<: *default_cmake_flags
+        BUILD_TYPE: Debug
+        BUILD_EXAMPLES: "yes"
+        BUILD_BENCHMARKS: "yes"
+        BUILD_TOOLS: "yes"
+
+gcc_nontests_Release:
+    extends: .build_template
+    stage: build:gcc
+    variables:
+        <<: *default_cmake_flags
+        BUILD_TYPE: Release
+        BUILD_EXAMPLES: "yes"
+        BUILD_BENCHMARKS: "yes"
+        BUILD_TOOLS: "yes"
+
+
+
+clang_tests_Debug:
+    extends:
+        - gcc_tests_Debug
+        - .clang
+
+clang_tests_Release:
+    extends:
+        - gcc_tests_Release
+        - .clang
+
+clang_matrix_tests_Debug:
+    extends:
+        - gcc_matrix_tests_Debug
+        - .clang
+
+clang_matrix_tests_Release:
+    extends:
+        - gcc_matrix_tests_Release
+        - .clang
+
+clang_nontests_Debug:
+    extends:
+        - gcc_nontests_Debug
+        - .clang
+
+clang_nontests_Release:
+    extends:
+        - gcc_nontests_Release
+        - .clang
+
+
+
+
+
+Ginkgo examples:
+    extends: .build_template
+    stage: build:cuda-nvcc
+    tags:
+        - docker
+        - nvidia
+    variables:
+        <<: *default_cmake_flags
+        USE_CUDA: "yes"
+        BUILD_TYPE: Debug
+        BUILD_EXAMPLES: "yes"
+    before_script:
+        - !reference [.env_setup, script]
+        # clone and build Ginkgo
+        - git clone https://github.com/ginkgo-project/ginkgo.git
+        - cmake -B "./build_ginkgo/$CI_JOB_NAME" -S "ginkgo" -G Ninja
+                -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+                -DGINKGO_BUILD_TESTS="no"
+                -DGINKGO_BUILD_EXAMPLES="no"
+                -DGINKGO_BUILD_BENCHMARKS="no"
+        # "install" implies the "all" target
+        - ninja -C "./build_ginkgo/$CI_JOB_NAME" ${NINJAFLAGS} install
+
+
+
+
+
+documentation:
+    extends: .build_template
+    stage: build:cuda-nvcc
+    tags:
+        - docker
+        - nvidia
+    variables:
+        <<: *default_cmake_flags
+        USE_OPENMP: "yes"
+        USE_CUDA: "yes"
+        USE_MPI: "yes"
+        BUILD_TYPE: Debug
+        # build output snippets for documentation
+        BUILD_DOC: "yes"
+    rules:
+        - changes:
+            - Documentation/**/*
+            - src/TNL/**/*.{h,hpp}
+            - .gitlab-ci.yml
+    # store the built documentation for deployment
+    after_script:
+        - mv "./build/$CI_JOB_NAME/Documentation/html" "./html"
+    artifacts:
+        paths:
+            - ./html/
+        expire_in: 7 days
+
+pages:
+    stage: deploy
+    rules:
+        - if: $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "trigger" || $CI_COMMIT_BRANCH == "main"
+          changes:
+            - Documentation/**/*
+            - src/TNL/**/*.{h,hpp}
+            - .gitlab-ci.yml
+    # use "dependencies" instead of "needs" to deploy only when the entire pipeline succeeds
+    dependencies:
+        - documentation
+    image: "archlinux:latest"
+    script:
+        - mv ./html/ public/
+    artifacts:
+        paths:
+            - public
+
+clang-format src/TNL:
+    stage: lint
+    rules:
+        - changes:
+            - src/TNL/**/*.{h,hpp,cpp,cu}
+    script:
+        - ./scripts/run-clang-format.py
+                --color always
+                --style file
+                --exclude "src/TNL/3rdparty/*"
+                --recursive
+                src/TNL
+    interruptible: true
+
+clang-format src/Benchmarks:
+    stage: lint
+    rules:
+        - changes:
+            - src/Benchmarks/**/*.{h,hpp,cpp,cu}
+    script:
+        - ./scripts/run-clang-format.py
+                --color always
+                --style file
+                --recursive
+                src/Benchmarks
+    interruptible: true
+    # TODO: remove to enforce formatting
+    allow_failure: true
+
+clang-format src/Examples:
+    stage: lint
+    rules:
+        - changes:
+            - src/Examples/**/*.{h,hpp,cpp,cu}
+    script:
+        - ./scripts/run-clang-format.py
+                --color always
+                --style file
+                --recursive
+                src/Examples
+    interruptible: true
+    # TODO: remove to enforce formatting
+    allow_failure: true
+
+clang-format src/Tools:
+    stage: lint
+    rules:
+        - changes:
+            - src/Tools/**/*.{h,hpp,cpp,cu}
+    script:
+        - ./scripts/run-clang-format.py
+                --color always
+                --style file
+                --recursive
+                src/Tools
+    interruptible: true
+    # TODO: remove to enforce formatting
+    allow_failure: true
+
+clang-format src/UnitTests:
+    stage: lint
+    rules:
+        - changes:
+            - src/UnitTests/**/*.{h,hpp,cpp,cu}
+    script:
+        - ./scripts/run-clang-format.py
+                --color always
+                --style file
+                --recursive
+                src/UnitTests
+    interruptible: true
+    # TODO: remove to enforce formatting
+    allow_failure: true
+
+clang-format Documentation:
+    stage: lint
+    rules:
+        - changes:
+            - Documentation/**/*.{h,hpp,cpp,cu}
+    script:
+        - ./scripts/run-clang-format.py
+                --color always
+                --style file
+                --recursive
+                Documentation
+    interruptible: true
+    # TODO: remove to enforce formatting
+    allow_failure: true
+
+clang-tidy:
+    stage: lint
+    rules:
+        - changes:
+            - Documentation/**/*.{h,hpp,cpp,cu}
+            - src/**/*.{h,hpp,cpp,cu}
+            - "**/CMakeLists.txt"
+            - cmake/*
+            - .gitlab-ci.yml
+    variables:
+        CXX: clang++
+        CC: clang
+    script:
+        # configure only to generate compile_commands.json
+        # TODO: set BUILD_EXAMPLES=yes to modernize examples
+        - cmake -B "./build/$CI_JOB_NAME" -S . -G Ninja
+                -DCMAKE_BUILD_TYPE=Debug
+                -DTNL_USE_OPENMP=yes
+                -DTNL_USE_MPI=yes
+                -DTNL_USE_CUDA=no
+                -DTNL_BUILD_TESTS=yes
+                -DTNL_BUILD_MATRIX_TESTS=yes
+                -DTNL_BUILD_DOC=yes
+                -DTNL_BUILD_BENCHMARKS=yes
+                -DTNL_BUILD_EXAMPLES=no
+                -DTNL_BUILD_TOOLS=yes
+                -DTNL_USE_CI_FLAGS=yes
+        # cmake creates compile_commands.json only on the second run, WTF!?
+        - cmake -B "./build/$CI_JOB_NAME" -S . -G Ninja
+        - ls -lah "./build/$CI_JOB_NAME"
+        # run-clang-tidy is weird compared to run-clang-format.py:
+        # - clang-tidy is not executed on header files, but on source files
+        # - the positional arguments are regexes filtering sources from the compile_commands.json
+        # - the -header-filter option (or HeaderFilterRegex in the config) allows to filter header files
+        - run-clang-tidy -p "./build/$CI_JOB_NAME" ".*"
+    interruptible: true
+    # TODO: remove to enforce
+    allow_failure: true

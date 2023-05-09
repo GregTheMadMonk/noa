@@ -1,22 +1,4 @@
-# Warning
-This fork is made to be used exclusively with [noa](https://github.com/grinisrit/noa).
-Actually, the only part of it that concerns us is **src/TNL**.
-Changes include: removed dependancy on `mpark::variant`, changes to header file paths _as they are in **noa**_.
-This repo only exists to make the process of merging custom changes with upstream TNL easier.
-
-## To NOA mantainers
-To be used with NOA, TNL has to undergo some modifications, such as:
-1. Replacing TNL header paths with their locations in NOA
-2. Replacing `mpark::` and `experimental::` feature references with their standard C++17 implementation
-3. Renaming `TNL` namespace to `noa::TNL`
-4. Changing the locations of 3rdparty library headers to the ones used within NOA
-
-For this purpose, `noa-ize.sh` script exists.
-All changes that are made to TNL codebase should be automated (if possible) through this script to avoid doing these repetitive tasks manually every time.
-
-# Original README
-
-[![pipeline status](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/badges/develop/pipeline.svg)](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/commits/develop)
+[![pipeline status](https://gitlab.com/tnl-project/tnl/badges/main/pipeline.svg)](https://gitlab.com/tnl-project/tnl/commits/main)
 
 # Template Numerical Library
 
@@ -49,10 +31,10 @@ several modules:
   as [vectors][vectors], [sparse matrices][matrices],
   [Krylov solvers][linear solvers] and [preconditioners][preconditioners].
    - Sparse matrix formats: CSR, Ellpack, Sliced Ellpack, Chunked Ellpack, Bisection Ellpack,
-   - tridiagonal, multidiagonal
+     tridiagonal, multidiagonal
    - Lambda matrices (matrix elements are defined by C++ lambda functions)
    - Stationary solvers: Jacobi, SOR
-   - Krylov solvers: CG, BiCGStab, BICGStab(l), GMRES, CWYGMRES, TFQMR
+   - Krylov solvers: CG, BiCGStab, BiCGStab(l), GMRES, TFQMR, IDR(s)
    - Preconditioners: Jacobi, ILU(0) (CPU only), ILUT (CPU only)
 - _[Meshes][meshes]_.
   TNL provides data structures for the representation of structured or
@@ -81,19 +63,20 @@ https://mmg-gitlab.fjfi.cvut.cz/doc/tnl/md_Pages_comparison_with_other_libraries
 TNL also provides several optional components:
 
 - TNL header files in the
-  [src/TNL](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/TNL)
+  [src/TNL](https://gitlab.com/tnl-project/tnl/tree/main/src/TNL)
   directory.
 - Various pre-processing and post-processing tools in the
-  [src/Tools](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Tools)
+  [src/Tools](https://gitlab.com/tnl-project/tnl/tree/main/src/Tools)
   directory.
-- Python bindings and scripts in the
-  [src/Python](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Python)
-  directory.
+- Various utilities implemented in Python in the
+  [src/Python](https://gitlab.com/tnl-project/tnl/tree/main/src/Python)
+  directory. Additionally, Python bindings for the C++ code are provided in
+  the separate [PyTNL](https://gitlab.com/tnl-project/pytnl) repository.
 - Examples of various numerical solvers in the
-  [src/Examples](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Examples)
+  [src/Examples](https://gitlab.com/tnl-project/tnl/tree/main/src/Examples)
   directory.
 - Benchmarks in the
-  [src/Benchmarks](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/tree/develop/src/Benchmarks)
+  [src/Benchmarks](https://gitlab.com/tnl-project/tnl/tree/main/src/Benchmarks)
   directory.
 
 These components can be individually enabled or disabled and installed by a
@@ -140,26 +123,28 @@ project. Note that this is not an exhaustive list.
 
 Before contributing, please get accustomed with the [code of conduct][code of conduct].
 
-[GitLab issues]: https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/-/issues
+[GitLab issues]: https://gitlab.com/tnl-project/tnl/-/issues
 [code of conduct]: CODE_OF_CONDUCT.md
 [contact]: https://tnl-project.org/#contact
 
 ## Citing
 
-If you use TNL in your scientific projects, please cite the following paper in
+If you use TNL in your scientific projects, please cite the following papers in
 your publications:
 
-- T. Oberhuber, J. Klinkovský, R. Fučík, [TNL: Numerical library for modern
-  parallel architectures](https://ojs.cvut.cz/ojs/index.php/ap/article/view/6075),
-  Acta Polytechnica 61.SI (2021), 122-134.
+- T. Oberhuber, J. Klinkovský, R. Fučík, [TNL: Numerical library for modern parallel architectures](
+  https://ojs.cvut.cz/ojs/index.php/ap/article/view/6075), Acta Polytechnica 61.SI (2021), 122-134.
+- J. Klinkovský, T. Oberhuber, R. Fučík, V. Žabka, [Configurable open-source data structure for
+  distributed conforming unstructured homogeneous meshes with GPU support](
+  https://doi.org/10.1145/3536164), ACM Transactions on Mathematical Software, 2022, 48(3), 1-33.
 
 ## Authors
 
 See the [list of team members](https://tnl-project.org/about/) on our website.
-The [overview of contributions](https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/-/graphs/develop)
+The [overview of contributions](https://gitlab.com/tnl-project/tnl/-/graphs/main)
 can be viewed on GitLab.
 
 ## License
 
 Template Numerical Library is provided under the terms of the [MIT License](
-https://mmg-gitlab.fjfi.cvut.cz/gitlab/tnl/tnl-dev/blob/develop/LICENSE).
+https://gitlab.com/tnl-project/tnl/blob/main/LICENSE).

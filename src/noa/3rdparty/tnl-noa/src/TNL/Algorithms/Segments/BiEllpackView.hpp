@@ -7,7 +7,7 @@
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/BiEllpackView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/LambdaAdapter.h>
 //#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/BiEllpack.h>
@@ -194,7 +194,7 @@ BiEllpackView< Device, Index, Organization, WarpSize >::forElements( IndexType f
          groupHeight /= 2;
       }
    };
-   Algorithms::ParallelFor< DeviceType >::exec( first, last, work );
+   Algorithms::parallelFor< DeviceType >( first, last, work );
 }
 
 template< typename Device, typename Index, ElementsOrganization Organization, int WarpSize >
@@ -216,7 +216,7 @@ BiEllpackView< Device, Index, Organization, WarpSize >::forSegments( IndexType b
       auto segment = view.getSegmentView( segmentIdx );
       function( segment );
    };
-   TNL::Algorithms::ParallelFor< DeviceType >::exec( begin, end, f );
+   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Device, typename Index, ElementsOrganization Organization, int WarpSize >

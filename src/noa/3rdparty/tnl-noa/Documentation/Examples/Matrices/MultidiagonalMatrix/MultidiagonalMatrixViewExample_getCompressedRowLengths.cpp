@@ -1,5 +1,4 @@
 #include <iostream>
-#include <TNL/Algorithms/ParallelFor.h>
 #include <TNL/Matrices/MultidiagonalMatrix.h>
 #include <TNL/Devices/Host.h>
 #include <TNL/Devices/Cuda.h>
@@ -10,7 +9,7 @@ void laplaceOperatorMatrix()
 {
    const int gridSize( 4 );
    const int matrixSize = gridSize * gridSize;
-   TNL::Matrices::MultidiagonalMatrix< double, Device > matrix( 
+   TNL::Matrices::MultidiagonalMatrix< double, Device > matrix(
       matrixSize,                     // number of rows
       matrixSize,                     // number of columns
    { - gridSize, -1, 0, 1, gridSize } // diagonals offsets
@@ -45,7 +44,7 @@ int main( int argc, char* argv[] )
    std::cout << "Creating Laplace operator matrix on CPU ... " << std::endl;
    laplaceOperatorMatrix< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Creating Laplace operator matrix on CUDA GPU ... " << std::endl;
    laplaceOperatorMatrix< TNL::Devices::Cuda >();
 #endif

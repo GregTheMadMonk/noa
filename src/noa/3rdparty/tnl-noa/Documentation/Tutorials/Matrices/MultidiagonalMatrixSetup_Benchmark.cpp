@@ -1,5 +1,6 @@
 #include <iostream>
-#include <TNL/Algorithms/ParallelFor.h>
+#include <TNL/Algorithms/parallelFor.h>
+#include <TNL/Containers/StaticArray.h>
 #include <TNL/Matrices/MultidiagonalMatrix.h>
 #include <TNL/Devices/Host.h>
 #include <TNL/Devices/Cuda.h>
@@ -87,9 +88,9 @@ void setElement_on_device( const int gridSize, Matrix& matrix )
    matrix.setDimensions( matrixSize, matrixSize, getOffsets< typename Matrix::DeviceType >( gridSize ) );
 
    auto matrixView = matrix.getView();
-   auto f = [=] __cuda_callable__ ( int i, int j ) mutable {
-      const int rowIdx = j * gridSize + i;
-      if( i == 0 || j == 0 || i == gridSize - 1 || j == gridSize - 1 )
+   auto f = [=] __cuda_callable__ ( TNL::Containers::StaticArray< 2, int > i ) mutable {
+      const int rowIdx = i[ 1 ] * gridSize + i[ 0 ];
+      if( i[ 0 ] == 0 || i[ 1 ] == 0 || i[ 0 ] == gridSize - 1 || i[ 1 ] == gridSize - 1 )
          matrixView.setElement( rowIdx, rowIdx,  1.0 );
       else
       {
@@ -100,7 +101,9 @@ void setElement_on_device( const int gridSize, Matrix& matrix )
          matrixView.setElement( rowIdx, rowIdx + gridSize,  1.0 );
       }
    };
-   TNL::Algorithms::ParallelFor2D< typename Matrix::DeviceType >::exec( 0, 0, gridSize, gridSize, f );
+   const TNL::Containers::StaticArray< 2, int > begin = { 0, 0 };
+   const TNL::Containers::StaticArray< 2, int > end = { gridSize, gridSize };
+   TNL::Algorithms::parallelFor< typename Matrix::DeviceType >( begin, end, f );
 }
 
 template< typename Matrix >
@@ -129,7 +132,7 @@ void getRow( const int gridSize, Matrix& matrix )
          row.setElement( 4, 1.0 );
       }
    };
-   TNL::Algorithms::ParallelFor< typename Matrix::DeviceType >::exec( 0, matrixSize, f );
+   TNL::Algorithms::parallelFor< typename Matrix::DeviceType >( 0, matrixSize, f );
 }
 
 template< typename Matrix >
@@ -148,34 +151,14 @@ void forElements( const int gridSize, Matrix& matrix )
       const int j = rowIdx / gridSize;
       if( ( i == 0 || j == 0 || i == gridSize - 1 || j == gridSize - 1 ) && localIdx == 0 )
       {
-         columnIdx = rowIdx;
          value = 1.0;
       }
       else
       {
-         switch( localIdx )
-         {
-            case 0:
-               columnIdx = rowIdx - gridSize;
-               value = 1.0;
-               break;
-            case 1:
-               columnIdx = rowIdx - 1;
-               value = 1.0;
-               break;
-            case 2:
-               columnIdx = rowIdx;
-               value = -4.0;
-               break;
-            case 3:
-               columnIdx = rowIdx + 1;
-               value = 1.0;
-               break;
-            case 4:
-               columnIdx = rowIdx + gridSize;
-               value = 1.0;
-               break;
-         }
+         if( localIdx == 2 )
+            value = -4.0;
+         else
+            value = 1.0;
       }
    };
    matrix.forElements( 0, matrixSize, f );
@@ -256,7 +239,7 @@ int main( int argc, char* argv[] )
    std::cout << "Creating Laplace operator matrix on CPU ... " << std::endl;
    laplaceOperatorMultidiagonalMatrix< TNL::Devices::Host >();
 
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    std::cout << "Creating Laplace operator matrix on CUDA GPU ... " << std::endl;
    laplaceOperatorMultidiagonalMatrix< TNL::Devices::Cuda >();
 #endif

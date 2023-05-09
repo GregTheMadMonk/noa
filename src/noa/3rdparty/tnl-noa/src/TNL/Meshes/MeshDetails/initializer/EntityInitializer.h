@@ -13,7 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/initializer/EntitySeed.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Atomic.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/AtomicOperations.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/staticFor.h>
 
 namespace noa::TNL {
@@ -49,8 +49,8 @@ initializeSuperentities( Initializer< MeshConfig >& meshInitializer,
    if constexpr( subentityStorage && (subdimension > 0 || std::is_same_v< SuperentityTopology, Topologies::Polyhedron >) ) {
       NeighborCountsArray capacities( superentitiesCount );
 
-      Algorithms::ParallelFor< Devices::Host >::exec(
-         GlobalIndexType{ 0 },
+      Algorithms::parallelFor< Devices::Host >(  //
+         0,
          superentitiesCount,
          [ & ]( GlobalIndexType superentityIndex )
          {
@@ -71,8 +71,8 @@ initializeSuperentities( Initializer< MeshConfig >& meshInitializer,
    }
 
    if constexpr( subentityStorage || superentityStorage ) {
-      Algorithms::ParallelFor< Devices::Host >::exec(
-         GlobalIndexType{ 0 },
+      Algorithms::parallelFor< Devices::Host >(
+         0,
          superentitiesCount,
          [ & ]( GlobalIndexType superentityIndex )
          {

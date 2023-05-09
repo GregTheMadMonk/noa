@@ -12,7 +12,6 @@
 
 #include "ILU0.h"
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/Utils/TriangularSolve.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
 
 namespace noa::TNL {
 namespace Solvers {

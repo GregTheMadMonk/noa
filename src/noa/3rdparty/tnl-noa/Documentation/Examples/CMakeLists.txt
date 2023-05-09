@@ -2,6 +2,7 @@ ADD_SUBDIRECTORY( Algorithms )
 ADD_SUBDIRECTORY( Containers )
 ADD_SUBDIRECTORY( Pointers )
 ADD_SUBDIRECTORY( Matrices )
+ADD_SUBDIRECTORY( Meshes )
 ADD_SUBDIRECTORY( Solvers )
 
 set( COMMON_EXAMPLES )
@@ -22,26 +23,41 @@ set( HOST_EXAMPLES
    StringExampleGetAllocatedSize
    StringExampleReplace
    StringExampleSplit
+   StringExampleSetSize
    StringExampleStrip
    TimerExample
    TimerExampleLogger )
 
-if( BUILD_CUDA )
+if( TNL_BUILD_CUDA )
    foreach( target IN ITEMS ${COMMON_EXAMPLES} ${CUDA_EXAMPLES} )
-      cuda_add_executable( ${target}-cuda ${target}.cu OPTIONS )
-      add_custom_command( COMMAND ${target}-cuda > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out OUTPUT ${target}.out )
-      set( CUDA_OUTPUTS ${CUDA_OUTPUTS} ${target}.out )
+      add_executable( ${target} ${target}.cu )
+      target_link_libraries( ${target} PUBLIC TNL::TNL_CUDA )
+      add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          DEPENDS ${target} )
+      set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
    endforeach()
 else()
-   foreach( target IN ITEMS ${COMMON_EXAMPLES} ${HOST_EXAMPLES})
+   foreach( target IN ITEMS ${COMMON_EXAMPLES} )
       add_executable( ${target} ${target}.cpp )
-      add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out OUTPUT ${target}.out )
-      set( HOST_OUTPUTS ${HOST_OUTPUTS} ${target}.out )
+      target_link_libraries( ${target} PUBLIC TNL::TNL_CXX )
+      add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          DEPENDS ${target} )
+      set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
    endforeach()
 endif()
 
-IF( BUILD_CUDA )
-   ADD_CUSTOM_TARGET( RunExamples-cuda ALL DEPENDS ${CUDA_OUTPUTS} )
-ELSE()
-   ADD_CUSTOM_TARGET( RunExamples ALL DEPENDS ${HOST_OUTPUTS} )
-ENDIF()
+foreach( target IN ITEMS ${HOST_EXAMPLES} )
+   add_executable( ${target} ${target}.cpp )
+   target_link_libraries( ${target} PUBLIC TNL::TNL_CXX )
+   add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                       OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                       DEPENDS ${target} )
+   set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
+endforeach()
+
+add_custom_target( RunExamples ALL DEPENDS ${DOC_OUTPUTS} )
+
+# add the dependency to the main target
+add_dependencies( run-doc-examples RunExamples )

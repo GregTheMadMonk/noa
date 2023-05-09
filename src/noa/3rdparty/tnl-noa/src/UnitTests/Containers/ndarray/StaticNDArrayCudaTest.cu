@@ -3,7 +3,7 @@
 
 #include <TNL/Containers/NDArray.h>
 
-#include <TNL/Algorithms/ParallelFor.h>
+#include <TNL/Algorithms/parallelFor.h>
 
 using namespace TNL;
 using namespace TNL::Containers;
@@ -39,7 +39,7 @@ void __test_SetThroughView()
     };
 
     a.setValue(0);
-    Algorithms::ParallelFor< TNL::Devices::Cuda >::exec( 0, 1, kernel, a_view );
+    Algorithms::parallelFor< TNL::Devices::Cuda >( 0, 1, kernel, a_view );
     expect_identity( a.getStorageArray() );
 }
 TEST( StaticNDArrayCudaTest, SetThroughView )
@@ -70,7 +70,7 @@ void __test_CopyFromArray()
     };
 
     a.setValue(0);
-    Algorithms::ParallelFor< TNL::Devices::Cuda >::exec( 0, 1, kernel, a_view );
+    Algorithms::parallelFor< TNL::Devices::Cuda >( 0, 1, kernel, a_view );
     expect_identity( a.getStorageArray() );
 }
 TEST( StaticNDArrayCudaTest, CopyFromArray )

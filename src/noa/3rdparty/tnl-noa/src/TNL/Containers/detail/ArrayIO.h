@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <type_traits>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Object.h>

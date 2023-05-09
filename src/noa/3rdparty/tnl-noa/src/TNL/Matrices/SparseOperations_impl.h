@@ -14,7 +14,7 @@
 #include <memory>  // std::unique_ptr
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Pointers/DevicePointer.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 
 namespace noa::TNL {
 namespace Matrices {
@@ -336,8 +336,7 @@ reorderArray( const Array1& src, Array2& dest, const PermutationArray& perm )
       dest[ i ] = src[ perm[ i ] ];
    };
 
-   Algorithms::ParallelFor< DeviceType >::exec(
-      (IndexType) 0, src.getSize(), kernel, src.getData(), dest.getData(), perm.getData() );
+   Algorithms::parallelFor< DeviceType >( 0, src.getSize(), kernel, src.getData(), dest.getData(), perm.getData() );
 }
 
 }  // namespace Matrices

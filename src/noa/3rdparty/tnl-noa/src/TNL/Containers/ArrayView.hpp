@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MultiDeviceMemoryOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/detail/ArrayIO.h>
@@ -285,7 +285,7 @@ ArrayView< Value, Device, Index >::forElements( IndexType begin, IndexType end, 
    {
       f( i, view[ i ] );
    };
-   Algorithms::ParallelFor< DeviceType >::exec( begin, end, g, f, *this );
+   Algorithms::parallelFor< DeviceType >( begin, end, g, f, *this );
 }
 
 template< typename Value, typename Device, typename Index >
@@ -300,7 +300,7 @@ ArrayView< Value, Device, Index >::forElements( IndexType begin, IndexType end, 
    {
       f( i, view[ i ] );
    };
-   Algorithms::ParallelFor< DeviceType >::exec( begin, end, g, f, *this );
+   Algorithms::parallelFor< DeviceType >( begin, end, g, f, *this );
 }
 
 template< typename Value, typename Device, typename Index >

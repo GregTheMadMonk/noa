@@ -35,7 +35,7 @@ main( int argc, char* argv[] )
    if( ! parseCommandLine( argc, argv, config, parameters ) )
       return EXIT_FAILURE;
 
-   const int n = parameters.getParameter< int >( "grid-size" );;
+   const int n = parameters.getParameter< int >( "grid-size" );
    const std::string executor_string = parameters.getParameter< std::string >( "executor" );
    const std::string preconditioner = parameters.getParameter< std::string >( "preconditioner" );
 
@@ -195,7 +195,7 @@ main( int argc, char* argv[] )
    // Solve the system
    TNL::Timer t;
    t.start();
-   solver->apply( lend( gko_b ), lend( gko_x ) );
+   solver->apply( gko_b, gko_x );
    t.stop();
 
    // Write the result

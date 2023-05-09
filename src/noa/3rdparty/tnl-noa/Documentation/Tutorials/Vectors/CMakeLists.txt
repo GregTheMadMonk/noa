@@ -1,15 +1,34 @@
-IF( BUILD_CUDA )
-   CUDA_ADD_EXECUTABLE( Expressions Expressions.cu )
-   ADD_CUSTOM_COMMAND( COMMAND Expressions > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/Expressions.out OUTPUT Expressions.out )
-   CUDA_ADD_EXECUTABLE( Reduction Reduction.cu )
-   ADD_CUSTOM_COMMAND( COMMAND Reduction > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/Reduction.out OUTPUT Reduction.out )
-   ADD_EXECUTABLE( StaticVectorExample StaticVectorExample.cpp )
-   ADD_CUSTOM_COMMAND( COMMAND StaticVectorExample > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/StaticVectorExample.out OUTPUT StaticVectorExample.out )
-ENDIF()
+set( CUDA_EXAMPLES
+     Expressions
+     Reduction
+)
+set( HOST_EXAMPLES
+     StaticVectorExample
+)
 
-IF( BUILD_CUDA )
-ADD_CUSTOM_TARGET( TutorialsVectors-cuda ALL DEPENDS
-   Expressions.out
-   Reduction.out
-   StaticVectorExample.out )
-ENDIF()
+if( TNL_BUILD_CUDA )
+   foreach( target IN ITEMS ${CUDA_EXAMPLES} )
+      add_executable( ${target} ${target}.cu )
+      target_link_libraries( ${target} PUBLIC TNL::TNL_CUDA )
+      add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                          DEPENDS ${target} )
+      set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
+   endforeach()
+
+   add_custom_target( RunTutorialsVectorsExamples-cuda ALL DEPENDS ${DOC_OUTPUTS} )
+endif()
+
+foreach( target IN ITEMS ${HOST_EXAMPLES} )
+   add_executable( ${target} ${target}.cpp )
+   target_link_libraries( ${target} PUBLIC TNL::TNL_CXX )
+   add_custom_command( COMMAND ${target} > ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                       OUTPUT ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out
+                       DEPENDS ${target} )
+   set( DOC_OUTPUTS ${DOC_OUTPUTS} ${TNL_DOCUMENTATION_OUTPUT_SNIPPETS_PATH}/${target}.out )
+endforeach()
+
+add_custom_target( RunTutorialsVectorsExamples ALL DEPENDS ${DOC_OUTPUTS} )
+
+# add the dependency to the main target
+add_dependencies( run-doc-examples RunTutorialsVectorsExamples )

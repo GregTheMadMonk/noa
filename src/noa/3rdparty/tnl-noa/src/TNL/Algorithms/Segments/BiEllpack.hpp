@@ -7,7 +7,7 @@
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/ParallelFor.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/scan.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/BiEllpack.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Ellpack.h>
@@ -170,7 +170,7 @@ BiEllpack< Device, Index, IndexAllocator, Organization, WarpSize >::computeColum
          groupPointersView[ groupIdx + groupBegin ] = groupSize;
       }
    };
-   Algorithms::ParallelFor< DeviceType >::exec( (IndexType) 0, this->virtualRows / getWarpSize(), createGroups );
+   Algorithms::parallelFor< DeviceType >( 0, this->virtualRows / getWarpSize(), createGroups );
 }
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int WarpSize >

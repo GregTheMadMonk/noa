@@ -1,0 +1,41 @@
+# build/output directories
+/build/
+
+# Netbeans project stuff
+/nbproject
+
+# Eclipse project stuff
+/.settings
+/.project
+/.pydevproject
+
+# VSCode
+/.vscode/
+/.cache/
+
+# Visual Studio
+/.vs/
+/out/
+/CMakeSettings.json
+
+# CTest creates this
+/Testing
+
+# Editors
+*.orig
+*.bak
+*.backup
+*.swp
+
+# GDB
+.gdb_history
+
+# old/deprecated directories (can be removed later, they are not used anymore)
+/Debug
+/Release
+/RelWithDebInfo
+/Build
+/Documentation/output_snippets/
+/Documentation/html/
+/build-tinyxml2/
+/builddir

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <TNL/Solvers/ODE/StaticEuler.h>
 #include <TNL/Containers/Vector.h>
-#include <TNL/Algorithms/ParallelFor.h>
+#include <TNL/Algorithms/parallelFor.h>
 
 using Real = double;
 
@@ -40,7 +40,7 @@ void solveParallelODEs( const char* file_name )
          results_view[ time_step++ * c_vals + idx ] = u;
       }
    };
-   TNL::Algorithms::ParallelFor< Device >::exec( 0, c_vals, solve );
+   TNL::Algorithms::parallelFor< Device >( 0, c_vals, solve );
 
    std::fstream file;
    file.open( file_name, std::ios::out );
@@ -58,7 +58,7 @@ int main( int argc, char* argv[] )
    TNL::String file_name( argv[ 1 ] );
    file_name += "/StaticODESolver-SineParallelExample-result.out";
    solveParallelODEs< TNL::Devices::Host >( file_name.getString() );
-#ifdef HAVE_CUDA
+#ifdef __CUDACC__
    solveParallelODEs< TNL::Devices::Cuda >( file_name.getString() );
 #endif
 }
