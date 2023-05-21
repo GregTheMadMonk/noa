@@ -8,8 +8,6 @@
 #include <noa/utils/combine/combine.hh>
 #include <noa/utils/domain/domain.hh>
 
-#include "../methods.hh"
-
 namespace noa::utils::cfd::tasks {
 
 /// \brief Gradient evolution sensitivity calculation method
@@ -21,7 +19,10 @@ struct GradEv; // Incomplete
 /// TODO: Could this be generalized for all 2D cases?
 template <domain::CDomainWithTopology<TNL::Meshes::Topologies::Triangle> DomainType>
 struct GradEv<DomainType> : public combine::MakeDynamic<GradEv<DomainType>> {
-    using MHFEType = MHFE<methods::LMHFE<DomainType>>;
+    /// \brief MHFE task type
+    ///
+    /// useLumping is `true` because the method is only derived for lumped MHFE
+    using MHFEType = MHFE<DomainType, true>;
 
     void run(const MHFEType& mhfe) {
     } // <-- void GradEv::run()

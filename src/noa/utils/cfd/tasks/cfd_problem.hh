@@ -52,6 +52,13 @@ public:
     /// \brief Edge solutions layer index
     RealLayerView edgeSolution;
 
+    /// \brief Re-calculate all cached values
+    ///
+    /// Is set to `2` by \ref update(), and checked by `needsUpdate()`.
+    /// Signs that a re-caclulation of cached values is required to be
+    /// performed by all tasks depending on it
+    int queueUpdate = 0;
+
 public:
     /// \brief Default constructor
     ///
@@ -71,6 +78,9 @@ public:
         this->requestLayer(DomainType::dimEdge, this->neumann,       RealType{});
         this->requestLayer(DomainType::dimEdge, this->neumannMask,   int{});
         this->requestLayer(DomainType::dimEdge, this->edgeSolution,  RealType{});
+
+        // First step needs to calculate all of the cache-able parameters
+        this->update();
     }
 
     CFDProblem(const CFDProblem&) = delete;
@@ -80,12 +90,10 @@ public:
 
     /// \brief Each time CFDProblem is used, it performs a validity check
     void run() {
-        if (!this->valid()) throw errors::InvalidSetup{};
+        // Don't update on the next step
+        if (this->queueUpdate > 0) --this->queueUpdate;
 
-        // Fill the initial solution with zeros
-        if (!this->solution.isValid()) {
-            this->solution.fill([] (auto, auto& v) { v = RealType{}; });
-        }
+        if (!this->valid()) throw errors::InvalidSetup{};
     } // <-- void CFDProblem::run()
 
     /// \brief Set domain mesh
@@ -121,6 +129,18 @@ public:
     void bindView(domain::LayerView<DataType, DomainType>& view) {
         view.bindTo(*this->domain);
     }
+    
+    /// \brief Get problem domain
+    [[nodiscard]] const DomainType& getDomain() const { return this->domain; }
+
+    /// \brief Sign to all dependant tasks that an update of all cached values is needed
+    ///
+    /// Sets \ref queueUpdate to `2`. This is needed to ensure that all dependant tasks
+    /// still recieve update signal after a \ref run() is performed once
+    void update() { this->queueUpdate = 2; }
+
+    /// \brief Check if an update to all cached values is needed
+    [[nodiscard]] bool needsUpdate() const { return this->queueUpdate > 0; }
 
 private:
     /// \brief Validate CFD problem formulation
@@ -145,6 +165,7 @@ private:
             return false;\
         }
 
+        NOA_CFD_PROBLEM_CHECK_VIEW(solution);
         NOA_CFD_PROBLEM_CHECK_VIEW(a);
         NOA_CFD_PROBLEM_CHECK_VIEW(c);
         NOA_CFD_PROBLEM_CHECK_VIEW(dirichlet);
@@ -155,17 +176,19 @@ private:
         #undef NOA_CFD_PROBLEM_CHECK_VIEW
 
         // Check that all boundaries have at least one boundary condition associated with them
-        bool ret = true;
+        bool hasBoundary = true;
         this->domain.getMesh().template forBoundary<DomainType::dimEdge>(
-            [this, &ret] (auto edge) {
+            [this, &hasBoundary] (auto edge) {
+                hasBoundary &= this->dirichletMask[edge] != 0 || this->neumannMask[edge] != 0;
             }
         );
 
-        if (!ret) {
+        if (!hasBoundary) {
             std::cerr << "Domain boundary conditions missing on one or more boundary edges!";
+            return false;
         }
 
-        return ret;
+        return true;
     } // <-- bool CFDProblem::valid()
 }; // <-- struct CFDProblem
 

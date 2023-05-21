@@ -104,7 +104,7 @@ public:
     /// points to is available, there might still be garbage in there.
     ///
     /// Validation is performed via \ref fill()
-    void bindTo(DomainType& domain) {
+    void bindTo(DomainType& domain) override {
         if (&domain != this->domain) {
             this->unbindFrom(); // This automatically sets \ref valid to `false`
             this->domain = &domain;
@@ -117,7 +117,7 @@ public:
     } // <-- bindTo()
 
     /// \brief Unbind from Domain
-    void unbindFrom() {
+    void unbindFrom() override {
         if (this->domain == nullptr) return;
 
         auto& views = Base::getDomainViews(*this->domain);
@@ -138,6 +138,30 @@ public:
         this->valid = true;
     } // <-- fill()
 
+    /// \brief Fill the view with a constant value
+    ///
+    /// Sets \ref valid to `true`
+    void fill(DataType value) {
+        view.forAllElements([value] (auto, auto& v) { v = value; });
+        this->valid = true;
+    } // <-- fill()
+
+    /// \brief Set the view \ref valid flag to `true` but don't mutate it
+    ///
+    /// Should be used in case the view was already filled by an ouside code
+    void fill() {
+        this->valid = true;
+    } // <-- fill()
+
+    /// \brief Element getter
+    DataType& operator[](typename ViewType::IndexType index) {
+        return this->view[index];
+    } // <-- operator[]()
+
+    /// \brief Element getter (const)
+    const DataType& operator[](typename ViewType::IndexType index) const {
+        return this->view[index];
+    } // <-- operator[]()
 private:
     void copyFrom(const LayerView& other) {
         this->unbindFrom();
