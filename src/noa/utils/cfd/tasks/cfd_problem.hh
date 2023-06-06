@@ -66,7 +66,7 @@ public:
     /// When the domain mesh is set, layers persist and get resized
     /// accordingly
     CFDProblem() {
-        auto solutionLayer = this->requestLayer(DomainType::dimCell, this->solution, RealType{});
+        auto& solutionLayer = this->requestLayer(DomainType::dimCell, this->solution, RealType{});
         solutionLayer.alias = "Computed Solution";
         solutionLayer.exportHint = true;
 
@@ -123,6 +123,18 @@ public:
 
         return ret;
     }
+
+    /// \brief Remove the layer from a domain
+    ///
+    /// Sometimes while updating the subtask we might need to remove and re-add some layers
+    ///
+    /// \param view view to the layer that needs to be removed. View is marked as invalid after this
+    ///
+    /// \throws if the deletion of the layer will invalidate views other than view
+    template <typename DataType>
+    void removeLayer(domain::LayerView<DataType, DomainType>& view) {
+        auto& manager = this->domain.getLayers(view);
+    } // <-- void removeLayer()
 
     /// \brief Rebind a view to this problem's domain
     template <typename DataType>

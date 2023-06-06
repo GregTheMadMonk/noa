@@ -87,6 +87,11 @@ public:
         this->unbindFrom();
     }
 
+    /// \brief Dimension getter
+    std::size_t getDimension() const { return this->dimension; }
+    /// \brief Index getter
+    std::size_t getIndex() const { return this->index; }
+
     /// \brief Access the stored view
     ViewType& operator*() { return this->view; }
     /// \brief Access the stored view

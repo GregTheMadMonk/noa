@@ -3,23 +3,29 @@
 #include <noa/utils/combine/combine.hh>
 #include <noa/utils/cfd/cfd.hh>
 
+template <typename VectorType>
+void gWrtP(typename VectorType::ConstViewType in, typename VectorType::ViewType out) {
+}
+
 int main(int argc, char** argv) {
     using DomainType     = noa::utils::domain::Domain<noa::TNL::Meshes::Topologies::Triangle>;
+    using VectorType     = DomainType::LayerManagerType::Vector<typename DomainType::RealType>;
     using CFDProblemType = noa::utils::cfd::tasks::CFDProblem<DomainType>;
-    using MHFEType       = noa::utils::cfd::tasks::MHFE<DomainType, true>;
+    using MHFEType       = noa::utils::cfd::tasks::MHFE<DomainType, false>;
+    // using GradEvType     = noa::utils::cfd::tasks::GradEv<gWrtP<VectorType>, DomainType>;
 
     using noa::utils::combine::StaticComputation;
 
     StaticComputation<MHFEType> computation;
+    // StaticComputation<GradEvType> computation;
     auto& problem = computation.template get<CFDProblemType>();
     auto& mhfe    = computation.template get<MHFEType>();
-    const auto& cproblem = computation.template get<CFDProblemType>();
 
     std::cout << problem.solution->getSize() << std::endl;
     std::cout << problem.edgeSolution->getSize() << std::endl;
     
     DomainType domain;
-    noa::utils::domain::generate2DGrid(domain, 10, 20, 1.0, 1.0);
+    noa::utils::domain::generate2DGrid(domain, 20, 10, 1.0, 1.0);
 
     problem.setMesh(domain.getMesh());
 
@@ -64,13 +70,14 @@ int main(int argc, char** argv) {
         }
     );
 
-    mhfe.tau = 0.01;
+    mhfe.tau = 0.005;
 
-    std::cout << problem.needsUpdate() << std::endl;
-    computation.run();
-    std::cout << problem.needsUpdate() << std::endl;
-    // computation.run();
-    // std::cout << problem.needsUpdate() << std::endl;
+    while (mhfe.getTime() < 1) {
+        computation.run();
+        std::cerr << "\r" << mhfe.getTime() << "                 ";
+        problem.getDomain().write("temp/" + std::to_string(mhfe.getTime()) + ".vtu");
+    }
+    std::cerr << std::endl;
 
     return 0;
 }

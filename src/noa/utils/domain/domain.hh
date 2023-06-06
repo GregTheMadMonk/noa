@@ -316,7 +316,7 @@ struct Domain {
         }
 
         /// Write Domain to a file
-        void write(const Path& filename) {
+        void write(const Path& filename) const {
                 assert(("Mesh data is empty, nothing to save!", !isClean()));
 
                 std::ofstream file(filename);
@@ -327,13 +327,13 @@ struct Domain {
         }
 
         /// Write domain to an ostream
-        void writeStream(std::ostream& stream) {
+        void writeStream(std::ostream& stream) const {
                 MeshWriter writer(stream);
                 writer.template writeEntities<dimCell>(mesh.value());
 
                 // Write layers
                 for (int dim = 0; dim <= dimCell; ++dim)
-                        for (auto it : layers.at(dim)) {
+                        for (const auto it : layers.at(dim)) {
                                 const auto& layer = it.second;
                                 if (!layer.exportHint) continue;
                                 if (dim == dimCell)

@@ -19,6 +19,7 @@
 
 // Local headers
 #include "cfd_problem.hh"
+#include "../scalar_function.hh"
 
 // getEntityMeasure should be included after Mesh.h
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Geometry/getEntityMeasure.h>
@@ -56,15 +57,15 @@ struct MHFE<DomainType, useLumping> : public combine::MakeDynamic<MHFE<DomainTyp
     /// \brief Domain local index type
     using LocalIndexType = DomainType::LocalIndexType;
 
+    /// \brief System sparse matrix type
+    using SparseMatrixType = TNL::Matrices::SparseMatrix<RealType, DeviceType, GlobalIndexType>;
+
     /// \brief Simulation time step
     RealType tau{};
 
 private:
     /// \brief Current simulation time
     RealType time{};
-
-    /// \brief System sparse matrix type
-    using SparseMatrixType = TNL::Matrices::SparseMatrix<RealType, DeviceType, GlobalIndexType>;
 
     /// \brief TNL Vector type
     template <typename DataType>
@@ -73,6 +74,8 @@ private:
     /// \brief System matrix row capacities
     domain::LayerView<GlobalIndexType, DomainType> capacities;
 
+    /// \brief Number of cells adjacent to an edge
+    ProblemType::IntLayerView localCells;
     /// \brief Amount of edges per cell
     ProblemType::IntLayerView edges;
     /// \biref Max amount of edges per cell
@@ -103,6 +106,11 @@ private:
     /// \brief Cached cell measures
     ProblemType::RealLayerView measures;
 
+    // TODO: Remove this and provide getters where needed?
+    template <auto scalarWrtP, domain::CDomain GEDomainType>
+    requires CScalarFuncWrtP<decltype(scalarWrtP), GEDomainType>
+    friend struct GradEv;
+
 public:
     /// \biref Preconditioner name
     std::string preconditionerName = "diagonal";
@@ -110,22 +118,24 @@ public:
     std::string solverName         = "gmres";
 
     /// \brief Default constructor
-    MHFE(ProblemType& problem) {
+    explicit MHFE(ProblemType& problem) {
         this->time = RealType{};
         this->tau  = RealType{};
 
-        problem.requestLayer(DomainType::dimCell, this->edges,    int{});
-        problem.requestLayer(DomainType::dimCell, this->measures, RealType{});
+        problem.requestLayer(DomainType::dimEdge, this->localCells, int{});
 
-        problem.requestLayer(DomainType::dimCell, this->pPrev,    RealType{});
+        problem.requestLayer(DomainType::dimCell, this->edges,      int{});
+        problem.requestLayer(DomainType::dimCell, this->measures,   RealType{});
 
-        problem.requestLayer(DomainType::dimCell, this->lambda,   RealType{});
-        problem.requestLayer(DomainType::dimCell, this->alpha_i,  RealType{});
-        problem.requestLayer(DomainType::dimCell, this->alpha,    RealType{});
-        problem.requestLayer(DomainType::dimCell, this->beta,     RealType{});
-        problem.requestLayer(DomainType::dimCell, this->l,        RealType{});
+        problem.requestLayer(DomainType::dimCell, this->pPrev,      RealType{});
 
-        problem.requestLayer(DomainType::dimEdge, this->rhs,      RealType{});
+        problem.requestLayer(DomainType::dimCell, this->lambda,     RealType{});
+        problem.requestLayer(DomainType::dimCell, this->alpha_i,    RealType{});
+        problem.requestLayer(DomainType::dimCell, this->alpha,      RealType{});
+        problem.requestLayer(DomainType::dimCell, this->beta,       RealType{});
+        problem.requestLayer(DomainType::dimCell, this->l,          RealType{});
+
+        problem.requestLayer(DomainType::dimEdge, this->rhs,        RealType{});
 
         problem.requestLayer(DomainType::dimEdge, this->capacities, GlobalIndexType{});
     } // <-- MHFE()
@@ -134,6 +144,9 @@ public:
     MHFE& operator=(const MHFE&) = delete;
     MHFE(MHFE&&) = default;
     MHFE& operator=(MHFE&&) = default;
+
+    /// \brief Get simulation time
+    RealType getTime() const { return time; }
 
     /// \brief Perform MHFE solution step
     void run(ProblemType& problem) {
@@ -144,17 +157,6 @@ public:
 
         // Update RHS vector with respect to border conditions
         this->fillRhs(problem);
-        /*
-        this->rhs.fill([&problem, this] (auto edge, auto& value) {
-            if (problem.dirichletMask[edge]) {
-                value = problem.dirichlet[edge];
-                return;
-            }
-
-            // THIS IS AN ERROR!!!
-            value = this->B[edge] * this->pPrev[edge] + problem.neumannMask[edge] * problem.neumann[edge];
-        });
-        */
 
         // Construct solver and preconditioner
         auto preconditioner = TNL::Solvers::getPreconditioner<SparseMatrixType>(this->preconditionerName);
@@ -162,11 +164,8 @@ public:
 
         preconditioner->update(this->M);
         solver->setMatrix(this->M);
-        solver->setPreconditioner(preconditioner);
+        //solver->setPreconditioner(preconditioner);
 
-        // Get edge-wise solution
-        this->fillRhs(problem);
-        std::cerr << *this->M << std::endl;
         solver->solve(*this->rhs, *problem.edgeSolution);
 
         // Update cell-wise solution
@@ -189,6 +188,11 @@ private:
         const auto& mesh = problem.getDomain().getMesh();
         const auto cells = mesh.template getEntitiesCount<DomainType::dimCell>();
         const auto edges = mesh.template getEntitiesCount<DomainType::dimEdge>();
+
+        // Cache cells per edge
+        this->localCells.fill([&mesh] (auto edge, auto& edgeCells) {
+            edgeCells = mesh.template getSuperentitiesCount<DomainType::dimEdge, DomainType::dimCell>(edge);
+        });
 
         // Cache edges per cell
         this->edges.fill([&mesh] (auto cell, auto& cellEdges) {
@@ -234,12 +238,13 @@ private:
         this->maxEdges = [this] {
             LocalIndexType ret = 0;
 
-            this->edges->forAllElements([&ret] (auto idx, auto value) {
+            this->edges->forAllElements([&ret] (auto, auto value) {
                 if (value > ret) ret = value;
             });
 
             return ret;
         } ();
+
         this->Binv = std::vector<RealType>(cells * this->maxEdges * this->maxEdges, RealType{0});
         // Binv elements will be stored contiguosly for each cell
         // |elem|elem|elem|elem|elem|elem| ...
@@ -249,30 +254,30 @@ private:
             // B^{-1} contains edge vector's dot products
             // For the calculation to be correct, we need them to be oriented correctly
             using PointType = DomainType::MeshType::PointType;
-            std::vector<PointType> rv; // Cell edge vectors
+            std::vector<PointType> rv(this->edges[cell]); // Cell edge vectors
 
             const auto cellEntity = mesh.template getEntity<DomainType::dimCell>(cell);
             const auto cellCenter = TNL::Meshes::getEntityCenter(mesh, cellEntity);
-            PointType r1, r2;
 
-            for (auto k = this->edges[cell] - 1; k >= 0; --k) {
+            for (LocalIndexType k = 0; k < this->edges[cell]; ++k) {
                 const auto edge = mesh.template getSubentityIndex<DomainType::dimCell, DomainType::dimEdge>(cell, k);
                 const auto p1 = mesh.getPoint(mesh.template getSubentityIndex<DomainType::dimEdge, 0>(edge, 0));
                 const auto p2 = mesh.getPoint(mesh.template getSubentityIndex<DomainType::dimEdge, 0>(edge, 1));
 
-                auto r = p2 - p1;
+                const auto r = p2 - p1;
 
                 const auto edgeEntity = mesh.template getEntity<DomainType::dimEdge>(edge);
-                auto n = TNL::Meshes::getOutwardNormalVector(mesh, edgeEntity, cellCenter);
+                const auto n = TNL::Meshes::getOutwardNormalVector(mesh, edgeEntity, cellCenter);
 
                 const auto crossZ = n[0] * r[1] - n[1] * r[0];
 
-                rv.push_back( (crossZ < 0) ? -r : r );
+                rv[k] = (1 - 2 * (crossZ < 0)) * r;
+                // rv[k] = (crossZ < 0) ? -r : r;
             }
 
             for (auto i = this->edges[cell] - 1; i >= 0; --i) {
                 for (auto j = this->edges[cell] - 1; j >= 0; --j) {
-                    const auto index = this->maxEdges * this->maxEdges * cell + i * this->maxEdges + j;
+                    const auto index = (cell * this->maxEdges + j) * this->maxEdges + i;
 
                     this->Binv.at(index) = (rv.at(i), rv.at(j)) / this->measures[cell] + 1.0 / this->l[cell] / 3.0;
                 }
@@ -280,11 +285,17 @@ private:
         }
 
         // Fill capacities
-        this->capacities.fill([&mesh] (auto edge, auto& capacity) {
+        this->capacities.fill([&problem, &mesh] (auto edge, auto& capacity) {
             // Row capacities for a system matrix
             // Each row contains as many nonzero elements as there are
             // edges in the cells adjacent to the corresponding edge
             capacity = 1;
+
+            // Exceptions are rows corresponding to edges with only Dirichlet conditions
+            // There only have one element
+            if (problem.dirichletMask[edge] && !problem.neumannMask[edge]) {
+                return;
+            }
 
             const auto localCells = mesh.template getSuperentitiesCount<DomainType::dimEdge, DomainType::dimCell>(edge);
             for (auto cell = localCells - 1; cell >= 0; --cell) {
@@ -300,15 +311,13 @@ private:
 
         // Fill the linear system matrix
         mesh.template forAll<DomainType::dimEdge>([&mesh, &problem, this] (auto edge) {
-            if (problem.dirichletMask[edge]) {
-                this->M->addElement(edge, edge, 1, 1);
-            }
+            this->M->addElement(edge, edge, problem.dirichletMask[edge], 1);
 
             if (problem.dirichletMask[edge] && !problem.neumannMask[edge]) return;
 
             const auto localCells = mesh.template getSuperentitiesCount<DomainType::dimEdge, DomainType::dimCell>(edge);
 
-            for (auto cell = localCells - 1; cell >= 0; --cell) {
+            for (LocalIndexType cell = 0; cell < localCells; ++cell) {
                 const auto gCellIdx = mesh.template getSuperentityIndex<DomainType::dimEdge, DomainType::dimCell>(edge, cell);
                 this->matrixTerm(problem, gCellIdx, edge);
             }
@@ -378,22 +387,21 @@ private:
 
         const auto mesh = problem.getDomain().getMesh();
         mesh.template forAll<DomainType::dimEdge>([&mesh, &problem, this] (auto edge) {
-            if (problem.dirichletMask[edge]) {
-                this->rhs[edge] += problem.dirichlet[edge];
-            }
+            this->rhs[edge] = problem.neumannMask[edge] * problem.neumann[edge] + problem.dirichletMask[edge] * problem.dirichlet[edge];
 
             if (problem.dirichletMask[edge] && !problem.neumannMask[edge]) return;
 
             const auto localCells = mesh.template getSuperentitiesCount<DomainType::dimEdge, DomainType::dimCell>(edge);
 
-            for (auto cell = localCells - 1; cell >= 0; --cell) {
-                const auto gCellIdx = mesh.template getSuperentityIndex<DomainType::dimEdge, DomainType::dimCell>(edge, cell);
+            for (LocalIndexType lCell = 0; lCell < localCells; ++lCell) {
+                const auto cell = mesh.template getSuperentityIndex<DomainType::dimEdge, DomainType::dimCell>(edge, lCell);
                 if constexpr (useLumping) {
                     this->rhs[edge] += problem.c[cell] * this->measures[cell] * problem.edgeSolution[edge] / 3.0 / this->tau;
                 } else {
                     this->rhs[edge] += problem.a[cell] * this->lambda[cell] * problem.solution[cell] / this->l[cell] / this->beta[cell];
                 }
             }
+
         });
     } // <-- fillRhs()
 

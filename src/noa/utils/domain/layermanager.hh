@@ -231,19 +231,28 @@ struct LayerManager {
 
         /// Layer map start iterator
         auto begin() { return this->layers.begin(); }
+        /// Layer map start iterator (const override)
+        const auto begin() const { return this->layers.begin(); }
         /// Layer map end iterator
         auto end() { return this->layers.end(); }
+        /// Layer map end iterator (const override)
+        const auto end() const { return this->layers.end(); }
 
         /// Remove all layers
         void clear() {
-                while (!layers.empty()) layers.erase(layers.begin());
+            while (!layers.empty()) layers.erase(layers.begin());
         }
 
         /// Add a layer storing a certain data type and returns its index
         template <typename DataType>
-        LayerType& add(const std::size_t& alias, const DataType& value = DataType()) {
-                layers.emplace(alias, LayerType(size, value));
-                return layers.at(alias);
+        LayerType& add(std::size_t alias, const DataType& value = DataType()) {
+            layers.emplace(alias, LayerType(size, value));
+            return layers.at(alias);
+        }
+
+        /// \brief Remove the layer at the alias
+        void remove(std::size_t alias) {
+            layers.erase(alias);
         }
 
         /// Get the first non-taken layer key
@@ -259,22 +268,22 @@ struct LayerManager {
 
         /// Return selected layer's data
         template <typename DataType>
-        Vector<DataType>& get(const std::size_t& index) {
-                return layers.at(index).template get<DataType>();
+        Vector<DataType>& get(std::size_t index) {
+            return layers.at(index).template get<DataType>();
         }
 
         template <typename DataType>
-        const Vector<DataType>& get(const std::size_t& index) const {
-                return layers.at(index).template get<DataType>();
+        const Vector<DataType>& get(std::size_t index) const {
+            return layers.at(index).template get<DataType>();
         }
 
         /// Return selected layer (`Layer` object instead of data)
-        LayerType& getLayer(const std::size_t& index) {
-                return layers.at(index);
+        LayerType& getLayer(std::size_t index) {
+            return layers.at(index);
         }
 
-        const LayerType& getLayer(const std::size_t& index) const {
-                return layers.at(index);
+        const LayerType& getLayer(std::size_t index) const {
+            return layers.at(index);
         }
 }; // <-- struct LayerManager
 
