@@ -5,19 +5,20 @@
 
 template <typename VectorType>
 void gWrtP(typename VectorType::ConstViewType in, typename VectorType::ViewType out) {
+    out.forAllElements([size=in.getSize()] (auto, auto& v) { v = 1.0 / size; });
 }
 
 int main(int argc, char** argv) {
     using DomainType     = noa::utils::domain::Domain<noa::TNL::Meshes::Topologies::Triangle>;
     using VectorType     = DomainType::LayerManagerType::Vector<typename DomainType::RealType>;
     using CFDProblemType = noa::utils::cfd::tasks::CFDProblem<DomainType>;
-    using MHFEType       = noa::utils::cfd::tasks::MHFE<DomainType, false>;
-    // using GradEvType     = noa::utils::cfd::tasks::GradEv<gWrtP<VectorType>, DomainType>;
+    using MHFEType       = noa::utils::cfd::tasks::MHFE<DomainType, true>;
+    using GradEvType     = noa::utils::cfd::tasks::GradEv<gWrtP<VectorType>, DomainType>;
 
     using noa::utils::combine::StaticComputation;
 
-    StaticComputation<MHFEType> computation;
-    // StaticComputation<GradEvType> computation;
+    // StaticComputation<MHFEType> computation;
+    StaticComputation<GradEvType> computation;
     auto& problem = computation.template get<CFDProblemType>();
     auto& mhfe    = computation.template get<MHFEType>();
 
