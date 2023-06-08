@@ -118,7 +118,7 @@ public:
             views.push_back(this);
         }
 
-        view.bind(this->domain->getLayers(this->dimension).template get<DataType>(this->index));
+        this->view.bind(this->domain->getLayers(this->dimension).template get<DataType>(this->index));
     } // <-- bindTo()
 
     /// \brief Unbind from Domain
@@ -139,7 +139,15 @@ public:
     /// Essentially calls TNL View's forAll. Sets \ref valid to `true`
     template <std::invocable<typename ViewType::IndexType, DataType&> Func>
     void fill(Func f) {
-        view.forAllElements(f);
+        this->view.forAllElements(f);
+        this->valid = true;
+    } // <-- fill()
+
+    /// \brief Fill the view to be exactly like another view
+    ///
+    /// Sets \ref valid to `true`
+    void fill(const LayerView& other) {
+        this->view.forAllElements([&other] (auto idx, auto& v) { v = other[idx]; });
         this->valid = true;
     } // <-- fill()
 
@@ -147,7 +155,7 @@ public:
     ///
     /// Sets \ref valid to `true`
     void fill(DataType value) {
-        view.forAllElements([value] (auto, auto& v) { v = value; });
+        this->view.forAllElements([value] (auto, auto& v) { v = value; });
         this->valid = true;
     } // <-- fill()
 

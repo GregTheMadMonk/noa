@@ -9,6 +9,7 @@
 #include <noa/utils/domain/domain.hh>
 
 #include "../scalar_function.hh"
+#include "mhfe.hh"
 
 namespace noa::utils::cfd::tasks {
 
@@ -64,7 +65,7 @@ public:
     explicit GradEv(ProblemType& problem, const LMHFEType& lmhfe) {
         problem.requestLayer(DomainType::dimCell, this->gWrtP,   RealType{});
         auto& resultLayer = problem.requestLayer(DomainType::dimCell, this->gWrtA,   RealType{});
-        resultLayer.alias = "Scalar WRT a";
+        resultLayer.alias = "GradEv sensitivity";
         resultLayer.exportHint = true;
 
         problem.requestLayer(DomainType::dimEdge, this->bWrtTp,  RealType{});
@@ -169,7 +170,7 @@ public:
     } // <-- void GradEv::run()
 
     /// \brief Get const view to the result
-    auto getResult() const { return this->gWrtA.getConstView(); }
+    auto getResult() const { return this->gWrtA->getConstView(); }
 
 private:
     void update(ProblemType& problem, const LMHFEType& lmhfe) {
