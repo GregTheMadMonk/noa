@@ -17,8 +17,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/PVTIWriter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/MeshFunctionGnuplotWriter.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 template< typename MeshFunction >
 bool
@@ -290,5 +289,4 @@ writeDistributedMeshFunction(
 
 // TODO: specialization of writeDistributedMeshFunction for unstructured mesh
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Optimization {
+namespace noa::TNL::Solvers::Optimization {
 
 template< typename Vector,
           typename SolverMonitor = IterativeSolverMonitor< typename Vector::RealType, typename Vector::IndexType > >
@@ -53,8 +51,6 @@ protected:
    VectorType gradient, v, aux;
 };
 
-}  // namespace Optimization
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Optimization
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Optimization/NesterovMomentum.hpp>

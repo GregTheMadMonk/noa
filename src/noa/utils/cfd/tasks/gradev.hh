@@ -58,6 +58,10 @@ private:
     /// \brief Sensitivity result
     ProblemType::RealLayerView gWrtA;
 
+    template <auto AscalarWrtP, domain::CDomain ADomainType>
+    requires CScalarFuncWrtP<decltype(AscalarWrtP), ADomainType>
+    friend struct Adjoint;
+
 public:
     /// \brief Default constructor
     ///
@@ -99,25 +103,6 @@ public:
         });
 
         for (GlobalIndexType cell = 0; cell < cells; ++cell) {
-            lmhfe.M->forAllElements([&mat = this->MWrtA[cell]] (auto row, auto, auto col, auto&) {
-                mat.setElement(row, col, 0);
-            });
-
-            for (LocalIndexType lEdge1 = 0; lEdge1 < lmhfe.edges[cell]; ++lEdge1) {
-                const auto edge1 = mesh.template getSubentityIndex<DomainType::dimCell, DomainType::dimEdge>(cell, lEdge1);
-                if (problem.dirichletMask[edge1]) continue;
-
-                for (LocalIndexType lEdge2 = 0; lEdge2 < lmhfe.edges[cell]; ++lEdge2) {
-                    const auto edge2 = mesh.template getSubentityIndex<DomainType::dimCell, DomainType::dimEdge>(cell, lEdge2);
-                    const auto BinvIndex = (cell * lmhfe.maxEdges + lEdge1) * lmhfe.maxEdges + lEdge2;
-
-                    const auto delta = lmhfe.Binv[BinvIndex] - lmhfe.alpha_i[cell] * lmhfe.alpha_i[cell] / lmhfe.alpha[cell];
-                    this->MWrtA[cell].addElement(edge1, edge2, delta, 1);
-                }
-            }
-        }
-
-        for (GlobalIndexType cell = 0; cell < cells; ++cell) {
             this->MWrtA[cell].vectorProduct(*problem.edgeSolution, *this->rhs[cell]);
 
             this->rhs[cell]->forAllElements([cell, &problem, this] (auto edge, auto& v) {
@@ -147,7 +132,7 @@ public:
             }
         }
 
-        this->pWrtA.forAllElements([&mesh, &problem, &lmhfe, this] (auto cell, auto aCell, auto, auto& v) {
+        this->pWrtA.forAllElements([&mesh, &problem, &lmhfe, this] (auto aCell, auto cell, auto, auto& v) {
             // V * p_wrt_a
             v *= lmhfe.lambda[cell] / lmhfe.beta[cell];
 
@@ -182,6 +167,25 @@ private:
         MWrtA = std::vector<SparseMatrixType>(cells, SparseMatrixType(edges, edges));
         for (auto& MWrtA_e : MWrtA) {
             MWrtA_e.setRowCapacities(*lmhfe.capacities);
+        }
+
+        for (GlobalIndexType cell = 0; cell < cells; ++cell) {
+            lmhfe.M->forAllElements([&mat = this->MWrtA[cell]] (auto row, auto, auto col, auto&) {
+                mat.setElement(row, col, 0);
+            });
+
+            for (LocalIndexType lEdge1 = 0; lEdge1 < lmhfe.edges[cell]; ++lEdge1) {
+                const auto edge1 = mesh.template getSubentityIndex<DomainType::dimCell, DomainType::dimEdge>(cell, lEdge1);
+                if (problem.dirichletMask[edge1]) continue;
+
+                for (LocalIndexType lEdge2 = 0; lEdge2 < lmhfe.edges[cell]; ++lEdge2) {
+                    const auto edge2 = mesh.template getSubentityIndex<DomainType::dimCell, DomainType::dimEdge>(cell, lEdge2);
+                    const auto BinvIndex = (cell * lmhfe.maxEdges + lEdge1) * lmhfe.maxEdges + lEdge2;
+
+                    const auto delta = lmhfe.Binv[BinvIndex] - lmhfe.alpha_i[cell] * lmhfe.alpha_i[cell] / lmhfe.alpha[cell];
+                    this->MWrtA[cell].addElement(edge1, edge2, delta, 1);
+                }
+            }
         }
 
         this->rhs = std::vector<typename ProblemType::RealLayerView>(edges);

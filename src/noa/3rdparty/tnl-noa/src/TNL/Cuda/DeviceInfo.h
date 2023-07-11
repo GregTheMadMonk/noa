@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/String.h>
 
-namespace noa::TNL {
-namespace Cuda {
+namespace noa::TNL::Cuda {
 
 struct DeviceInfo
 {
@@ -57,7 +56,6 @@ struct DeviceInfo
    getRegistersPerMultiprocessor( int deviceNum );
 };
 
-}  // namespace Cuda
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Cuda
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/DeviceInfo.hpp>

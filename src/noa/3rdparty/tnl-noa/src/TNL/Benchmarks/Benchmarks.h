@@ -16,8 +16,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/String.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolverMonitor.h>
 
-namespace noa::TNL {
-namespace Benchmarks {
+namespace noa::TNL::Benchmarks {
 
 const double oneGB = 1024.0 * 1024.0 * 1024.0;
 
@@ -32,19 +31,19 @@ struct BenchmarkResult
    double bandwidth = std::numeric_limits< double >::quiet_NaN();
    double speedup = std::numeric_limits< double >::quiet_NaN();
 
-   virtual HeaderElements
+   [[nodiscard]] virtual HeaderElements
    getTableHeader() const
    {
       return HeaderElements( { "time", "stddev", "stddev/time", "loops", "bandwidth", "speedup" } );
    }
 
-   virtual std::vector< int >
+   [[nodiscard]] virtual std::vector< int >
    getColumnWidthHints() const
    {
       return std::vector< int >( { 14, 14, 14, 6, 14, 14 } );
    }
 
-   virtual RowElements
+   [[nodiscard]] virtual RowElements
    getRowElements() const
    {
       RowElements elements;
@@ -80,7 +79,7 @@ public:
    void
    setMinTime( double minTime );
 
-   bool
+   [[nodiscard]] bool
    isResetingOn() const;
 
    // Sets metadata columns -- values used for all subsequent rows until
@@ -138,10 +137,10 @@ public:
    void
    addErrorMessage( const std::string& message );
 
-   SolverMonitorType&
+   [[nodiscard]] SolverMonitorType&
    getMonitor();
 
-   double
+   [[nodiscard]] double
    getBaseTime() const;
 
 protected:
@@ -160,7 +159,6 @@ protected:
    SolverMonitorType monitor;
 };
 
-}  // namespace Benchmarks
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Benchmarks
 
 #include "Benchmarks.hpp"

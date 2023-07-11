@@ -12,9 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/ExplicitSolver.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 /**
  * \brief Solver of ODEs with the first order of accuracy.
@@ -29,16 +27,16 @@ namespace ODE {
  *
  * It is supposed to be used when the unknown \f$ \vec x \in R^n \f$ is expressed by a \ref Containers::Vector.
  *
- * For problems where \f$ \vec x\f$ is represented by \ref TNL::Containers::StaticVector,
- * see \ref TNL::Solvers::ODE::StaticEuler<Containers::StaticVector<Size_,Real>>.
- * For problems where \f$ x\f$ is represented by floating-point number, see \ref TNL::Solvers::ODE::StaticEuler.
+ * For problems where \f$ \vec x\f$ is represented by \ref noa::TNL::Containers::StaticVector,
+ * see \ref noa::TNL::Solvers::ODE::StaticEuler<Containers::StaticVector<Size_,Real>>.
+ * For problems where \f$ x\f$ is represented by floating-point number, see \ref noa::TNL::Solvers::ODE::StaticEuler.
  *
  * The following example demonstrates the use the solvers:
  *
  * \includelineno Solvers/ODE/ODESolver-HeatEquationExample.h
  *
- * \tparam Vector is type of vector storing \f$ \vec x \in R^n \f$, mostly \ref TNL::Containers::Vector
- *    or \ref TNL::Containers::VectorView.
+ * \tparam Vector is type of vector storing \f$ \vec x \in R^n \f$, mostly \ref noa::TNL::Containers::Vector
+ *    or \ref noa::TNL::Containers::VectorView.
  */
 template< typename Vector,
           typename SolverMonitor = IterativeSolverMonitor< typename Vector::RealType, typename Vector::IndexType > >
@@ -68,15 +66,15 @@ public:
    /**
     * \brief Alias for type of unknown variable \f$ \vec x \f$.
     *
-    * Note that \e VectorType can be \ref TNL::Containers::VectorView but
-    * \e DofVectorType is always \ref TNL::Containers::Vector.
+    * Note that \e VectorType can be \ref noa::TNL::Containers::VectorView but
+    * \e DofVectorType is always \ref noa::TNL::Containers::Vector.
     */
-   using DofVectorType = TNL::Containers::Vector< RealType, DeviceType, IndexType >;
+   using DofVectorType = noa::TNL::Containers::Vector< RealType, DeviceType, IndexType >;
 
    /**
     * \brief Type of object used for monitoring the convergence.
     *
-    * Can be \ref TNL::Solvers::IterativeSolverMonitor.
+    * Can be \ref noa::TNL::Solvers::IterativeSolverMonitor.
     */
    using SolverMonitorType = SolverMonitor;
 
@@ -125,7 +123,7 @@ public:
     *
     * \return the Courant number.
     */
-   const RealType&
+   [[nodiscard]] const RealType&
    getCourantNumber() const;
 
    /**
@@ -153,8 +151,6 @@ protected:
    RealType courantNumber = 0.0;
 };
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/Euler.hpp>

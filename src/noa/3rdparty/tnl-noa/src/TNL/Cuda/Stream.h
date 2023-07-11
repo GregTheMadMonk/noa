@@ -10,8 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/DummyDefs.h>
 
-namespace noa::TNL {
-namespace Cuda {
+namespace noa::TNL::Cuda {
 
 class Stream
 {
@@ -104,7 +103,7 @@ public:
     * `cudaStream_t`:
     *
     * \code{.cpp}
-    * const cudaStream_t stream = TNL::Cuda::Stream::create();
+    * const cudaStream_t stream = noa::TNL::Cuda::Stream::create();
     * my_kernel<<< gridSize, blockSize, 0, stream >>>( args... );
     * \endcode
     */
@@ -114,5 +113,4 @@ public:
    }
 };
 
-}  // namespace Cuda
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Cuda

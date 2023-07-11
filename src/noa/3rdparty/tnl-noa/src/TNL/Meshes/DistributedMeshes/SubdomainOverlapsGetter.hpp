@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace DistributedMeshes {
+namespace noa::TNL::Meshes::DistributedMeshes {
 
 /*
  * TODO: This could work when the MPI directions are rewritten
@@ -182,6 +180,4 @@ SubdomainOverlapsGetter< Grid< 3, Real, Device, Index > >::getOverlaps(
       upper[ 2 ] = upperPeriodicBoundariesOverlapSize[ 2 ];
 }
 
-}  // namespace DistributedMeshes
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::DistributedMeshes

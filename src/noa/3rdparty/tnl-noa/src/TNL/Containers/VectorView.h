@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ArrayView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Expressions/ExpressionTemplates.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 /**
  * \brief \e VectorView extends \ref ArrayView with algebraic operations.
@@ -40,7 +39,7 @@ public:
    /**
     * \brief Device used to run operations on the vector.
     *
-    * See \ref TNL::Devices for the available options.
+    * See \ref noa::TNL::Devices for the available options.
     */
    using DeviceType = Device;
 
@@ -61,7 +60,7 @@ public:
 
    /**
     * \brief A template which allows to quickly obtain a
-    * \ref TNL::Containers::VectorView "VectorView" type with changed template
+    * \ref noa::TNL::Containers::VectorView "VectorView" type with changed template
     * parameters.
     */
    template< typename _Real, typename _Device = Device, typename _Index = Index >
@@ -104,7 +103,7 @@ public:
     * \param end The end of the vector view sub-interval. The default value is 0
     *            which is, however, replaced with the array size.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ViewType
    getView( IndexType begin = 0, IndexType end = 0 );
 
@@ -120,7 +119,7 @@ public:
     * \param end The end of the vector view sub-interval. The default value is 0
     *            which is, however, replaced with the array size.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstViewType
    getConstView( IndexType begin = 0, IndexType end = 0 ) const;
 
@@ -144,7 +143,7 @@ public:
 
    /**
     * \brief Assigns a value or an array - same as
-    * \ref TNL::Containers::ArrayView::operator= "ArrayView::operator=".
+    * \ref noa::TNL::Containers::ArrayView::operator= "ArrayView::operator=".
     *
     * \return Reference to this vector view.
     */
@@ -243,7 +242,6 @@ struct HasEnabledExpressionTemplates< VectorView< Real, Device, Index > > : std:
 {};
 }  // namespace Expressions
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/VectorView.hpp>

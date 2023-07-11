@@ -118,7 +118,7 @@ getHypreMemoryLocation()
       #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
       namespace noa::TNL {
          /**
-          * \brief The \ref TNL::Devices "device" compatible with Hypre's data
+          * \brief The \ref noa::TNL::Devices "device" compatible with Hypre's data
           * structures.
           *
           * The type depends on how the Hypre library was configured. By

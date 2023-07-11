@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/MeshTypeResolver.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Readers/getMeshReader.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename ConfigTag, typename Device, typename Functor >
 bool
@@ -103,5 +102,4 @@ loadMesh( Mesh< MeshConfig, Devices::Cuda >& mesh, const std::string& fileName, 
    return true;
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

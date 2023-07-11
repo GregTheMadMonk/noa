@@ -110,6 +110,9 @@ private:
     template <auto scalarWrtP, domain::CDomain GEDomainType>
     requires CScalarFuncWrtP<decltype(scalarWrtP), GEDomainType>
     friend struct GradEv;
+    template <auto scalarWrtP, domain::CDomain GEDomainType>
+    requires CScalarFuncWrtP<decltype(scalarWrtP), GEDomainType>
+    friend struct Adjoint;
 
 public:
     /// \biref Preconditioner name
@@ -181,6 +184,8 @@ public:
 
         this->time += tau;
     } // <-- void MHFE::run()
+
+    const SparseMatrixType& getM() const { return *this->M; }
 
 private:
     /// \brief Calculate parameters that don't need to be updated every step
@@ -303,6 +308,7 @@ private:
                 capacity += mesh.template getSubentitiesCount<DomainType::dimCell, DomainType::dimEdge>(gCellIdx) - 1;
             }
         });
+        this->capacities->forAllElements([] (auto, auto v) { assert(v == 1 || v == 3 || v == 5); });
 
         // Create M
         this->M = std::make_shared<SparseMatrixType>(edges, edges);
@@ -345,13 +351,21 @@ private:
             throw utils::errors::FallthroughError{};
         } ();
 
-        for (auto lei = this->edges[cell] - 1; lei >= 0; --lei) {
+        assert(this->edges[cell] == 3);
+        for (LocalIndexType lei = 0; lei < this->edges[cell]; ++lei) {
             const auto gEdge = mesh.template getSubentityIndex<DomainType::dimCell, DomainType::dimEdge>(cell, lei);
 
             // lei <-> edgeLocal should not matter since B^{-1} is symmetrical
             const auto BinvIndex = (cell * this->maxEdges + lei ) * this->maxEdges + edgeLocal;
 
             if constexpr (useLumping) {
+                const auto d = 
+                    problem.a[cell] * (
+                        this->Binv[BinvIndex]
+                        -
+                        this->alpha_i[cell] * this->alpha_i[cell] / this->alpha[cell]
+                    ) + (lei == edgeLocal) * (problem.c[cell] * this->measures[cell] / 3.0 / this->tau)
+                ;
                 // LMHFE
                 this->M->addElement(
                     edge, gEdge,

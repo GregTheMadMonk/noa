@@ -8,10 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/detail/VerticesPerEntity.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
-namespace detail {
+namespace noa::TNL::Meshes::Writers::detail {
 
 template< typename Mesh, int EntityDimension, typename EntityType = typename Mesh::template EntityType< EntityDimension > >
 struct VTKOffsetsCountGetter
@@ -73,7 +70,4 @@ struct VTKOffsetsCountGetter< Mesh,
    }
 };
 
-}  // namespace detail
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers::detail

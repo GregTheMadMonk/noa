@@ -13,8 +13,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/NDArrayView.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 /**
  * \defgroup ndarray  N-dimensional arrays
@@ -36,7 +35,7 @@ template< std::size_t slicedDimension = 0, std::size_t sliceSize = 0 >
 struct SliceInfo
 {
    // sliceSize == 0 means no slicing
-   static constexpr std::size_t
+   [[nodiscard]] static constexpr std::size_t
    getSliceSize( std::size_t dimension )
    {
       return ( dimension == slicedDimension ) ? sliceSize : 0;
@@ -48,7 +47,7 @@ struct SliceInfo
  *
  * \tparam Type of the underlying one-dimensional array for storing the elements.
  * \tparam Type of the N-dimensional indexer, \ref NDArrayIndexer.
- * \tparam Type of the \ref TNL::Devices "device" used for running operations on the array.
+ * \tparam Type of the \ref noa::TNL::Devices "device" used for running operations on the array.
  *
  * Note that the class inherits from the `Indexer`, i.e. \ref NDArrayIndexer.
  *
@@ -64,7 +63,7 @@ public:
    //! \brief Type of the values stored in the array.
    using ValueType = typename Array::ValueType;
 
-   //! \brief Type of the \ref TNL::Devices "device" used for running operations on the array.
+   //! \brief Type of the \ref noa::TNL::Devices "device" used for running operations on the array.
    using DeviceType = Device;
 
    //! \brief Type of indices used for addressing the array elements.
@@ -124,7 +123,7 @@ public:
    }
 
    //! \brief Compares the array with another N-dimensional array.
-   bool
+   [[nodiscard]] bool
    operator==( const NDArrayStorage& other ) const
    {
       // FIXME: uninitialized data due to alignment in NDArray and padding in SlicedNDArray
@@ -132,7 +131,7 @@ public:
    }
 
    //! \brief Compares the array with another N-dimensional array.
-   bool
+   [[nodiscard]] bool
    operator!=( const NDArrayStorage& other ) const
    {
       // FIXME: uninitialized data due to alignment in NDArray and padding in SlicedNDArray
@@ -144,7 +143,7 @@ public:
     *
     * This method can be called from device kernels.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ValueType*
    getData()
    {
@@ -156,7 +155,7 @@ public:
     *
     * This method can be called from device kernels.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    std::add_const_t< ValueType >*
    getData() const
    {
@@ -174,7 +173,7 @@ public:
    using IndexerType::isContiguousBlock;
 
    //! Returns a const-qualified reference to the underlying indexer.
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const IndexerType&
    getIndexer() const
    {
@@ -182,7 +181,7 @@ public:
    }
 
    //! \brief Returns a modifiable view of the array.
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ViewType
    getView()
    {
@@ -190,7 +189,7 @@ public:
    }
 
    //! \brief Returns a non-modifiable view of the array.
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstViewType
    getConstView() const
    {
@@ -211,7 +210,7 @@ public:
     *          subarray sizes.
     */
    template< std::size_t... Dimensions, typename... IndexTypes >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    auto
    getSubarrayView( IndexTypes&&... indices )
    {
@@ -249,7 +248,7 @@ public:
     * \returns Reference to the array element.
     */
    template< typename... IndexTypes >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ValueType&
    operator()( IndexTypes&&... indices )
    {
@@ -266,7 +265,7 @@ public:
     * \returns Constant reference to the array element.
     */
    template< typename... IndexTypes >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const ValueType&
    operator()( IndexTypes&&... indices ) const
    {
@@ -283,7 +282,7 @@ public:
     * \param index Index of the element in the one-dimensional array.
     * \returns Reference to the array element.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ValueType&
    operator[]( IndexType index )
    {
@@ -301,7 +300,7 @@ public:
     * \param index Index of the element in the one-dimensional array.
     * \returns Constant reference to the array element.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const ValueType&
    operator[]( IndexType index ) const
    {
@@ -496,7 +495,7 @@ public:
     * the device.
     */
    template< typename... IndexTypes >
-   ValueType
+   [[nodiscard]] ValueType
    getElement( IndexTypes&&... indices ) const
    {
       static_assert( sizeof...( indices ) == getDimension(), "got wrong number of indices" );
@@ -504,14 +503,14 @@ public:
    }
 
    //! \brief Returns a constant reference to the underlying storage array.
-   const StorageArray&
+   [[nodiscard]] const StorageArray&
    getStorageArray() const
    {
       return array;
    }
 
    //! \brief Returns a reference to the underlying storage array.
-   StorageArray&
+   [[nodiscard]] StorageArray&
    getStorageArray()
    {
       return array;
@@ -542,7 +541,7 @@ protected:
  * \tparam Permutation Permutation that will be applied to indices when
  *                     accessing the array elements. The identity permutation
  *                     is used by default.
- * \tparam Device Type of the \ref TNL::Devices "device" that will be used for
+ * \tparam Device Type of the \ref noa::TNL::Devices "device" that will be used for
  *                running operations on the array.
  * \tparam Index Type of indices used for addressing the array elements.
  * \tparam Overlaps Sequence of integers representing the overlaps in each
@@ -603,7 +602,7 @@ public:
    }
 
    //! \brief Returns the allocator associated with the array.
-   AllocatorType
+   [[nodiscard]] AllocatorType
    getAllocator() const
    {
       return this->array.getAllocator();
@@ -663,7 +662,7 @@ public:
  *                     accessing the array elements. The identity permutation
  *                     is used by default.
  * \tparam SliceInfo Type of the \ref SliceInfo "slicing configuration".
- * \tparam Device Type of the \ref TNL::Devices "device" that will be used for
+ * \tparam Device Type of the \ref noa::TNL::Devices "device" that will be used for
  *                running operations on the array.
  * \tparam Index Type of indices used for addressing the array elements.
  * \tparam Overlaps Sequence of integers representing the overlaps in each
@@ -726,7 +725,7 @@ public:
    }
 
    //! \brief Returns the allocator associated with the array.
-   AllocatorType
+   [[nodiscard]] AllocatorType
    getAllocator() const
    {
       return this->array.getAllocator();
@@ -736,5 +735,4 @@ public:
 // this is a Doxygen end-group marker
 //! @}
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

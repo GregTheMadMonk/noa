@@ -12,9 +12,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 /**
  * \brief Writer of data linked with meshes into [VTI format](https://kitware.github.io/vtk-examples/site/VTKFileFormats/).
@@ -161,8 +159,6 @@ protected:
    closePiece();
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/VTIWriter.hpp>

@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Operators/Operator.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Operators/ExactOperatorComposition.h>
 
-namespace noa::TNL {
-namespace Operators {
+namespace noa::TNL::Operators {
 
 /****
  * This object serves for composition of two operators F and G into an operator F( G( u ) ).
@@ -207,5 +206,4 @@ protected:
    InnerOperatorFunction innerOperatorFunction;
 };
 
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators

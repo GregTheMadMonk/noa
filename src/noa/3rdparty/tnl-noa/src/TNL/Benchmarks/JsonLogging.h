@@ -12,8 +12,7 @@
 #include "Logging.h"
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 
-namespace noa::TNL {
-namespace Benchmarks {
+namespace noa::TNL::Benchmarks {
 
 class JsonLogging : public Logging
 {
@@ -168,5 +167,4 @@ protected:
    HeaderElements lastHeaderElements;
 };
 
-}  // namespace Benchmarks
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Benchmarks

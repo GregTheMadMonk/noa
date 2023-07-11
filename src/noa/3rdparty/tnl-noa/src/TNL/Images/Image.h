@@ -6,11 +6,10 @@
 
 #pragma once
 
-namespace noa::TNL {
 /**
  * \brief Namespace for image processing.
  */
-namespace Images {
+namespace noa::TNL::Images {
 
 template< typename Index = int >
 class Image
@@ -20,13 +19,13 @@ public:
 
    Image() : width( 0 ), height( 0 ) {}
 
-   IndexType
+   [[nodiscard]] IndexType
    getWidth() const
    {
       return this->width;
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getHeight() const
    {
       return this->height;
@@ -36,5 +35,4 @@ protected:
    IndexType width, height;
 };
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images

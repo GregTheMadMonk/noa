@@ -19,9 +19,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/reduce.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaSupportMissing.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace detail {
+namespace noa::TNL::Algorithms::detail {
 
 template< ScanType Type, ScanPhaseType PhaseType >
 template< typename InputArray, typename OutputArray, typename Reduction >
@@ -145,11 +143,11 @@ Scan< Devices::Host, Type, PhaseType >::perform( const InputArray& input,
 
    const IndexType size = end - begin;
    const int max_threads = Devices::Host::getMaxThreadsCount();
-   const IndexType block_size = TNL::max( 1024, TNL::roundUpDivision( size, max_threads ) );
-   const IndexType blocks = TNL::roundUpDivision( size, block_size );
+   const IndexType block_size = noa::TNL::max( 1024, noa::TNL::roundUpDivision( size, max_threads ) );
+   const IndexType blocks = noa::TNL::roundUpDivision( size, block_size );
 
    if( Devices::Host::isOMPEnabled() && blocks >= 2 ) {
-      const int threads = TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
+      const int threads = noa::TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
       Containers::Array< ValueType > block_results( blocks + 1 );
 
       #pragma omp parallel num_threads(threads)
@@ -157,7 +155,7 @@ Scan< Devices::Host, Type, PhaseType >::perform( const InputArray& input,
          const int block_idx = omp_get_thread_num();
          const IndexType block_offset = block_idx * block_size;
          const IndexType block_begin = begin + block_offset;
-         const IndexType block_end = TNL::min( block_begin + block_size, end );
+         const IndexType block_end = noa::TNL::min( block_begin + block_size, end );
          const IndexType block_output_begin = outputBegin + block_offset;
 
          switch( PhaseType ) {
@@ -237,11 +235,11 @@ Scan< Devices::Host, Type, PhaseType >::performFirstPhase( const InputArray& inp
 
    const IndexType size = end - begin;
    const int max_threads = Devices::Host::getMaxThreadsCount();
-   const IndexType block_size = TNL::max( 1024, TNL::roundUpDivision( size, max_threads ) );
-   const IndexType blocks = TNL::roundUpDivision( size, block_size );
+   const IndexType block_size = noa::TNL::max( 1024, noa::TNL::roundUpDivision( size, max_threads ) );
+   const IndexType blocks = noa::TNL::roundUpDivision( size, block_size );
 
    if( Devices::Host::isOMPEnabled() && blocks >= 2 ) {
-      const int threads = TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
+      const int threads = noa::TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
       Containers::Array< ValueType, Devices::Sequential > block_results( blocks + 1 );
 
       #pragma omp parallel num_threads(threads)
@@ -249,7 +247,7 @@ Scan< Devices::Host, Type, PhaseType >::performFirstPhase( const InputArray& inp
          const int block_idx = omp_get_thread_num();
          const IndexType block_offset = block_idx * block_size;
          const IndexType block_begin = begin + block_offset;
-         const IndexType block_end = TNL::min( block_begin + block_size, end );
+         const IndexType block_end = noa::TNL::min( block_begin + block_size, end );
          const IndexType block_output_begin = outputBegin + block_offset;
 
          switch( PhaseType ) {
@@ -306,17 +304,17 @@ Scan< Devices::Host, Type, PhaseType >::performSecondPhase( const InputArray& in
 
    const IndexType size = end - begin;
    const int max_threads = Devices::Host::getMaxThreadsCount();
-   const IndexType block_size = TNL::max( 1024, TNL::roundUpDivision( size, max_threads ) );
-   const IndexType blocks = TNL::roundUpDivision( size, block_size );
+   const IndexType block_size = noa::TNL::max( 1024, noa::TNL::roundUpDivision( size, max_threads ) );
+   const IndexType blocks = noa::TNL::roundUpDivision( size, block_size );
 
    if( Devices::Host::isOMPEnabled() && blocks >= 2 ) {
-      const int threads = TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
+      const int threads = noa::TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
       #pragma omp parallel num_threads(threads)
       {
          const int block_idx = omp_get_thread_num();
          const IndexType block_offset = block_idx * block_size;
          const IndexType block_begin = begin + block_offset;
-         const IndexType block_end = TNL::min( block_begin + block_size, end );
+         const IndexType block_end = noa::TNL::min( block_begin + block_size, end );
          const IndexType block_output_begin = outputBegin + block_offset;
 
          const ValueType block_shift = reduction( shift, blockShifts[ block_idx ] );
@@ -418,6 +416,4 @@ Scan< Devices::Cuda, Type, PhaseType >::performSecondPhase( const InputArray& in
 #endif
 }
 
-}  // namespace detail
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::detail

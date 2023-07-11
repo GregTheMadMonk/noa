@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MultidiagonalMatrix.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Real,
           typename Device,
@@ -1020,5 +1019,4 @@ MultidiagonalMatrix< Real, Device, Index, Organization, RealAllocator, IndexAllo
    return this->view.getPaddingIndex();
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

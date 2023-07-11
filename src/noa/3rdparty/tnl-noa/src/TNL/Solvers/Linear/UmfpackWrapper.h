@@ -15,9 +15,7 @@
    #include "LinearSolver.h"
    #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/CSR.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 template< typename Matrix >
 struct is_csr_matrix
@@ -79,9 +77,7 @@ public:
    solve( ConstVectorViewType b, VectorViewType x ) override;
 };
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
    #include "UmfpackWrapper.hpp"
 

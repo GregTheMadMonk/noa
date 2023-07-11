@@ -10,28 +10,26 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/DistributedMesh.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename ConfigTag, typename Device, typename Functor >
-bool
+[[nodiscard]] bool
 resolveDistributedMeshType( Functor&& functor, const std::string& fileName, const std::string& fileFormat = "auto" );
 
 template< typename ConfigTag, typename Device, typename Functor >
-bool
+[[nodiscard]] bool
 resolveAndLoadDistributedMesh( Functor&& functor,
                                const std::string& fileName,
                                const std::string& fileFormat = "auto",
                                const MPI::Comm& communicator = MPI_COMM_WORLD );
 
 template< typename Mesh >
-bool
+[[nodiscard]] bool
 loadDistributedMesh( DistributedMeshes::DistributedMesh< Mesh >& distributedMesh,
                      const std::string& fileName,
                      const std::string& fileFormat = "auto",
                      const MPI::Comm& communicator = MPI_COMM_WORLD );
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/resolveDistributedMeshType.hpp>

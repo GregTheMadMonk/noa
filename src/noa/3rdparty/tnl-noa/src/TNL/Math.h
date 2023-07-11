@@ -139,7 +139,7 @@ __cuda_callable__
 ResultType
 argAbsMin( const T1& a, const T2& b )
 {
-   return ( TNL::abs( a ) < TNL::abs( b ) ) ? a : b;
+   return ( noa::TNL::abs( a ) < noa::TNL::abs( b ) ) ? a : b;
 }
 
 /***
@@ -150,7 +150,7 @@ __cuda_callable__
 ResultType
 argAbsMax( const T1& a, const T2& b )
 {
-   return ( TNL::abs( a ) > TNL::abs( b ) ) ? a : b;
+   return ( noa::TNL::abs( a ) > noa::TNL::abs( b ) ) ? a : b;
 }
 
 /**
@@ -549,54 +549,6 @@ constexpr bool
 isSmall( const Real& v, const Real& tolerance = 1.0e-5 )
 {
    return ( -tolerance <= v && v <= tolerance );
-}
-
-/**
- * \brief This function divides \e num by \e div and rounds up the result.
- *
- * \param num An integer considered as dividend.
- * \param div An integer considered as divisor.
- */
-constexpr int
-roundUpDivision( const int num, const int div )
-{
-   return num / div + static_cast< int >( num % div != 0 );
-}
-
-/**
- * \brief This function rounds up \e number to the nearest multiple of number \e multiple.
- *
- * \param number Integer we want to round.
- * \param multiple Integer.
- */
-constexpr int
-roundToMultiple( int number, int multiple )
-{
-   return multiple * ( number / multiple + static_cast< int >( number % multiple != 0 ) );
-}
-
-/**
- * \brief This function checks if \e x is an integral power of two.
- *
- * Returns \e true if \e x is a power of two. Otherwise returns \e false.
- * \param x Integer.
- */
-constexpr bool
-isPow2( int x )
-{
-   return ( ( x & ( x - 1 ) ) == 0 );
-}
-
-/**
- * \brief This function checks if \e x is an integral power of two.
- *
- * Returns \e true if \e x is a power of two. Otherwise returns \e false.
- * \param x Long integer.
- */
-constexpr bool
-isPow2( long int x )
-{
-   return ( ( x & ( x - 1 ) ) == 0 );
 }
 
 }  // namespace noa::TNL

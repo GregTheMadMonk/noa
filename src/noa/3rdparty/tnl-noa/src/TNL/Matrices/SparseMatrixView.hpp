@@ -14,8 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/details/SparseMatrix.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Real,
           typename Device,
@@ -88,8 +87,8 @@ template< typename Real,
 std::string
 SparseMatrixView< Real, Device, Index, MatrixType, SegmentsView, ComputeReal >::getSerializationType()
 {
-   return "Matrices::SparseMatrix< " + TNL::getSerializationType< RealType >() + ", "
-        + TNL::getSerializationType< SegmentsViewType >() + ", [any_device], " + TNL::getSerializationType< IndexType >() + ", "
+   return "Matrices::SparseMatrix< " + noa::TNL::getSerializationType< RealType >() + ", "
+        + noa::TNL::getSerializationType< SegmentsViewType >() + ", [any_device], " + noa::TNL::getSerializationType< IndexType >() + ", "
         + MatrixType::getSerializationType() + ", [any_allocator], [any_allocator] >";
 }
 
@@ -446,7 +445,11 @@ SparseMatrixView< Real, Device, Index, MatrixType, SegmentsView, ComputeReal >::
       auto fetch = [ inVectorView, valuesView, columnIndexesView, paddingIndex ] __cuda_callable__(
                       IndexType globalIdx, bool& compute ) mutable -> ComputeRealType
       {
+         TNL_ASSERT_GE( globalIdx, 0, "" );
+         TNL_ASSERT_LT( globalIdx, columnIndexesView.getSize(), "" );
          const IndexType column = columnIndexesView[ globalIdx ];
+         TNL_ASSERT( ( column >= 0 || column == paddingIndex ), std::cerr << "Wrong column index." << std::endl );
+         TNL_ASSERT_LT( column, inVectorView.getSize(), "Wrong column index." );
          if( SegmentsViewType::havePadding() ) {
             compute = ( column != paddingIndex );
             if( ! compute )
@@ -1012,5 +1015,4 @@ SparseMatrixView< Real, Device, Index, MatrixType, SegmentsView, ComputeReal >::
    return this->columnIndexes;
 }
 
-}  // namespace Matrices
-}  // namespace  TNL
+}  // namespace noa::TNL::Matrices

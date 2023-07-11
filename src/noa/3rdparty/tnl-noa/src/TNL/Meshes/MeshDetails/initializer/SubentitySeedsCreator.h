@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polygon.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/SubentityVertexCount.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename Mesh, typename EntityTopology, typename SubentityDimensionTag >
 class SubentitySeedsCreator
@@ -339,5 +338,4 @@ public:
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

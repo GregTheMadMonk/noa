@@ -9,10 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Mesh.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-//! \brief Namespace for mesh writers.
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 namespace details {
 
@@ -56,8 +53,6 @@ protected:
    // IndexType pointsCount = 0;
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/FPMAWriter.hpp>

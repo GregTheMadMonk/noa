@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Tetrahedron.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Hexahedron.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 enum class EntityRefinerVersion
 {
@@ -237,5 +236,4 @@ struct EntityRefiner< MeshConfig, Topologies::Hexahedron, EntityRefinerVersion::
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

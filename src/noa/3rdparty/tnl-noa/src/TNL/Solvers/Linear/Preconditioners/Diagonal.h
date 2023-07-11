@@ -10,17 +10,14 @@
 
 #include "Preconditioner.h"
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
-namespace Preconditioners {
+namespace noa::TNL::Solvers::Linear::Preconditioners {
 
 /**
  * \brief Diagonal (Jacobi) preconditioner for iterative solvers of linear systems.
  *
  * See [detailed description]([Netlib](http://netlib.org/linalg/html_templates/node55.html)).
  *
- * See \ref TNL::Solvers::Linear::Preconditioners::Preconditioner for example of setup with a linear solver.
+ * See \ref noa::TNL::Solvers::Linear::Preconditioners::Preconditioner for example of setup with a linear solver.
  *
  * \tparam Matrix is type of the matrix describing the linear system.
  */
@@ -91,7 +88,7 @@ protected:
 /**
  * \brief Specialization of the diagonal preconditioner for distributed matrices.
  *
- * See \ref TNL::Solvers::Linear::Preconditioners::Diagonal
+ * See \ref noa::TNL::Solvers::Linear::Preconditioners::Diagonal
  *
  * \tparam Matrix is a type of matrix describing the linear system.
  */
@@ -161,9 +158,6 @@ protected:
    VectorType diagonal;
 };
 
-}  // namespace Preconditioners
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear::Preconditioners
 
 #include "Diagonal.hpp"

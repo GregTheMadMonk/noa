@@ -13,9 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/detail/VTKMeshEntitiesWriter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 template< typename Mesh >
 VTKWriter< Mesh >::VTKWriter( std::ostream& str, VTK::FileFormat format ) : str( str.rdbuf() ), format( format )
@@ -185,6 +183,4 @@ VTKWriter< Mesh >::writeHeader()
    headerWritten = true;
 }
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers

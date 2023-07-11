@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/detail/Scan.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Functional.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 /**
  * \brief Computes an inclusive scan (or prefix sum) of an input array and
@@ -80,21 +79,21 @@ inclusiveScan( const InputArray& input,
 
 /**
  * \brief Overload of \ref inclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The [identity element](https://en.wikipedia.org/wiki/Identity_element) is
  * taken as `reduction.template getIdentity< typename OutputArray::ValueType >()`.
  * See \ref inclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `input.getSize()`.
  */
-template< typename InputArray, typename OutputArray, typename Reduction = TNL::Plus >
+template< typename InputArray, typename OutputArray, typename Reduction = noa::TNL::Plus >
 void
 inclusiveScan( const InputArray& input,
                OutputArray& output,
                typename InputArray::IndexType begin = 0,
                typename InputArray::IndexType end = 0,
                typename OutputArray::IndexType outputBegin = 0,
-               Reduction&& reduction = TNL::Plus{} )
+               Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = input.getSize();
@@ -166,21 +165,21 @@ exclusiveScan( const InputArray& input,
 
 /**
  * \brief Overload of \ref exclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The [identity element](https://en.wikipedia.org/wiki/Identity_element) is
  * taken as `reduction.template getIdentity< typename OutputArray::ValueType >()`.
  * See \ref exclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `input.getSize()`.
  */
-template< typename InputArray, typename OutputArray, typename Reduction = TNL::Plus >
+template< typename InputArray, typename OutputArray, typename Reduction = noa::TNL::Plus >
 void
 exclusiveScan( const InputArray& input,
                OutputArray& output,
                typename InputArray::IndexType begin = 0,
                typename InputArray::IndexType end = 0,
                typename OutputArray::IndexType outputBegin = 0,
-               Reduction&& reduction = TNL::Plus{} )
+               Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = input.getSize();
@@ -240,19 +239,19 @@ inplaceInclusiveScan( Array& array,
 
 /**
  * \brief Overload of \ref inplaceInclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The [identity element](https://en.wikipedia.org/wiki/Identity_element) is
  * taken as `reduction.template getIdentity< typename Array::ValueType >()`.
  * See \ref inplaceInclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `array.getSize()`.
  */
-template< typename Array, typename Reduction = TNL::Plus >
+template< typename Array, typename Reduction = noa::TNL::Plus >
 void
 inplaceInclusiveScan( Array& array,
                       typename Array::IndexType begin = 0,
                       typename Array::IndexType end = 0,
-                      Reduction&& reduction = TNL::Plus{} )
+                      Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = array.getSize();
@@ -312,19 +311,19 @@ inplaceExclusiveScan( Array& array,
 
 /**
  * \brief Overload of \ref inplaceExclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The [identity element](https://en.wikipedia.org/wiki/Identity_element) is
  * taken as `reduction.template getIdentity< typename Array::ValueType >()`.
  * See \ref inplaceExclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `array.getSize()`.
  */
-template< typename Array, typename Reduction = TNL::Plus >
+template< typename Array, typename Reduction = noa::TNL::Plus >
 void
 inplaceExclusiveScan( Array& array,
                       typename Array::IndexType begin = 0,
                       typename Array::IndexType end = 0,
-                      Reduction&& reduction = TNL::Plus{} )
+                      Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = array.getSize();
@@ -332,5 +331,4 @@ inplaceExclusiveScan( Array& array,
    inplaceExclusiveScan( array, begin, end, std::forward< Reduction >( reduction ), identity );
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

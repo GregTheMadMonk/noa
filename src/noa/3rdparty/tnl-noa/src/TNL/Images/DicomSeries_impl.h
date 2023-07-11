@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomSeries.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomSeriesInfo.h>
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 int
 findLastIndexOf( String& str, const char* c )
@@ -381,5 +380,4 @@ DicomSeries::isDicomSeriesLoaded()
    return isLoaded;
 }
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images

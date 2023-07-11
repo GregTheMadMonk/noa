@@ -22,8 +22,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Pyramid.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polyhedron.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename Grid >
 __cuda_callable__
@@ -69,7 +68,7 @@ typename VectorExpression::RealType
 getTriangleArea( const VectorExpression& v1, const VectorExpression& v2 )
 {
    using Real = typename VectorExpression::RealType;
-   return Real( 0.5 ) * TNL::abs( v1.x() * v2.y() - v1.y() * v2.x() );
+   return Real( 0.5 ) * noa::TNL::abs( v1.x() * v2.y() - v1.y() * v2.x() );
 }
 
 template< typename VectorExpression, std::enable_if_t< VectorExpression::getSize() == 3, bool > = true >
@@ -82,7 +81,7 @@ getTriangleArea( const VectorExpression& v1, const VectorExpression& v2 )
    const Real c1 = v1.y() * v2.z() - v1.z() * v2.y();  // first component of the cross product
    const Real c2 = v1.z() * v2.x() - v1.x() * v2.z();  // second component of the cross product
    const Real c3 = v1.x() * v2.y() - v1.y() * v2.x();  // third component of the cross product
-   return Real( 0.5 ) * TNL::sqrt( c1 * c1 + c2 * c2 + c3 * c3 );
+   return Real( 0.5 ) * noa::TNL::sqrt( c1 * c1 + c2 * c2 + c3 * c3 );
 }
 
 template< typename MeshConfig, typename Device >
@@ -121,7 +120,7 @@ getTetrahedronVolume( const VectorExpression& v1, const VectorExpression& v2, co
    // V = (1/6) * det(v1, v2, v3)
    const Real det = v1.x() * v2.y() * v3.z() + v1.y() * v2.z() * v3.x() + v1.z() * v2.x() * v3.y()
                   - ( v1.z() * v2.y() * v3.x() + v1.y() * v2.x() * v3.z() + v1.x() * v2.z() * v3.y() );
-   return Real( 1.0 / 6.0 ) * TNL::abs( det );
+   return Real( 1.0 / 6.0 ) * noa::TNL::abs( det );
 }
 
 template< typename MeshConfig, typename Device >
@@ -205,7 +204,7 @@ typename MeshConfig::RealType
 getEntityMeasure( const Mesh< MeshConfig, Device >& mesh, const MeshEntity< MeshConfig, Device, Topologies::Polygon >& entity )
 {
    const auto area = getPolygon2DArea< 0, 1 >( mesh, entity );
-   return TNL::abs( area );
+   return noa::TNL::abs( area );
 }
 
 template< typename MeshConfig, typename Device, std::enable_if_t< MeshConfig::spaceDimension == 3, bool > = true >
@@ -220,7 +219,7 @@ getEntityMeasure( const Mesh< MeshConfig, Device >& mesh, const MeshEntity< Mesh
 
    // select largest abs coordinate of normal vector to ignore for projection
    auto normal = getNormalVector( mesh, entity );
-   normal = TNL::abs( normal );
+   normal = noa::TNL::abs( normal );
    int coord = 2;  // ignore z-coord
    if( normal.x() > normal.y() ) {
       if( normal.x() > normal.z() )
@@ -244,7 +243,7 @@ getEntityMeasure( const Mesh< MeshConfig, Device >& mesh, const MeshEntity< Mesh
          area *= l2Norm( normal ) / normal.z();
          break;
    }
-   return TNL::abs( area );
+   return noa::TNL::abs( area );
 }
 
 // Wedge
@@ -313,7 +312,7 @@ outside.
             };
         }
     }
-    return Real{ 1.0 / 6.0 } * TNL::abs( volume );
+    return Real{ 1.0 / 6.0 } * noa::TNL::abs( volume );
 }*/
 
 template< typename MeshConfig, typename Device >
@@ -345,5 +344,4 @@ getEntityMeasure( const Mesh< MeshConfig, Device >& mesh,
    return volume;
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

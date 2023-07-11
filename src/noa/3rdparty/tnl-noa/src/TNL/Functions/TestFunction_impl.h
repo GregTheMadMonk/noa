@@ -40,8 +40,7 @@
 
 #include "TestFunction.h"
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 template< int FunctionDimension, typename Real, typename Device >
 TestFunction< FunctionDimension, Real, Device >::TestFunction()
@@ -93,8 +92,8 @@ TestFunction< FunctionDimension, Real, Device >::configSetup( Config::ConfigDesc
    config.addEntry< double >(
       prefix + "height", "Height of zero-level-set function for the blob, pseudosquare test functions.", 1.0 );
    Analytic::VectorNorm< 3, double >::configSetup( config, "vector-norm-" );
-   TNL::Operators::Analytic::Heaviside< 3, double >::configSetup( config, "heaviside-" );
-   TNL::Operators::Analytic::SmoothHeaviside< 3, double >::configSetup( config, "smooth-heaviside-" );
+   noa::TNL::Operators::Analytic::Heaviside< 3, double >::configSetup( config, "heaviside-" );
+   noa::TNL::Operators::Analytic::SmoothHeaviside< 3, double >::configSetup( config, "smooth-heaviside-" );
    config.addEntry< String >( prefix + "time-dependence", "Time dependence of the test function.", "none" );
    config.addEntryEnum( "none" );
    config.addEntryEnum( "linear" );
@@ -896,5 +895,4 @@ TestFunction< FunctionDimension, Real, Device >::~TestFunction()
    deleteFunctions();
 }
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

@@ -14,9 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 struct BubbleSort
 {
@@ -50,6 +48,4 @@ struct BubbleSort
    }
 };
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

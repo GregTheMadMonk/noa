@@ -20,8 +20,7 @@
 
 #include "HeatEquationProblem.h"
 
-namespace noa::TNL {
-namespace Problems {
+namespace noa::TNL::Problems {
 
 template< typename Mesh, typename BoundaryCondition, typename RightHandSide, typename DifferentialOperator >
 String
@@ -98,7 +97,8 @@ HeatEquationProblem< Mesh, BoundaryCondition, RightHandSide, DifferentialOperato
    if( MPI::GetSize() > 1 ) {
       std::cout << "Nodes Distribution: " << this->distributedMeshPointer->printProcessDistr() << std::endl;
       if( ! Functions::readDistributedMeshFunction(
-             *this->distributedMeshPointer, *this->uPointer, "u", initialConditionFile ) ) {
+             *this->distributedMeshPointer, *this->uPointer, "u", initialConditionFile ) )
+      {
          std::cerr << "I am not able to load the initial condition from the file " << initialConditionFile << "." << std::endl;
          return false;
       }
@@ -204,5 +204,4 @@ HeatEquationProblem< Mesh, BoundaryCondition, RightHandSide, DifferentialOperato
       time, tau, this->getMesh(), this->uPointer, matrixPointer, bPointer );
 }
 
-}  // namespace Problems
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Problems

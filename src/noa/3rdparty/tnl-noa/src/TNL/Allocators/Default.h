@@ -14,8 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 
-namespace noa::TNL {
-namespace Allocators {
+namespace noa::TNL::Allocators {
 
 /**
  * \brief A trait-like class used for the selection of a default allocators for
@@ -48,5 +47,4 @@ struct Default< Devices::Cuda >
    using Allocator = Allocators::Cuda< T >;
 };
 
-}  // namespace Allocators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Allocators

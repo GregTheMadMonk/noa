@@ -12,19 +12,18 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/DefaultSorter.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 /**
  * \brief Function for sorting elements of array or vector in ascending order.
  *
  * \tparam Array is a type of container to be sorted. It can be, for example,
- *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
- *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView.
+ *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
+ *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView.
  * \tparam Sorter is an algorithm for sorting. It can be
- *         \ref TNL::Algorithms::Sorting::STLSort for sorting on host and
- *         \ref TNL::Algorithms::Sorting::Quicksort or
- *         \ref TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
+ *         \ref noa::TNL::Algorithms::Sorting::STLSort for sorting on host and
+ *         \ref noa::TNL::Algorithms::Sorting::Quicksort or
+ *         \ref noa::TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
  *
  * \param array is an instance of array/array view/vector/vector view for sorting.
  * \param sorter is an instance of sorter.
@@ -49,12 +48,12 @@ ascendingSort( Array& array, const Sorter& sorter = Sorter{} )
  * \brief Function for sorting elements of array or vector in descending order.
  *
  * \tparam Array is a type of container to be sorted. It can be, for example,
- *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
- *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView.
+ *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
+ *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView.
  * \tparam Sorter is an algorithm for sorting. It can be
- *         \ref TNL::Algorithms::Sorting::STLSort for sorting on host and
- *         \ref TNL::Algorithms::Sorting::Quicksort or
- *         \ref TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
+ *         \ref noa::TNL::Algorithms::Sorting::STLSort for sorting on host and
+ *         \ref noa::TNL::Algorithms::Sorting::Quicksort or
+ *         \ref noa::TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
  *
  * \param array is an instance of array/array view/vector/vector view for sorting.
  * \param sorter is an instance of sorter.
@@ -79,8 +78,8 @@ descendingSort( Array& array, const Sorter& sorter = Sorter{} )
  * \brief Function for sorting elements of array or vector based on a user defined comparison lambda function.
  *
  * \tparam Array is a type of container to be sorted. It can be, for example,
- *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
- *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView.
+ *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
+ *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView.
  * \tparam Compare is a lambda function for comparing of two elements. It
  *         returns true if the first argument should be ordered before the
  *         second. The lambda function is supposed to be defined as follows
@@ -89,9 +88,9 @@ descendingSort( Array& array, const Sorter& sorter = Sorter{} )
  *  auto compare = [] __cuda_callable__ ( const ValueType& a , const ValueType& b ) -> bool { return .... };
  *  ```
  * \tparam Sorter is an algorithm for sorting. It can be
- *         \ref TNL::Algorithms::Sorting::STLSort for sorting on host and
- *         \ref TNL::Algorithms::Sorting::Quicksort or
- *         \ref TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
+ *         \ref noa::TNL::Algorithms::Sorting::STLSort for sorting on host and
+ *         \ref noa::TNL::Algorithms::Sorting::Quicksort or
+ *         \ref noa::TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
  *
  * \param array is an instance of array/array view/vector/vector view for sorting.
  * \param compare is an instance of the lambda function for comparison of two elements.
@@ -134,7 +133,7 @@ sort( Array& array, const Compare& compare, const Sorter& sorter = Sorter{} )
  * auto swap = [=] __cuda_callable__ (  const Index& a , const Index& b ) mutable { swap( ....); };
  * ```
  * \tparam Sorter is an algorithm for sorting. It can be
- *         \ref TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
+ *         \ref noa::TNL::Algorithms::Sorting::BitonicSort for sorting on CUDA GPU.
  *         Currently there is no algorithm for CPU :(.
  *
  * \param begin is the first index of the range `[begin, end)` to be sorted.
@@ -167,8 +166,8 @@ sort( const Index begin, const Index end, Compare&& compare, Swap&& swap, const 
  * \brief Functions returning true if the array elements are sorted according to the lmabda function `comparison`.
  *
  * \tparam Array is the type of array/vector. It can be, for example,
- *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
- *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView.
+ *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
+ *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView.
  * \tparam Compare is a lambda function for comparing of two elements. It
  *         returns true if the first argument should be ordered before the
  *         second - both are given by indices representing their positions. The
@@ -195,15 +194,15 @@ isSorted( const Array& arr, const Compare& compare )
    {
       return ! compare( view[ i ], view[ i - 1 ] );
    };
-   return TNL::Algorithms::reduce< Device >( 1, arr.getSize(), fetch, std::logical_and<>{}, true );
+   return noa::TNL::Algorithms::reduce< Device >( 1, arr.getSize(), fetch, std::logical_and<>{}, true );
 }
 
 /**
  * \brief Functions returning true if the array elements are sorted in ascending order.
  *
  * \tparam Array is the type of array/vector. It can be, for example,
- *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
- *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView.
+ *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
+ *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView.
  *
  * \param arr is an instance of tested array.
  *
@@ -221,8 +220,8 @@ isAscending( const Array& arr )
  * \brief Functions returning true if the array elements are sorted in descending order.
  *
  * \tparam Array is the type of array/vector. It can be, for example,
- *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
- *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView.
+ *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
+ *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView.
  *
  * \param arr is an instance of tested array.
  *
@@ -236,5 +235,4 @@ isDescending( const Array& arr )
    return isSorted( arr, std::greater<>{} );
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

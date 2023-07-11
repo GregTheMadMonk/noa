@@ -22,8 +22,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/DistributedMeshSynchronizer.h>
 
-namespace noa::TNL {
-namespace Problems {
+namespace noa::TNL::Problems {
 
 template< typename Mesh,
           typename BoundaryCondition,
@@ -122,7 +121,6 @@ protected:
    bool catchExceptions = true;
 };
 
-}  // namespace Problems
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Problems
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Problems/HeatEquationProblem_impl.h>

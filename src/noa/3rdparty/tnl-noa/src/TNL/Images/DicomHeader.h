@@ -12,8 +12,7 @@
    #include <dcmtk/dcmdata/dcdeftag.h>
 #endif
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 class DicomSeriesInfo;
 class DicomPatientInfo;
@@ -62,7 +61,6 @@ protected:
    bool isLoaded;
 };
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomHeader_impl.h>

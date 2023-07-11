@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Mesh.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshEntity.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 // compatibility wrapper
 template< typename Grid, int EntityDimension >
@@ -51,5 +50,4 @@ getEntityCenter( const Mesh< MeshConfig, Device >& mesh, const MeshEntity< MeshC
    return ( 1.0 / subvertices ) * c;
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

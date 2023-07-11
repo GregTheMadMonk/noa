@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/MeshFunction.h>
 
-namespace noa::TNL {
-namespace Operators {
+namespace noa::TNL::Operators {
 
 template< typename MeshFunction >
 class IdentityOperator : public Domain< MeshFunction::getMeshDimension(), MeshFunction::getDomainType() >
@@ -35,5 +34,4 @@ protected:
    const MeshFunction& meshFunction;
 };
 
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators

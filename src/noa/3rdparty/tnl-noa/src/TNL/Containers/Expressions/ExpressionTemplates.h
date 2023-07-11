@@ -63,7 +63,7 @@ struct BinaryExpressionTemplate< T1, T2, Operation, VectorExpressionVariable, Ve
       TNL_ASSERT_EQ( op1.getSize(), op2.getSize(), "Attempt to mix operands with different sizes." );
    }
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       return Operation{}( op1.getElement( i ), op2.getElement( i ) );
@@ -83,14 +83,14 @@ struct BinaryExpressionTemplate< T1, T2, Operation, VectorExpressionVariable, Ve
       return operator[]( i );
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSize() const
    {
       return op1.getSize();
    }
 
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const
    {
       return *this;
@@ -116,7 +116,7 @@ struct BinaryExpressionTemplate< T1, T2, Operation, VectorExpressionVariable, Ar
 
    BinaryExpressionTemplate( const T1& a, const T2& b ) : op1( a.getConstView() ), op2( b ) {}
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       return Operation{}( op1.getElement( i ), op2 );
@@ -136,14 +136,14 @@ struct BinaryExpressionTemplate< T1, T2, Operation, VectorExpressionVariable, Ar
       return operator[]( i );
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSize() const
    {
       return op1.getSize();
    }
 
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const
    {
       return *this;
@@ -169,7 +169,7 @@ struct BinaryExpressionTemplate< T1, T2, Operation, ArithmeticVariable, VectorEx
 
    BinaryExpressionTemplate( const T1& a, const T2& b ) : op1( a ), op2( b.getConstView() ) {}
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       return Operation{}( op1, op2.getElement( i ) );
@@ -189,14 +189,14 @@ struct BinaryExpressionTemplate< T1, T2, Operation, ArithmeticVariable, VectorEx
       return operator[]( i );
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSize() const
    {
       return op2.getSize();
    }
 
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const
    {
       return *this;
@@ -223,7 +223,7 @@ struct UnaryExpressionTemplate
 
    UnaryExpressionTemplate( const T1& a ) : operand( a.getConstView() ) {}
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       return Operation{}( operand.getElement( i ) );
@@ -243,14 +243,14 @@ struct UnaryExpressionTemplate
       return operator[]( i );
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSize() const
    {
       return operand.getSize();
    }
 
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const
    {
       return *this;
@@ -276,41 +276,41 @@ protected:
          return BinaryExpressionTemplate< ET1, ET2, functor >( a, b );                                         \
       }
 
-TNL_MAKE_BINARY_EXPRESSION( operator+, TNL::Plus )
-TNL_MAKE_BINARY_EXPRESSION( operator-, TNL::Minus )
-TNL_MAKE_BINARY_EXPRESSION( operator*, TNL::Multiplies )
-TNL_MAKE_BINARY_EXPRESSION( operator/, TNL::Divides )
-TNL_MAKE_BINARY_EXPRESSION( operator%, TNL::Modulus )
-TNL_MAKE_BINARY_EXPRESSION( min, TNL::Min )
-TNL_MAKE_BINARY_EXPRESSION( max, TNL::Max )
+TNL_MAKE_BINARY_EXPRESSION( operator+, noa::TNL::Plus )
+TNL_MAKE_BINARY_EXPRESSION( operator-, noa::TNL::Minus )
+TNL_MAKE_BINARY_EXPRESSION( operator*, noa::TNL::Multiplies )
+TNL_MAKE_BINARY_EXPRESSION( operator/, noa::TNL::Divides )
+TNL_MAKE_BINARY_EXPRESSION( operator%, noa::TNL::Modulus )
+TNL_MAKE_BINARY_EXPRESSION( min, noa::TNL::Min )
+TNL_MAKE_BINARY_EXPRESSION( max, noa::TNL::Max )
 
-TNL_MAKE_UNARY_EXPRESSION( operator+, TNL::UnaryPlus )
-TNL_MAKE_UNARY_EXPRESSION( operator-, TNL::UnaryMinus )
-TNL_MAKE_UNARY_EXPRESSION( operator!, TNL::LogicalNot )
-TNL_MAKE_UNARY_EXPRESSION( operator~, TNL::BitNot )
-TNL_MAKE_UNARY_EXPRESSION( abs, TNL::Abs )
-TNL_MAKE_UNARY_EXPRESSION( exp, TNL::Exp )
-TNL_MAKE_UNARY_EXPRESSION( sqr, TNL::Sqr )
-TNL_MAKE_UNARY_EXPRESSION( sqrt, TNL::Sqrt )
-TNL_MAKE_UNARY_EXPRESSION( cbrt, TNL::Cbrt )
-TNL_MAKE_UNARY_EXPRESSION( log, TNL::Log )
-TNL_MAKE_UNARY_EXPRESSION( log10, TNL::Log10 )
-TNL_MAKE_UNARY_EXPRESSION( log2, TNL::Log2 )
-TNL_MAKE_UNARY_EXPRESSION( sin, TNL::Sin )
-TNL_MAKE_UNARY_EXPRESSION( cos, TNL::Cos )
-TNL_MAKE_UNARY_EXPRESSION( tan, TNL::Tan )
-TNL_MAKE_UNARY_EXPRESSION( asin, TNL::Asin )
-TNL_MAKE_UNARY_EXPRESSION( acos, TNL::Acos )
-TNL_MAKE_UNARY_EXPRESSION( atan, TNL::Atan )
-TNL_MAKE_UNARY_EXPRESSION( sinh, TNL::Sinh )
-TNL_MAKE_UNARY_EXPRESSION( cosh, TNL::Cosh )
-TNL_MAKE_UNARY_EXPRESSION( tanh, TNL::Tanh )
-TNL_MAKE_UNARY_EXPRESSION( asinh, TNL::Asinh )
-TNL_MAKE_UNARY_EXPRESSION( acosh, TNL::Acosh )
-TNL_MAKE_UNARY_EXPRESSION( atanh, TNL::Atanh )
-TNL_MAKE_UNARY_EXPRESSION( floor, TNL::Floor )
-TNL_MAKE_UNARY_EXPRESSION( ceil, TNL::Ceil )
-TNL_MAKE_UNARY_EXPRESSION( sign, TNL::Sign )
+TNL_MAKE_UNARY_EXPRESSION( operator+, noa::TNL::UnaryPlus )
+TNL_MAKE_UNARY_EXPRESSION( operator-, noa::TNL::UnaryMinus )
+TNL_MAKE_UNARY_EXPRESSION( operator!, noa::TNL::LogicalNot )
+TNL_MAKE_UNARY_EXPRESSION( operator~, noa::TNL::BitNot )
+TNL_MAKE_UNARY_EXPRESSION( abs, noa::TNL::Abs )
+TNL_MAKE_UNARY_EXPRESSION( exp, noa::TNL::Exp )
+TNL_MAKE_UNARY_EXPRESSION( sqr, noa::TNL::Sqr )
+TNL_MAKE_UNARY_EXPRESSION( sqrt, noa::TNL::Sqrt )
+TNL_MAKE_UNARY_EXPRESSION( cbrt, noa::TNL::Cbrt )
+TNL_MAKE_UNARY_EXPRESSION( log, noa::TNL::Log )
+TNL_MAKE_UNARY_EXPRESSION( log10, noa::TNL::Log10 )
+TNL_MAKE_UNARY_EXPRESSION( log2, noa::TNL::Log2 )
+TNL_MAKE_UNARY_EXPRESSION( sin, noa::TNL::Sin )
+TNL_MAKE_UNARY_EXPRESSION( cos, noa::TNL::Cos )
+TNL_MAKE_UNARY_EXPRESSION( tan, noa::TNL::Tan )
+TNL_MAKE_UNARY_EXPRESSION( asin, noa::TNL::Asin )
+TNL_MAKE_UNARY_EXPRESSION( acos, noa::TNL::Acos )
+TNL_MAKE_UNARY_EXPRESSION( atan, noa::TNL::Atan )
+TNL_MAKE_UNARY_EXPRESSION( sinh, noa::TNL::Sinh )
+TNL_MAKE_UNARY_EXPRESSION( cosh, noa::TNL::Cosh )
+TNL_MAKE_UNARY_EXPRESSION( tanh, noa::TNL::Tanh )
+TNL_MAKE_UNARY_EXPRESSION( asinh, noa::TNL::Asinh )
+TNL_MAKE_UNARY_EXPRESSION( acosh, noa::TNL::Acosh )
+TNL_MAKE_UNARY_EXPRESSION( atanh, noa::TNL::Atanh )
+TNL_MAKE_UNARY_EXPRESSION( floor, noa::TNL::Floor )
+TNL_MAKE_UNARY_EXPRESSION( ceil, noa::TNL::Ceil )
+TNL_MAKE_UNARY_EXPRESSION( sign, noa::TNL::Sign )
 
    #undef TNL_MAKE_UNARY_EXPRESSION
    #undef TNL_MAKE_BINARY_EXPRESSION
@@ -395,7 +395,7 @@ template< typename ET1, typename ET2,
 auto
 operator,( const ET1& a, const ET2& b )
 {
-   return Algorithms::reduce( a * b, TNL::Plus{} );
+   return Algorithms::reduce( a * b, noa::TNL::Plus{} );
 }
 
 template< typename ET1, typename ET2, typename..., EnableIfBinaryExpression_t< ET1, ET2, bool > = true >
@@ -411,35 +411,35 @@ template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = tr
 auto
 min( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::Min{} );
+   return Algorithms::reduce( a, noa::TNL::Min{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 argMin( const ET1& a )
 {
-   return Algorithms::reduceWithArgument( a, TNL::MinWithArg{} );
+   return Algorithms::reduceWithArgument( a, noa::TNL::MinWithArg{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 max( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::Max{} );
+   return Algorithms::reduce( a, noa::TNL::Max{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 argMax( const ET1& a )
 {
-   return Algorithms::reduceWithArgument( a, TNL::MaxWithArg{} );
+   return Algorithms::reduceWithArgument( a, noa::TNL::MaxWithArg{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 sum( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::Plus{} );
+   return Algorithms::reduce( a, noa::TNL::Plus{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
@@ -460,21 +460,21 @@ template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = tr
 auto
 l2Norm( const ET1& a )
 {
-   using TNL::sqrt;
+   using noa::TNL::sqrt;
    return sqrt( sum( sqr( a ) ) );
 }
 
 template< typename ET1, typename Real, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 lpNorm( const ET1& a, const Real& p )
-   // since (1.0 / p) has type double, TNL::pow returns double
+   // since (1.0 / p) has type double, noa::TNL::pow returns double
    -> double
 {
    if( p == 1.0 )
       return l1Norm( a );
    if( p == 2.0 )
       return l2Norm( a );
-   using TNL::pow;
+   using noa::TNL::pow;
    return pow( sum( pow( abs( a ), p ) ), 1.0 / p );
 }
 
@@ -482,42 +482,42 @@ template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = tr
 auto
 product( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::Multiplies{} );
+   return Algorithms::reduce( a, noa::TNL::Multiplies{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 logicalAnd( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::LogicalAnd{} );
+   return Algorithms::reduce( a, noa::TNL::LogicalAnd{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 logicalOr( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::LogicalOr{} );
+   return Algorithms::reduce( a, noa::TNL::LogicalOr{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 binaryAnd( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::BitAnd{} );
+   return Algorithms::reduce( a, noa::TNL::BitAnd{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 binaryOr( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::BitOr{} );
+   return Algorithms::reduce( a, noa::TNL::BitOr{} );
 }
 
 template< typename ET1, typename..., EnableIfUnaryExpression_t< ET1, bool > = true >
 auto
 binaryXor( const ET1& a )
 {
-   return Algorithms::reduce( a, TNL::BitXor{} );
+   return Algorithms::reduce( a, noa::TNL::BitXor{} );
 }
 
 #endif  // DOXYGEN_ONLY
@@ -548,7 +548,7 @@ operator<<( std::ostream& str, const UnaryExpressionTemplate< T, Operation >& ex
 
 }  // namespace Expressions
 
-// Make all operators visible in the TNL::Containers namespace to be considered
+// Make all operators visible in the noa::TNL::Containers namespace to be considered
 // even for Vector and VectorView
 using Expressions::operator!;
 using Expressions::operator~;
@@ -565,7 +565,7 @@ using Expressions::operator<=;
 using Expressions::operator>;
 using Expressions::operator>=;
 
-// Make all functions visible in the TNL::Containers namespace
+// Make all functions visible in the noa::TNL::Containers namespace
 using Expressions::abs;
 using Expressions::acos;
 using Expressions::acosh;
@@ -753,7 +753,7 @@ addAndReduceAbs( Vector& lhs,
    {
       const RealType aux = expression[ i ];
       lhs_data[ i ] += aux;
-      return TNL::abs( aux );
+      return noa::TNL::abs( aux );
    };
    return Algorithms::reduce< DeviceType >( (IndexType) 0, lhs.getSize(), fetch, reduction, zero );
 }
@@ -774,7 +774,7 @@ addAndReduceAbs( Vector& lhs,
    {
       const RealType aux = expression[ i ];
       lhs_data[ i ] += aux;
-      return TNL::abs( aux );
+      return noa::TNL::abs( aux );
    };
    return Algorithms::reduce< DeviceType >( (IndexType) 0, lhs.getSize(), fetch, reduction, zero );
 }

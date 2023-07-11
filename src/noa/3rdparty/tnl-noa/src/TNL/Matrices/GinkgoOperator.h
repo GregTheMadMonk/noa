@@ -11,8 +11,7 @@
 
 #include <ginkgo/ginkgo.hpp>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 /**
  * \brief Creates a Ginkgo Csr matrix view from a TNL CSR matrix.
@@ -173,5 +172,4 @@ private:
    const Matrix* wrapped_matrix;
 };
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

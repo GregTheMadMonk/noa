@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 
-namespace noa::TNL {
-namespace Operators {
-namespace Analytic {
+namespace noa::TNL::Operators::Analytic {
 
 // TODO: Implement RotationXY, RotationXZ and RotationYZ in all dimensions.
 //       Where it does not make sense, the operator does nothing.
@@ -64,6 +62,4 @@ public:
    }
 };
 
-}  // namespace Analytic
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators::Analytic

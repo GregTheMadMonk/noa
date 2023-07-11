@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename Real = double, typename Device = Devices::Host, typename Index = int >
 class DummyMesh
@@ -26,5 +25,4 @@ public:
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

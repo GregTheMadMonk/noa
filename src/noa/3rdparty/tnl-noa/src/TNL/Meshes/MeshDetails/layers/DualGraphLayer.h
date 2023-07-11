@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/traits/MeshTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename MeshConfig, typename Device, bool enabled = MeshConfig::dualGraphStorage() >
 class DualGraphLayer
@@ -54,28 +53,28 @@ public:
       return neighborCounts == other.getNeighborCounts() && graph == other.getDualGraph();
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const NeighborCountsArray&
    getNeighborCounts() const
    {
       return neighborCounts;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    NeighborCountsArray&
    getNeighborCounts()
    {
       return neighborCounts;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const DualGraph&
    getDualGraph() const
    {
       return graph;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    DualGraph&
    getDualGraph()
    {
@@ -182,5 +181,4 @@ public:
    {}
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

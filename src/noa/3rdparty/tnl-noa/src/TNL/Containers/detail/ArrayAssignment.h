@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MultiDeviceMemoryOperations.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace detail {
+namespace noa::TNL::Containers::detail {
 
 template< typename Array, typename T, bool isArrayType = IsArrayType< T >::value >
 struct ArrayAssignment;
@@ -66,6 +64,4 @@ struct ArrayAssignment< Array, T, false >
    }
 };
 
-}  // namespace detail
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::detail

@@ -23,8 +23,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/SharedMemory.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename DeviceType = Devices::Host >
 class MatrixOperations
@@ -64,7 +63,7 @@ public:
       if( n == 1 ) {
          if( beta != 0.0 ) {
 #ifdef HAVE_OPENMP
-#pragma omp parallel for if( TNL::Devices::Host::isOMPEnabled() )
+#pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
 #endif
             for( IndexType j = 0; j < m; j++ )
                y[ j ] = A[ j ] * alphax[ 0 ] + beta * y[ j ];
@@ -72,7 +71,7 @@ public:
          else {
 // the vector y might be uninitialized, and 0.0 * NaN = NaN
 #ifdef HAVE_OPENMP
-#pragma omp parallel for if( TNL::Devices::Host::isOMPEnabled() )
+#pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
 #endif
             for( IndexType j = 0; j < m; j++ )
                y[ j ] = A[ j ] * alphax[ 0 ];
@@ -85,7 +84,7 @@ public:
          const IndexType blocks = m / block_size;
 
 #ifdef HAVE_OPENMP
-#pragma omp parallel if( TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
+#pragma omp parallel if( noa::TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
 #endif
          {
             RealType aux[ block_size ];
@@ -179,7 +178,7 @@ public:
 
       if( n == 1 ) {
 #ifdef HAVE_OPENMP
-#pragma omp parallel for if( TNL::Devices::Host::isOMPEnabled() )
+#pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
 #endif
          for( IndexType j = 0; j < m; j++ )
             C[ j ] = alpha * A[ j ] + beta * B[ j ];
@@ -191,7 +190,7 @@ public:
          const IndexType blocks = m / block_size;
 
 #ifdef HAVE_OPENMP
-#pragma omp parallel if( TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
+#pragma omp parallel if( noa::TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
 #endif
          {
 #ifdef HAVE_OPENMP
@@ -399,5 +398,4 @@ public:
    }
 };
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

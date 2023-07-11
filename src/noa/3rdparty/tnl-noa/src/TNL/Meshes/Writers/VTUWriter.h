@@ -10,9 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 template< typename Mesh >
 class VTUWriter
@@ -100,8 +98,6 @@ protected:
    closePiece();
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/VTUWriter.hpp>

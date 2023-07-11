@@ -10,8 +10,7 @@
 
 #include "DistributedMatrix.h"
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Matrix >
 DistributedMatrix< Matrix >::DistributedMatrix( LocalRangeType localRowRange,
@@ -243,5 +242,4 @@ DistributedMatrix< Matrix >::vectorProduct( const InVector& inVector, OutVector&
    //   outVector.startSynchronization();
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

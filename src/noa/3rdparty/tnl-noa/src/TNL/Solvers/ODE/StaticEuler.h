@@ -13,9 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 /**
  * \brief Solver of ODEs with the first order of accuracy.
@@ -31,10 +29,10 @@ namespace ODE {
  * It is supposed to be used when the unknown \f$ x \in R \f$ is expressed by a scalar, i.e.
  * by a numeric type like `double` or `float`.
  *
- * For problems where \f$ \vec x\f$ is represented by \ref TNL::Containers::StaticVector,
- * see \ref TNL::Solvers::ODE::StaticEuler<Containers::StaticVector<Size_,Real>>.
- * For problems where \f$ \vec x\f$ is represented by \ref TNL::Containers::Vector,
- * or \ref TNL::Containers::VectorView, see \ref TNL::Solvers::ODE::Euler.
+ * For problems where \f$ \vec x\f$ is represented by \ref noa::TNL::Containers::StaticVector,
+ * see \ref noa::TNL::Solvers::ODE::StaticEuler<Containers::StaticVector<Size_,Real>>.
+ * For problems where \f$ \vec x\f$ is represented by \ref noa::TNL::Containers::Vector,
+ * or \ref noa::TNL::Containers::VectorView, see \ref noa::TNL::Solvers::ODE::Euler.
  *
  * The following example demonstrates the use the solvers:
  *
@@ -45,7 +43,7 @@ namespace ODE {
  * \include StaticODESolver-SineExample.out
  *
  * Since this variant of the Euler solver is static, it can be used even inside of GPU kernels and so combined with \ref
- * TNL::Algorithms::parallelFor as demonstrated by the following example:
+ * noa::TNL::Algorithms::parallelFor as demonstrated by the following example:
  *
  * \includelineno Solvers/ODE/StaticODESolver-SineParallelExample.h
  *
@@ -122,7 +120,7 @@ public:
     *
     * \return the Courant number.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getCourantNumber() const;
 
@@ -166,16 +164,16 @@ protected:
  *
  * It is supposed to be used when the unknown \f$ \vec x \in R^n \f$ is expressed by a \ref Containers::StaticVector.
  *
- * For problems where \f$ x\f$ is represented by floating-point number, see \ref TNL::Solvers::ODE::StaticEuler.
- * For problems where \f$ \vec x\f$ is represented by \ref TNL::Containers::Vector or \ref TNL::Containers::VectorView,
- * see \ref TNL::Solvers::ODE::Euler.
+ * For problems where \f$ x\f$ is represented by floating-point number, see \ref noa::TNL::Solvers::ODE::StaticEuler.
+ * For problems where \f$ \vec x\f$ is represented by \ref noa::TNL::Containers::Vector or \ref noa::TNL::Containers::VectorView,
+ * see \ref noa::TNL::Solvers::ODE::Euler.
  *
  * The following example demonstrates the use the solvers:
  *
  * \includelineno Solvers/ODE/StaticODESolver-LorenzExample.h
  *
  * Since this variant of the Euler solver is static, it can be used even inside of GPU kernels and so combined with \ref
- * TNL::Algorithms::parallelFor as demonstrated by the following example:
+ * noa::TNL::Algorithms::parallelFor as demonstrated by the following example:
  *
  * \includelineno Solvers/ODE/StaticODESolver-LorenzParallelExample.h
  *
@@ -204,7 +202,7 @@ public:
    /**
     * \brief Type of unknown variable \f$ x \f$.
     */
-   using VectorType = TNL::Containers::StaticVector< Size, Real >;
+   using VectorType = noa::TNL::Containers::StaticVector< Size, Real >;
 
    /**
     * \brief Alias for type of unknown variable \f$ x \f$.
@@ -258,7 +256,7 @@ public:
     *
     * \return the Courant number.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getCourantNumber() const;
 
@@ -289,8 +287,6 @@ protected:
    RealType courantNumber = 0.0;
 };
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/StaticEuler.hpp>

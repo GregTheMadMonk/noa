@@ -4,8 +4,8 @@
 #include <noa/utils/cfd/cfd.hh>
 
 template <typename VectorType>
-double g(typename VectorType::ConstViewType in) {
-    double ret = 0;
+float g(typename VectorType::ConstViewType in) {
+    float ret = 0;
 
     in.forAllElements([&ret] (auto, auto& v) { ret += v; });
 
@@ -18,7 +18,7 @@ void gWrtP(typename VectorType::ConstViewType in, typename VectorType::ViewType 
 }
 
 int main(int argc, char** argv) {
-    using DomainType     = noa::utils::domain::Domain<noa::TNL::Meshes::Topologies::Triangle, noa::TNL::Devices::Host, double>;
+    using DomainType     = noa::utils::domain::Domain<noa::TNL::Meshes::Topologies::Triangle>;
     using VectorType     = DomainType::LayerManagerType::Vector<typename DomainType::RealType>;
     using CFDProblemType = noa::utils::cfd::tasks::CFDProblem<DomainType>;
     using MHFEType       = noa::utils::cfd::tasks::MHFE<DomainType, true>;
@@ -36,8 +36,10 @@ int main(int argc, char** argv) {
     std::cout << problem.edgeSolution->getSize() << std::endl;
     
     DomainType domain;
-    // noa::utils::domain::generate2DGrid(domain, 20, 10, 1.0, 1.0);
-    noa::utils::domain::generate2DGrid(domain, 40, 20, 0.5, 0.5);
+    //noa::utils::domain::generate2DGrid(domain, 20, 10, 1.0, 1.0);
+    const auto Nx = 5;
+    const auto dx = 10.0 / Nx;
+    noa::utils::domain::generate2DGrid(domain, 2 * Nx, Nx, dx, dx);
 
     problem.setMesh(domain.getMesh());
 
@@ -84,24 +86,21 @@ int main(int argc, char** argv) {
 
     mhfe.tau = 0.005;
 
-    while (mhfe.getTime() < 1.1) {
+    std::ofstream f("dump.dat");
+    while (mhfe.getTime() < 25.0) {
         computation.run();
         std::cerr << "\r" << mhfe.getTime()
             << " : " << sum(computation.template get<GradEvType>().getResult())
             << " : " << sum(computation.template get<FinDiffType>().getResult())
             << "                 ";
+        f << mhfe.getTime()
+            << ", " << sum(computation.template get<GradEvType>().getResult())
+            << ", " << sum(computation.template get<FinDiffType>().getResult())
+            << std::endl;
         // std::cerr << g<VectorType>(*problem.solution) << std::endl;
         problem.getDomain().write("temp/" + std::to_string(mhfe.getTime()) + ".vtu");
     }
     std::cerr << std::endl;
-
-    /*
-    std::cerr << computation.template get<GradEvType>().getResult() << std::endl;
-    std::cerr << computation.template get<FinDiffType>().getResult() << std::endl;
-    std::cerr << g<VectorType>(*problem.solution) << std::endl;
-    std::cerr << "---" << std::endl;
-    computation.template get<FinDiffType>().printScalars();
-    */
 
     return 0;
 }

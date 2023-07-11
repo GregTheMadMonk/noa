@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Kernels/details/CSRAdaptiveKernelBlockDescriptor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Kernels/details/CSRAdaptiveKernelParameters.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Index, typename Device >
 struct CSRAdaptiveKernelView
@@ -21,12 +19,12 @@ struct CSRAdaptiveKernelView
    using DeviceType = Device;
    using ViewType = CSRAdaptiveKernelView< Index, Device >;
    using ConstViewType = CSRAdaptiveKernelView< Index, Device >;
-   using BlocksType = TNL::Containers::Vector< detail::CSRAdaptiveKernelBlockDescriptor< Index >, Device, Index >;
+   using BlocksType = noa::TNL::Containers::Vector< detail::CSRAdaptiveKernelBlockDescriptor< Index >, Device, Index >;
    using BlocksView = typename BlocksType::ViewType;
 
    static constexpr int MaxValueSizeLog = detail::CSRAdaptiveKernelParameters<>::MaxValueSizeLog;
 
-   static int
+   [[nodiscard]] static int
    getSizeValueLog( const int& i )
    {
       return detail::CSRAdaptiveKernelParameters<>::getSizeValueLog( i );
@@ -37,15 +35,15 @@ struct CSRAdaptiveKernelView
    void
    setBlocks( BlocksType& blocks, int idx );
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ViewType
    getView();
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstViewType
    getConstView() const;
 
-   static TNL::String
+   [[nodiscard]] static noa::TNL::String
    getKernelType();
 
    template< typename OffsetsView, typename Fetch, typename Reduction, typename ResultKeeper, typename Real, typename... Args >
@@ -69,8 +67,6 @@ protected:
    BlocksView blocksArray[ MaxValueSizeLog ];
 };
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Kernels/CSRAdaptiveKernelView.hpp>

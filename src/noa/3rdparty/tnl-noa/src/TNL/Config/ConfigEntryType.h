@@ -14,8 +14,7 @@
 #include <vector>
 #include <variant>
 
-namespace noa::TNL {
-namespace Config {
+namespace noa::TNL::Config {
 
 using std::get;
 using std::holds_alternative;
@@ -165,5 +164,4 @@ getUIEntryType< std::vector< std::string > >()
    return "list of string";
 }
 
-}  // namespace Config
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Config

@@ -76,7 +76,7 @@ struct DistributedBinaryExpressionTemplate< T1, T2, Operation, VectorExpressionV
                      "Distributed expressions are supported only on vectors within the same communicator." );
    }
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       const IndexType li = getLocalRange().getLocalIndex( i );
@@ -91,49 +91,49 @@ struct DistributedBinaryExpressionTemplate< T1, T2, Operation, VectorExpressionV
       return getConstLocalView()[ i ];
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getSize() const
    {
       return op1.getSize();
    }
 
-   LocalRangeType
+   [[nodiscard]] LocalRangeType
    getLocalRange() const
    {
       return op1.getLocalRange();
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getGhosts() const
    {
       return op1.getGhosts();
    }
 
-   const MPI::Comm&
+   [[nodiscard]] const MPI::Comm&
    getCommunicator() const
    {
       return op1.getCommunicator();
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalView() const
    {
       return ConstLocalViewType( op1.getConstLocalView(), op2.getConstLocalView() );
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalViewWithGhosts() const
    {
       return ConstLocalViewType( op1.getConstLocalViewWithGhosts(), op2.getConstLocalViewWithGhosts() );
    }
 
-   std::shared_ptr< SynchronizerType >
+   [[nodiscard]] std::shared_ptr< SynchronizerType >
    getSynchronizer() const
    {
       return op1.getSynchronizer();
    }
 
-   int
+   [[nodiscard]] int
    getValuesPerElement() const
    {
       return op1.getValuesPerElement();
@@ -168,7 +168,7 @@ struct DistributedBinaryExpressionTemplate< T1, T2, Operation, VectorExpressionV
 
    DistributedBinaryExpressionTemplate( const T1& a, const T2& b ) : op1( a ), op2( b ) {}
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       const IndexType li = getLocalRange().getLocalIndex( i );
@@ -183,49 +183,49 @@ struct DistributedBinaryExpressionTemplate< T1, T2, Operation, VectorExpressionV
       return getConstLocalView()[ i ];
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getSize() const
    {
       return op1.getSize();
    }
 
-   LocalRangeType
+   [[nodiscard]] LocalRangeType
    getLocalRange() const
    {
       return op1.getLocalRange();
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getGhosts() const
    {
       return op1.getGhosts();
    }
 
-   const MPI::Comm&
+   [[nodiscard]] const MPI::Comm&
    getCommunicator() const
    {
       return op1.getCommunicator();
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalView() const
    {
       return ConstLocalViewType( op1.getConstLocalView(), op2 );
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalViewWithGhosts() const
    {
       return ConstLocalViewType( op1.getConstLocalViewWithGhosts(), op2 );
    }
 
-   std::shared_ptr< SynchronizerType >
+   [[nodiscard]] std::shared_ptr< SynchronizerType >
    getSynchronizer() const
    {
       return op1.getSynchronizer();
    }
 
-   int
+   [[nodiscard]] int
    getValuesPerElement() const
    {
       return op1.getValuesPerElement();
@@ -259,7 +259,7 @@ struct DistributedBinaryExpressionTemplate< T1, T2, Operation, ArithmeticVariabl
 
    DistributedBinaryExpressionTemplate( const T1& a, const T2& b ) : op1( a ), op2( b ) {}
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       const IndexType li = getLocalRange().getLocalIndex( i );
@@ -274,49 +274,49 @@ struct DistributedBinaryExpressionTemplate< T1, T2, Operation, ArithmeticVariabl
       return getConstLocalView()[ i ];
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getSize() const
    {
       return op2.getSize();
    }
 
-   LocalRangeType
+   [[nodiscard]] LocalRangeType
    getLocalRange() const
    {
       return op2.getLocalRange();
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getGhosts() const
    {
       return op2.getGhosts();
    }
 
-   const MPI::Comm&
+   [[nodiscard]] const MPI::Comm&
    getCommunicator() const
    {
       return op2.getCommunicator();
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalView() const
    {
       return ConstLocalViewType( op1, op2.getConstLocalView() );
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalViewWithGhosts() const
    {
       return ConstLocalViewType( op1, op2.getConstLocalViewWithGhosts() );
    }
 
-   std::shared_ptr< SynchronizerType >
+   [[nodiscard]] std::shared_ptr< SynchronizerType >
    getSynchronizer() const
    {
       return op2.getSynchronizer();
    }
 
-   int
+   [[nodiscard]] int
    getValuesPerElement() const
    {
       return op2.getValuesPerElement();
@@ -352,7 +352,7 @@ struct DistributedUnaryExpressionTemplate
 
    DistributedUnaryExpressionTemplate( const T1& a ) : operand( a ) {}
 
-   RealType
+   [[nodiscard]] RealType
    getElement( const IndexType i ) const
    {
       const IndexType li = getLocalRange().getLocalIndex( i );
@@ -367,49 +367,49 @@ struct DistributedUnaryExpressionTemplate
       return getConstLocalView()[ i ];
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getSize() const
    {
       return operand.getSize();
    }
 
-   LocalRangeType
+   [[nodiscard]] LocalRangeType
    getLocalRange() const
    {
       return operand.getLocalRange();
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getGhosts() const
    {
       return operand.getGhosts();
    }
 
-   const MPI::Comm&
+   [[nodiscard]] const MPI::Comm&
    getCommunicator() const
    {
       return operand.getCommunicator();
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalView() const
    {
       return ConstLocalViewType( operand.getConstLocalView() );
    }
 
-   ConstLocalViewType
+   [[nodiscard]] ConstLocalViewType
    getConstLocalViewWithGhosts() const
    {
       return ConstLocalViewType( operand.getConstLocalViewWithGhosts() );
    }
 
-   std::shared_ptr< SynchronizerType >
+   [[nodiscard]] std::shared_ptr< SynchronizerType >
    getSynchronizer() const
    {
       return operand.getSynchronizer();
    }
 
-   int
+   [[nodiscard]] int
    getValuesPerElement() const
    {
       return operand.getValuesPerElement();
@@ -441,40 +441,40 @@ protected:
          return DistributedBinaryExpressionTemplate< ET1, ET2, functor >( a, b );                                         \
       }
 
-TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator+, TNL::Plus )
-TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator-, TNL::Minus )
-TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator*, TNL::Multiplies )
-TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator/, TNL::Divides )
-TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator%, TNL::Modulus )
-TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( min, TNL::Min )
-TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( max, TNL::Max )
+TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator+, noa::TNL::Plus )
+TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator-, noa::TNL::Minus )
+TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator*, noa::TNL::Multiplies )
+TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator/, noa::TNL::Divides )
+TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( operator%, noa::TNL::Modulus )
+TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( min, noa::TNL::Min )
+TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION( max, noa::TNL::Max )
 
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator+, TNL::UnaryPlus )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator-, TNL::UnaryMinus )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator!, TNL::LogicalNot )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator~, TNL::BitNot )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( abs, TNL::Abs )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( exp, TNL::Exp )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sqrt, TNL::Sqrt )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( cbrt, TNL::Cbrt )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( log, TNL::Log )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( log10, TNL::Log10 )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( log2, TNL::Log2 )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sin, TNL::Sin )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( cos, TNL::Cos )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( tan, TNL::Tan )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( asin, TNL::Asin )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( acos, TNL::Acos )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( atan, TNL::Atan )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sinh, TNL::Sinh )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( cosh, TNL::Cosh )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( tanh, TNL::Tanh )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( asinh, TNL::Asinh )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( acosh, TNL::Acosh )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( atanh, TNL::Atanh )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( floor, TNL::Floor )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( ceil, TNL::Ceil )
-TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sign, TNL::Sign )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator+, noa::TNL::UnaryPlus )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator-, noa::TNL::UnaryMinus )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator!, noa::TNL::LogicalNot )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( operator~, noa::TNL::BitNot )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( abs, noa::TNL::Abs )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( exp, noa::TNL::Exp )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sqrt, noa::TNL::Sqrt )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( cbrt, noa::TNL::Cbrt )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( log, noa::TNL::Log )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( log10, noa::TNL::Log10 )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( log2, noa::TNL::Log2 )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sin, noa::TNL::Sin )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( cos, noa::TNL::Cos )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( tan, noa::TNL::Tan )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( asin, noa::TNL::Asin )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( acos, noa::TNL::Acos )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( atan, noa::TNL::Atan )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sinh, noa::TNL::Sinh )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( cosh, noa::TNL::Cosh )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( tanh, noa::TNL::Tanh )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( asinh, noa::TNL::Asinh )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( acosh, noa::TNL::Acosh )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( atanh, noa::TNL::Atanh )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( floor, noa::TNL::Floor )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( ceil, noa::TNL::Ceil )
+TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION( sign, noa::TNL::Sign )
 
    #undef TNL_MAKE_DISTRIBUTED_UNARY_EXPRESSION
    #undef TNL_MAKE_DISTRIBUTED_BINARY_EXPRESSION
@@ -624,21 +624,21 @@ template< typename ET1, typename..., EnableIfDistributedUnaryExpression_t< ET1, 
 auto
 l2Norm( const ET1& a )
 {
-   using TNL::sqrt;
+   using noa::TNL::sqrt;
    return sqrt( sum( a * a ) );
 }
 
 template< typename ET1, typename Real, typename..., EnableIfDistributedUnaryExpression_t< ET1, bool > = true >
 auto
 lpNorm( const ET1& a, const Real& p )
-   // since (1.0 / p) has type double, TNL::pow returns double
+   // since (1.0 / p) has type double, noa::TNL::pow returns double
    -> double
 {
    if( p == 1.0 )
       return l1Norm( a );
    if( p == 2.0 )
       return l2Norm( a );
-   using TNL::pow;
+   using noa::TNL::pow;
    return pow( sum( pow( abs( a ), p ) ), 1.0 / p );
 }
 
@@ -730,7 +730,7 @@ operator<<( std::ostream& str, const DistributedUnaryExpressionTemplate< T, Oper
 
 }  // namespace Expressions
 
-// Make all operators visible in the TNL::Containers namespace to be considered
+// Make all operators visible in the noa::TNL::Containers namespace to be considered
 // even for DistributedVector and DistributedVectorView
 using Expressions::operator!;
 using Expressions::operator~;
@@ -747,7 +747,7 @@ using Expressions::operator<=;
 using Expressions::operator>;
 using Expressions::operator>=;
 
-// Make all functions visible in the TNL::Containers namespace
+// Make all functions visible in the noa::TNL::Containers namespace
 using Expressions::abs;
 using Expressions::acos;
 using Expressions::acosh;
@@ -933,7 +933,7 @@ addAndReduceAbs( Vector& lhs,
    {
       const RealType aux = expression[ i ];
       lhs_data[ i ] += aux;
-      return TNL::abs( aux );
+      return noa::TNL::abs( aux );
    };
    return Algorithms::reduce< DeviceType >( lhs.getSize(), fetch, reduction, zero );
 }
@@ -954,7 +954,7 @@ addAndReduceAbs( Vector& lhs,
    {
       const RealType aux = expression[ i ];
       lhs_data[ i ] += aux;
-      return TNL::abs( aux );
+      return noa::TNL::abs( aux );
    };
    return Algorithms::reduce< DeviceType >( lhs.getSize(), fetch, reduction, zero );
 }

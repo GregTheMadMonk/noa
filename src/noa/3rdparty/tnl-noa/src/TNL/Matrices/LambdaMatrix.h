@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/LambdaMatrixRowView.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 /**
  * \brief "Matrix-free matrix" based on lambda functions.
@@ -92,12 +91,12 @@ public:
     */
    using ConstRowView = RowView;
 
-   static constexpr bool
+   [[nodiscard]] static constexpr bool
    isSymmetric()
    {
       return false;
    }
-   static constexpr bool
+   [[nodiscard]] static constexpr bool
    isBinary()
    {
       return false;
@@ -168,7 +167,7 @@ public:
     *
     * \return number of matrix rows.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getRows() const;
 
@@ -177,7 +176,7 @@ public:
     *
     * \return number of matrix columns.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getColumns() const;
 
@@ -186,7 +185,7 @@ public:
     *
     * \return constant reference to CompressedRowLengthsLambda.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const CompressedRowLengthsLambda&
    getCompressedRowLengthsLambda() const;
 
@@ -195,7 +194,7 @@ public:
     *
     * \return constant reference to MatrixElementsLambda.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const MatrixElementsLambda&
    getMatrixElementsLambda() const;
 
@@ -235,7 +234,7 @@ public:
     * \par Output
     * \include LambdaMatrixExample_getNonzeroElementsCount.out
     */
-   IndexType
+   [[nodiscard]] IndexType
    getNonzeroElementsCount() const;
 
    /**
@@ -252,7 +251,7 @@ public:
     *
     * See \ref LambdaMatrixRowView.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstRowView
    getRow( IndexType rowIdx ) const;
 
@@ -264,7 +263,7 @@ public:
     *
     * \return value of given matrix element.
     */
-   RealType
+   [[nodiscard]] RealType
    getElement( IndexType row, IndexType column ) const;
 
    /**
@@ -326,7 +325,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::LambdaMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::LambdaMatrix::RowView.
     *
     * \par Example
     * \include Matrices/LambdaMatrix/LambdaMatrixExample_forRows.cpp
@@ -351,7 +350,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::LambdaMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::LambdaMatrix::RowView.
     *
     * \par Example
     * \include Matrices/LambdaMatrix/LambdaMatrixExample_forRows.cpp
@@ -372,7 +371,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::LambdaMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::LambdaMatrix::RowView.
     *
     * \param begin defines beginning of the range [begin,end) of rows to be processed.
     * \param end defines ending of the range [begin,end) of rows to be processed.
@@ -489,12 +488,12 @@ public:
     * ```
     *
     * \tparam InVector is type of input vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     * \tparam OutVector is type of output vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     *
     * \param inVector is input vector.
@@ -572,7 +571,7 @@ struct LambdaMatrixFactory
     * \include LambdaMatrixExample_Constructor.out
     */
    template< typename MatrixElementsLambda, typename CompressedRowLengthsLambda >
-   static auto
+   [[nodiscard]] static auto
    create( MatrixElementsLambda& matrixElementsLambda, CompressedRowLengthsLambda& compressedRowLengthsLambda )
       -> LambdaMatrix< MatrixElementsLambda, CompressedRowLengthsLambda, Real, Device, Index >
    {
@@ -609,7 +608,7 @@ struct LambdaMatrixFactory
     * \include LambdaMatrixExample_Constructor.out
     */
    template< typename MatrixElementsLambda, typename CompressedRowLengthsLambda >
-   static auto
+   [[nodiscard]] static auto
    create( IndexType rows,
            IndexType columns,
            MatrixElementsLambda& matrixElementsLambda,
@@ -635,7 +634,6 @@ struct LambdaMatrixFactory
    }
 };
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/LambdaMatrix.hpp>

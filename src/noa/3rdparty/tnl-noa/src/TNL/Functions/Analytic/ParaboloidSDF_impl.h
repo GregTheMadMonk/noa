@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/Analytic/ParaboloidSDF.h>
 
-namespace noa::TNL {
-namespace Functions {
-namespace Analytic {
+namespace noa::TNL::Functions::Analytic {
 
 template< int dimensions, typename Real >
 ParaboloidSDFBase< dimensions, Real >::ParaboloidSDFBase()
@@ -147,6 +145,4 @@ ParaboloidSDF< 3, Real >::getPartialDerivative( const PointType& v, const Real& 
    return 0.0;
 }
 
-}  // namespace Analytic
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions::Analytic

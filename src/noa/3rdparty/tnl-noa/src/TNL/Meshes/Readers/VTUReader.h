@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Readers/XMLVTK.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/EntityShapeGroupChecker.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Readers {
+namespace noa::TNL::Meshes::Readers {
 
 class VTUReader : public XMLVTK
 {
@@ -275,6 +273,4 @@ public:
    }
 };
 
-}  // namespace Readers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Readers

@@ -12,8 +12,7 @@
 
 #include "CudaSupportMissing.h"
 
-namespace noa::TNL {
-namespace Exceptions {
+namespace noa::TNL::Exceptions {
 
 #ifdef __CUDACC__
 using CudaStatusType = cudaError;
@@ -42,7 +41,7 @@ public:
      code_( error_code )
    {}
 
-   CudaStatusType
+   [[nodiscard]] CudaStatusType
    code() const
    {
       return code_;
@@ -72,5 +71,4 @@ private:
    CudaStatusType code_;
 };
 
-}  // namespace Exceptions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Exceptions

@@ -10,9 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ndarray/SizesHolderHelpers.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace detail {
+namespace noa::TNL::Containers::detail {
 
 template< typename OffsetsHolder, typename Sequence >
 struct OffsetsHelper
@@ -157,11 +155,12 @@ struct SlicedIndexer< Permutation, Overlaps, Alignment, SliceInfo, level, false 
    static typename SizesHolder::IndexType
    getIndex( const SizesHolder& sizes, const StridesHolder& strides, Indices&&... indices )
    {
-      static constexpr std::size_t idx = get< level >( Permutation{} );
-      static constexpr std::size_t overlap = detail::get< idx >( Overlaps{} );
+      using Index = typename SizesHolder::IndexType;
+      constexpr std::size_t idx = get< level >( Permutation{} );
+      constexpr Index overlap = detail::get< idx >( Overlaps{} );
       const auto alpha = get_from_pack< idx >( std::forward< Indices >( indices )... );
-      const auto size = Alignment::template getAlignedSize< idx >( sizes ) + 2 * overlap;
-      const auto previous = SlicedIndexer< Permutation, Overlaps, Alignment, SliceInfo, level - 1 >::getIndex(
+      const Index size = Alignment::template getAlignedSize< idx >( sizes ) + 2 * overlap;
+      const Index previous = SlicedIndexer< Permutation, Overlaps, Alignment, SliceInfo, level - 1 >::getIndex(
          sizes, strides, std::forward< Indices >( indices )... );
 
       return strides.template getStride< idx >( alpha ) * ( alpha + overlap + size * previous );
@@ -178,11 +177,12 @@ struct SlicedIndexer< Permutation, Overlaps, Alignment, SliceInfo, level, true >
    {
       static_assert( SizesHolder::template getStaticSize< get< level >( Permutation{} ) >() == 0,
                      "Invalid SliceInfo: static dimension cannot be sliced." );
+      using Index = typename SizesHolder::IndexType;
 
-      static constexpr std::size_t idx = get< level >( Permutation{} );
-      static constexpr std::size_t overlap = detail::get< idx >( Overlaps{} );
+      constexpr std::size_t idx = get< level >( Permutation{} );
+      constexpr Index overlap = detail::get< idx >( Overlaps{} );
       const auto alpha = get_from_pack< idx >( std::forward< Indices >( indices )... );
-      static constexpr std::size_t S = SliceInfo::getSliceSize( idx );
+      constexpr Index S = SliceInfo::getSliceSize( idx );
       // TODO: check the calculation with strides and overlaps
       return strides.template getStride< idx >( alpha )
               * ( S * ( ( alpha + overlap ) / S )
@@ -203,8 +203,9 @@ struct SlicedIndexer< Permutation, Overlaps, Alignment, SliceInfo, 0, false >
    static typename SizesHolder::IndexType
    getIndex( const SizesHolder& sizes, const StridesHolder& strides, Indices&&... indices )
    {
-      static constexpr std::size_t idx = get< 0 >( Permutation{} );
-      static constexpr std::size_t overlap = detail::get< idx >( Overlaps{} );
+      using Index = typename SizesHolder::IndexType;
+      constexpr std::size_t idx = get< 0 >( Permutation{} );
+      constexpr Index overlap = detail::get< idx >( Overlaps{} );
       const auto alpha = get_from_pack< idx >( std::forward< Indices >( indices )... );
       return strides.template getStride< idx >( alpha ) * ( alpha + overlap );
    }
@@ -218,8 +219,9 @@ struct SlicedIndexer< Permutation, Overlaps, Alignment, SliceInfo, 0, true >
    static typename SizesHolder::IndexType
    getIndex( const SizesHolder& sizes, const StridesHolder& strides, Indices&&... indices )
    {
+      using Index = typename SizesHolder::IndexType;
       static constexpr std::size_t idx = get< 0 >( Permutation{} );
-      static constexpr std::size_t overlap = detail::get< idx >( Overlaps{} );
+      static constexpr Index overlap = detail::get< idx >( Overlaps{} );
       const auto alpha = get_from_pack< idx >( std::forward< Indices >( indices )... );
       return strides.template getStride< idx >( alpha ) * ( alpha + overlap );
    }
@@ -312,6 +314,4 @@ struct SlicedNDArrayBase
    }
 };
 
-}  // namespace detail
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::detail

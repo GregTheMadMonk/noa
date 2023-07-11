@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Expressions/ExpressionVariableType.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace Expressions {
+namespace noa::TNL::Containers::Expressions {
 
 template< typename T1,
           typename T2,
@@ -196,6 +194,4 @@ struct StaticComparison< T1, T2, VectorExpressionVariable, ArithmeticVariable >
    }
 };
 
-}  // namespace Expressions
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::Expressions

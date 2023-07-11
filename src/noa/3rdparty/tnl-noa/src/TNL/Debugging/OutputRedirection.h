@@ -10,12 +10,13 @@
 
 #include <iostream>
 
-#ifndef _MSC_VER
+#include <noa/3rdparty/tnl-noa/src/TNL/3rdparty/spy.hpp>
+
+#ifdef SPY_SUPPORTS_POSIX
    #include <unistd.h>
 #endif
 
-namespace noa::TNL {
-namespace Debugging {
+namespace noa::TNL::Debugging {
 
 class OutputRedirection
 {
@@ -31,7 +32,7 @@ public:
    bool
    redirect( const std::string& fname )
    {
-#ifndef _MSC_VER
+#ifdef SPY_SUPPORTS_POSIX
       // restore the original stream if there is any backup
       if( backupFd >= 0 || file != nullptr )
          if( ! restore() )
@@ -67,7 +68,7 @@ public:
    bool
    restore()
    {
-#ifndef _MSC_VER
+#ifdef SPY_SUPPORTS_POSIX
       // first restore the original file descriptor
       if( backupFd >= 0 ) {
          if( ::dup2( backupFd, targetFd ) < 0 ) {
@@ -98,7 +99,7 @@ public:
 inline bool
 redirect_stdout_stderr( const std::string& stdout_fname, const std::string& stderr_fname, bool restore = false )
 {
-#ifndef _MSC_VER
+#ifdef SPY_SUPPORTS_POSIX
    static OutputRedirection stdoutRedir( STDOUT_FILENO );
    static OutputRedirection stderrRedir( STDERR_FILENO );
 
@@ -120,5 +121,4 @@ redirect_stdout_stderr( const std::string& stdout_fname, const std::string& stde
 #endif
 }
 
-}  // namespace Debugging
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Debugging

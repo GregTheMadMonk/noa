@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace VTK {
+namespace noa::TNL::Meshes::VTK {
 
 template< EntityShape GeneralShape >
 struct EntityShapeGroup
@@ -80,6 +78,4 @@ struct EntityShapeGroupElement< EntityShape::Polyhedron, 5 >
    static constexpr EntityShape shape = EntityShape::HexagonalPrism;
 };
 
-}  // namespace VTK
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::VTK

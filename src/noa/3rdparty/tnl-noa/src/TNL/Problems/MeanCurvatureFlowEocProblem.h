@@ -15,8 +15,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Problems/MeanCurvatureFlowProblem.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Operators/operator-Q/tnlOneSideDiffOperatorQ.h>
 
-namespace noa::TNL {
-namespace Problems {
+namespace noa::TNL::Problems {
 
 template< typename Mesh,
           typename BoundaryCondition,
@@ -38,7 +37,6 @@ public:
    setup( const Config::ParameterContainer& parameters );
 };
 
-}  // namespace Problems
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Problems
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Problems/MeanCurvatureFlowEocProblem_impl.h>

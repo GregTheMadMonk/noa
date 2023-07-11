@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Mesh.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/DistributedMesh.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename T >
 class isGrid : public std::false_type
@@ -47,5 +46,4 @@ template< typename Config, typename Device >
 class isDistributedMesh< DistributedMeshes::DistributedMesh< Mesh< Config, Device > > > : public std::true_type
 {};
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

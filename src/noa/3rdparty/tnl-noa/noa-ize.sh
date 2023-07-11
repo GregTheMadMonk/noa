@@ -14,6 +14,7 @@ for F in $(find); do
 		sed -i 's/mpark::/std::/g' "$F"
 		# Put TNL namespace inside noa namespace
 		sed -i 's/ ::TNL/ ::noa::TNL/g' "$F"
+        sed -i 's/ TNL::/ noa::TNL::/g' "$F"
 		sed -i 's/namespace TNL/namespace noa::TNL/g' "$F"
 		# Change experimental/filesystem to filesystem
 		sed -i 's/experimental\/filesystem/filesystem/g' "$F"

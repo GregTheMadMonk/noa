@@ -14,9 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/Traverser_Grid2D.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/Traverser_Grid3D.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Real,
           typename MeshFunction,
@@ -183,6 +181,4 @@ protected:
    TraverserUserData userData;
 };
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE

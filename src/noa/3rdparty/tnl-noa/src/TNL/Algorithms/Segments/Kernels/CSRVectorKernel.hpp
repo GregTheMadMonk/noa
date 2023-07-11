@@ -12,9 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/LambdaAdapter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Kernels/CSRVectorKernel.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Offsets,
           typename Index,
@@ -39,21 +37,21 @@ reduceSegmentsCSRKernelVector( int gridIdx,
    /***
     * We map one warp to each segment
     */
-   const Index segmentIdx = TNL::Cuda::getGlobalThreadIdx_x( gridIdx ) / TNL::Cuda::getWarpSize() + first;
+   const Index segmentIdx = noa::TNL::Cuda::getGlobalThreadIdx_x( gridIdx ) / noa::TNL::Cuda::getWarpSize() + first;
    if( segmentIdx >= last )
       return;
 
-   const int laneIdx = threadIdx.x & ( TNL::Cuda::getWarpSize() - 1 );  // & is cheaper than %
+   const int laneIdx = threadIdx.x & ( noa::TNL::Cuda::getWarpSize() - 1 );  // & is cheaper than %
    TNL_ASSERT_LT( segmentIdx + 1, offsets.getSize(), "" );
    Index endIdx = offsets[ segmentIdx + 1 ];
 
    Index localIdx( laneIdx );
    Real aux = zero;
    bool compute( true );
-   for( Index globalIdx = offsets[ segmentIdx ] + localIdx; globalIdx < endIdx; globalIdx += TNL::Cuda::getWarpSize() ) {
+   for( Index globalIdx = offsets[ segmentIdx ] + localIdx; globalIdx < endIdx; globalIdx += noa::TNL::Cuda::getWarpSize() ) {
       TNL_ASSERT_LT( globalIdx, endIdx, "" );
       aux = reduce( aux, detail::FetchLambdaAdapter< Index, Fetch >::call( fetch, segmentIdx, localIdx, globalIdx, compute ) );
-      localIdx += TNL::Cuda::getWarpSize();
+      localIdx += noa::TNL::Cuda::getWarpSize();
    }
 
    /****
@@ -120,13 +118,13 @@ CSRVectorKernel< Index, Device >::reduceSegments( const OffsetsView& offsets,
       return;
 
    const Index warpsCount = last - first;
-   const std::size_t threadsCount = warpsCount * TNL::Cuda::getWarpSize();
+   const std::size_t threadsCount = warpsCount * noa::TNL::Cuda::getWarpSize();
    Devices::Cuda::LaunchConfiguration launch_config;
    launch_config.blockSize.x = 256;
    dim3 blocksCount, gridsCount;
-   TNL::Cuda::setupThreads( launch_config.blockSize, blocksCount, gridsCount, threadsCount );
+   noa::TNL::Cuda::setupThreads( launch_config.blockSize, blocksCount, gridsCount, threadsCount );
    for( unsigned int gridIdx = 0; gridIdx < gridsCount.x; gridIdx++ ) {
-      TNL::Cuda::setupGrid( blocksCount, gridsCount, gridIdx, launch_config.gridSize );
+      noa::TNL::Cuda::setupGrid( blocksCount, gridsCount, gridIdx, launch_config.gridSize );
       constexpr auto kernel =
          reduceSegmentsCSRKernelVector< OffsetsView, IndexType, Fetch, Reduction, ResultKeeper, Real, Args... >;
       Cuda::launchKernelAsync( kernel, launch_config, gridIdx, offsets, first, last, fetch, reduction, keeper, zero, args... );
@@ -135,6 +133,4 @@ CSRVectorKernel< Index, Device >::reduceSegments( const OffsetsView& offsets,
    TNL_CHECK_CUDA_DEVICE;
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

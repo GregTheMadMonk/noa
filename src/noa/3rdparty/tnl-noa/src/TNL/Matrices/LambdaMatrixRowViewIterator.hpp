@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/LambdaMatrixRowView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename RowView >
 __cuda_callable__
@@ -76,5 +75,4 @@ LambdaMatrixRowViewIterator< RowView >::operator*() const -> MatrixElementType
                              this->localIdx );
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

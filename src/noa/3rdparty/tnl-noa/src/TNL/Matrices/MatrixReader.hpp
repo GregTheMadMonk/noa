@@ -13,12 +13,11 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Timer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixReader.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Matrix, typename Device >
 void
-MatrixReader< Matrix, Device >::readMtx( const TNL::String& fileName, Matrix& matrix, bool verbose )
+MatrixReader< Matrix, Device >::readMtx( const noa::TNL::String& fileName, Matrix& matrix, bool verbose )
 {
    HostMatrix hostMatrix;
    MatrixReader< HostMatrix >::readMtx( fileName, hostMatrix, verbose );
@@ -34,13 +33,13 @@ MatrixReader< Matrix, Device >::readMtx( std::istream& str, Matrix& matrix, bool
    matrix = hostMatrix;
 }
 
-// MatrixReader specialization for TNL::Devices::Host.
+// MatrixReader specialization for noa::TNL::Devices::Host.
 
 // This is to prevent Doxygen warnings due to hidden class.
 /// \cond
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::readMtx( const String& fileName, Matrix& matrix, bool verbose )
+MatrixReader< Matrix, noa::TNL::Devices::Host >::readMtx( const String& fileName, Matrix& matrix, bool verbose )
 {
    std::fstream file;
    file.open( fileName.getString(), std::ios::in );
@@ -51,7 +50,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::readMtx( const String& fileName, Mat
 
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::readMtx( std::istream& file, Matrix& matrix, bool verbose )
+MatrixReader< Matrix, noa::TNL::Devices::Host >::readMtx( std::istream& file, Matrix& matrix, bool verbose )
 {
    IndexType rows = 0;
    IndexType columns = 0;
@@ -77,7 +76,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::readMtx( std::istream& file, Matrix&
 
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::verifyMtxFile( std::istream& file, const Matrix& matrix, bool verbose )
+MatrixReader< Matrix, noa::TNL::Devices::Host >::verifyMtxFile( std::istream& file, const Matrix& matrix, bool verbose )
 {
    bool symmetricSourceMatrix( false );
    IndexType rows = 0;
@@ -130,7 +129,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::verifyMtxFile( std::istream& file, c
 
 template< typename Matrix >
 bool
-MatrixReader< Matrix, TNL::Devices::Host >::findLineByElement( std::istream& file,
+MatrixReader< Matrix, noa::TNL::Devices::Host >::findLineByElement( std::istream& file,
                                                                const IndexType& row,
                                                                const IndexType& column,
                                                                String& line,
@@ -162,7 +161,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::findLineByElement( std::istream& fil
 
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::checkMtxHeader( const String& header, bool& symmetric )
+MatrixReader< Matrix, noa::TNL::Devices::Host >::checkMtxHeader( const String& header, bool& symmetric )
 {
    std::vector< String > parsedLine = header.split( ' ', String::SplitSkip::SkipEmpty );
    if( (int) parsedLine.size() < 5 || parsedLine[ 0 ] != "%%MatrixMarket" )
@@ -186,7 +185,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::checkMtxHeader( const String& header
 
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::readMtxHeader( std::istream& file,
+MatrixReader< Matrix, noa::TNL::Devices::Host >::readMtxHeader( std::istream& file,
                                                            IndexType& rows,
                                                            IndexType& columns,
                                                            bool& symmetric,
@@ -225,7 +224,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::readMtxHeader( std::istream& file,
 
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::computeCompressedRowLengthsFromMtxFile(
+MatrixReader< Matrix, noa::TNL::Devices::Host >::computeCompressedRowLengthsFromMtxFile(
    std::istream& file,
    Containers::Vector< int, DeviceType, int >& rowLengths,
    const int columns,
@@ -297,7 +296,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::computeCompressedRowLengthsFromMtxFi
 
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::readMatrixElementsFromMtxFile( std::istream& file,
+MatrixReader< Matrix, noa::TNL::Devices::Host >::readMatrixElementsFromMtxFile( std::istream& file,
                                                                            Matrix& matrix,
                                                                            bool symmetricMatrix,
                                                                            bool verbose )
@@ -347,7 +346,7 @@ MatrixReader< Matrix, TNL::Devices::Host >::readMatrixElementsFromMtxFile( std::
 
 template< typename Matrix >
 void
-MatrixReader< Matrix, TNL::Devices::Host >::parseMtxLineWithElement( const String& line,
+MatrixReader< Matrix, noa::TNL::Devices::Host >::parseMtxLineWithElement( const String& line,
                                                                      IndexType& row,
                                                                      IndexType& column,
                                                                      RealType& value )
@@ -364,5 +363,4 @@ MatrixReader< Matrix, TNL::Devices::Host >::parseMtxLineWithElement( const Strin
 }
 /// \endcond
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

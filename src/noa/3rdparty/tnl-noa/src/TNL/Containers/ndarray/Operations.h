@@ -10,8 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ndarray/Executors.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 namespace detail {
 
@@ -335,7 +334,7 @@ nd_maximum( Output& output, const Input1& input1, const Input2& input2 )
       output,
       [] __cuda_callable__( auto v1, auto v2 )
       {
-         return TNL::max( v1, v2 );
+         return noa::TNL::max( v1, v2 );
       },
       input1,
       input2 );
@@ -346,7 +345,7 @@ nd_maximum( Output& output, const Input1& input1, const Input2& input2 )
       output,
       [] __cuda_callable__( value_type_1 v1, value_type_2 v2 )
       {
-         return TNL::max( v1, v2 );
+         return noa::TNL::max( v1, v2 );
       },
       input1,
       input2 );
@@ -362,7 +361,7 @@ nd_minimum( Output& output, const Input1& input1, const Input2& input2 )
       output,
       [] __cuda_callable__( auto v1, auto v2 )
       {
-         return TNL::min( v1, v2 );
+         return noa::TNL::min( v1, v2 );
       },
       input1,
       input2 );
@@ -373,7 +372,7 @@ nd_minimum( Output& output, const Input1& input1, const Input2& input2 )
       output,
       [] __cuda_callable__( value_type_1 v1, value_type_2 v2 )
       {
-         return TNL::min( v1, v2 );
+         return noa::TNL::min( v1, v2 );
       },
       input1,
       input2 );
@@ -389,7 +388,7 @@ nd_absolute( Output& output, const Input& input )
       output,
       [] __cuda_callable__( auto v )
       {
-         return TNL::abs( v );
+         return noa::TNL::abs( v );
       },
       input );
 #else
@@ -398,7 +397,7 @@ nd_absolute( Output& output, const Input& input )
       output,
       [] __cuda_callable__( value_type v )
       {
-         return TNL::abs( v );
+         return noa::TNL::abs( v );
       },
       input );
 #endif
@@ -413,7 +412,7 @@ nd_sign( Output& output, const Input& input )
       output,
       [] __cuda_callable__( auto v )
       {
-         return TNL::sign( v );
+         return noa::TNL::sign( v );
       },
       input );
 #else
@@ -422,7 +421,7 @@ nd_sign( Output& output, const Input& input )
       output,
       [] __cuda_callable__( value_type v )
       {
-         return TNL::sign( v );
+         return noa::TNL::sign( v );
       },
       input );
 #endif
@@ -437,7 +436,7 @@ nd_pow( Output& output, const Input1& input1, const Input2& input2 )
       output,
       [] __cuda_callable__( auto v1, auto v2 )
       {
-         return TNL::pow( v1, v2 );
+         return noa::TNL::pow( v1, v2 );
       },
       input1,
       input2 );
@@ -448,7 +447,7 @@ nd_pow( Output& output, const Input1& input1, const Input2& input2 )
       output,
       [] __cuda_callable__( value_type_1 v1, value_type_2 v2 )
       {
-         return TNL::pow( v1, v2 );
+         return noa::TNL::pow( v1, v2 );
       },
       input1,
       input2 );
@@ -464,7 +463,7 @@ nd_sqrt( Output& output, const Input& input )
       output,
       [] __cuda_callable__( auto v )
       {
-         return TNL::sqrt( v );
+         return noa::TNL::sqrt( v );
       },
       input );
 #else
@@ -473,7 +472,7 @@ nd_sqrt( Output& output, const Input& input )
       output,
       [] __cuda_callable__( value_type v )
       {
-         return TNL::sqrt( v );
+         return noa::TNL::sqrt( v );
       },
       input );
 #endif
@@ -503,5 +502,4 @@ nd_square( Output& output, const Input& input )
 #endif
 }
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

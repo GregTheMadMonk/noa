@@ -52,7 +52,7 @@ namespace noa::utils::domain {
 
 /// \brief Domain stores a TNL mesh and various data over its elements in one place
 /// providing a friendly all-in-one-place interface for solvers.
-template <typename CellTopology, typename Device = TNL::Devices::Host, typename Real = float, typename GlobalIndex = long int, typename LocalIndex = short int>
+template <typename CellTopology, typename Device = TNL::Devices::Sequential, typename Real = float, typename GlobalIndex = long int, typename LocalIndex = short int>
 struct Domain {
         /* ----- PUBLIC TYPE ALIASES ----- */
         /// TNL Mesh config

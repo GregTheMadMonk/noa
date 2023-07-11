@@ -13,9 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/cudaPartition.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/quicksort_1Block.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 template< typename Index >
 __device__
@@ -28,26 +26,6 @@ writeNewTask( Index begin,
               int* newTasksCnt,
               Containers::ArrayView< TASK, Devices::Cuda > secondPhaseTasks,
               int* secondPhaseTasksCnt );
-
-//-----------------------------------------------------------
-
-template< typename Index >
-__global__
-void
-cudaCalcBlocksNeeded( Containers::ArrayView< TASK, Devices::Cuda > cuda_tasks,
-                      Index elemPerBlock,
-                      Containers::ArrayView< Index, Devices::Cuda > blocksNeeded )
-{
-#ifdef __CUDACC__
-   Index i = blockIdx.x * blockDim.x + threadIdx.x;
-   if( i >= cuda_tasks.getSize() )
-      return;
-
-   TASK& task = cuda_tasks[ i ];
-   Index size = task.partitionEnd - task.partitionBegin;
-   blocksNeeded[ i ] = size / elemPerBlock + ( size % elemPerBlock != 0 );
-#endif
-}
 
 //-----------------------------------------------------------
 
@@ -308,6 +286,4 @@ cudaQuickSort2ndPhase2( Containers::ArrayView< Value, Devices::Cuda > arr,
 #endif
 }
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

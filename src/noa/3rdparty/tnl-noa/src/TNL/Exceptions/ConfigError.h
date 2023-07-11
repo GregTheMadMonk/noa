@@ -10,13 +10,11 @@
 
 #include <stdexcept>
 
-namespace noa::TNL {
-namespace Exceptions {
+namespace noa::TNL::Exceptions {
 
 struct ConfigError : public std::runtime_error
 {
    ConfigError( const std::string& msg ) : std::runtime_error( msg ) {}
 };
 
-}  // namespace Exceptions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Exceptions

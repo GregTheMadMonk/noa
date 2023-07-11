@@ -10,26 +10,24 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ConfigEntryBase.h>
 
-namespace noa::TNL {
-namespace Config {
+namespace noa::TNL::Config {
 
 class ConfigDelimiter : public ConfigEntryBase
 {
 public:
    ConfigDelimiter( const std::string& delimiter ) : ConfigEntryBase( "", delimiter, false ) {}
 
-   bool
+   [[nodiscard]] bool
    isDelimiter() const override
    {
       return true;
    }
 
-   std::string
+   [[nodiscard]] std::string
    getUIEntryType() const override
    {
       return "";
    }
 };
 
-}  // namespace Config
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Config

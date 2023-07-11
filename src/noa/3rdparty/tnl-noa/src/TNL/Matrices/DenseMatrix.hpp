@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticArray.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Real, typename Device, typename Index, ElementsOrganization Organization, typename RealAllocator >
 DenseMatrix< Real, Device, Index, Organization, RealAllocator >::DenseMatrix( const RealAllocatorType& allocator )
@@ -108,6 +107,8 @@ DenseMatrix< Real, Device, Index, Organization, RealAllocator >::setDimensions( 
 {
    Matrix< Real, Device, Index, RealAllocator >::setDimensions( rows, columns );
    this->segments.setSegmentsSizes( rows, columns );
+   if( this->segments.getStorageSize() == -1 )
+      throw std::overflow_error( "The number of elements required by segments exceeds index type of the matrix." );
    this->values.setSize( this->segments.getStorageSize() );
    this->values = 0.0;
    this->view = this->getView();
@@ -471,10 +472,10 @@ DenseMatrixProductKernel( ResultMatrix resultMatrix,
       }
       __syncthreads();
 
-      const IndexType tileALastRow = TNL::min( tileDim, matrixARows - resultTileRow );
-      const IndexType tileALastColumn = TNL::min( tileDim, matrixAColumns - i );
-      // const IndexType tileBLastRow = TNL::min( tileDim, matrixBRows - i );
-      // const IndexType tileBLastColumn = TNL::min( tileDim, matrixBColumns - resultTileColumn );
+      const IndexType tileALastRow = noa::TNL::min( tileDim, matrixARows - resultTileRow );
+      const IndexType tileALastColumn = noa::TNL::min( tileDim, matrixAColumns - i );
+      // const IndexType tileBLastRow = noa::TNL::min( tileDim, matrixBRows - i );
+      // const IndexType tileBLastColumn = noa::TNL::min( tileDim, matrixBColumns - resultTileColumn );
 
       for( IndexType row = 0; row < tileALastRow; row += tileRowBlockSize ) {
          RealType sum( 0.0 );
@@ -1088,5 +1089,4 @@ operator!=( const DenseMatrixView< Real, Device, Index, Organization >& leftMatr
    return rightMatrix != leftMatrix;
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

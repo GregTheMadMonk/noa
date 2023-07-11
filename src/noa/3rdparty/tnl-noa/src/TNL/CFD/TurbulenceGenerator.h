@@ -25,7 +25,7 @@ template< typename T, typename I >
 auto
 linspace( T a, T b, I n )
 {
-   TNL::Containers::Array< T, TNL::Devices::Sequential, I > space( n );
+   noa::TNL::Containers::Array< T, noa::TNL::Devices::Sequential, I > space( n );
 
    // avoid division by zero
    if( n == 1 ) {
@@ -60,16 +60,16 @@ struct TurbulenceGenerator
    using txyz_permutation = std::index_sequence< 0, 3, 2, 1 >;  // t, z, y, x
    using txyz_overlaps = std::index_sequence< 0, 0, 0, 0 >;     // t, x, y, z
 
-   using Vector = TNL::Containers::Vector< Real, Device, unsigned >;
-   using Array1D = TNL::Containers::Array< Real, Device, Index >;
-   using Array3D = TNL::Containers::NDArray< Real,
-                                             TNL::Containers::SizesHolder< Index, 0, 0, 0 >,  // t, x, y, z
+   using Vector = noa::TNL::Containers::Vector< Real, Device, unsigned >;
+   using Array1D = noa::TNL::Containers::Array< Real, Device, Index >;
+   using Array3D = noa::TNL::Containers::NDArray< Real,
+                                             noa::TNL::Containers::SizesHolder< Index, 0, 0, 0 >,  // t, x, y, z
                                              xyz_permutation,
                                              Device,
                                              Index,
                                              xyz_overlaps >;
-   using Array4D = TNL::Containers::NDArray< Real,
-                                             TNL::Containers::SizesHolder< Index, 0, 0, 0, 0 >,  // t, x, y, z
+   using Array4D = noa::TNL::Containers::NDArray< Real,
+                                             noa::TNL::Containers::SizesHolder< Index, 0, 0, 0, 0 >,  // t, x, y, z
                                              txyz_permutation,
                                              Device,
                                              Index,
@@ -152,19 +152,19 @@ struct TurbulenceGenerator
       const unsigned ntimes = u.template getSize< 0 >();
 
       // turbulent velocity scale (RMS)
-      const Real velocityScale = TNL::sqrt( 2.0 / 3.0 * kineticEnergy );
+      const Real velocityScale = noa::TNL::sqrt( 2.0 / 3.0 * kineticEnergy );
 
       // dissipation rate
-      const Real dissipationRate = TNL::pow( kineticEnergy, 1.5 ) / lengthScale;
+      const Real dissipationRate = noa::TNL::pow( kineticEnergy, 1.5 ) / lengthScale;
 
       // highest wave number
-      const Real k_max = 2 * TNL::pi / minSpaceStep;
+      const Real k_max = 2 * noa::TNL::pi / minSpaceStep;
 
       // k_e (related to peak energy wave number)
-      const Real k_e = 9 * TNL::pi * c_E / ( 55 * lengthScale );
+      const Real k_e = 9 * noa::TNL::pi * c_E / ( 55 * lengthScale );
 
       // wave number used in the viscous expression (high wave numbers) in the von Karman spectrum
-      const Real k_eta = TNL::pow( dissipationRate / TNL::pow( viscosity, 3 ), 0.25 );
+      const Real k_eta = noa::TNL::pow( dissipationRate / noa::TNL::pow( viscosity, 3 ), 0.25 );
 
       // smallest wave number
       const Real k_min = k_e / smallestWaveNumberFactor;
@@ -196,8 +196,8 @@ struct TurbulenceGenerator
       Vector sz;
 
       // time correlation factors
-      const Real corr_a = TNL::exp( -timeStep / timeScale );
-      const Real corr_b = TNL::sqrt( 1 - corr_a * corr_a );
+      const Real corr_a = noa::TNL::exp( -timeStep / timeScale );
+      const Real corr_b = noa::TNL::sqrt( 1 - corr_a * corr_a );
 
       std::cout << "Number of time steps: " << ntimes << std::endl;
       std::cout << "Simulation time step: " << timeStep << std::endl;
@@ -209,15 +209,15 @@ struct TurbulenceGenerator
          generateAngles( rng, phi, psi, alpha, theta );
 
          // wave number vector from random angles
-         kx = TNL::sin( theta ) * TNL::cos( phi ) * k;
-         ky = TNL::sin( theta ) * TNL::sin( phi ) * k;
-         kz = TNL::cos( theta ) * k;
+         kx = noa::TNL::sin( theta ) * noa::TNL::cos( phi ) * k;
+         ky = noa::TNL::sin( theta ) * noa::TNL::sin( phi ) * k;
+         kz = noa::TNL::cos( theta ) * k;
 
          // sigma (s=sigma) from random angles. sigma is the unit direction which
          // gives the direction of the synthetic velocity vector (u, v, w)
-         sx = TNL::cos( phi ) * TNL::cos( theta ) * TNL::cos( alpha ) - TNL::sin( phi ) * TNL::sin( alpha );
-         sy = TNL::sin( phi ) * TNL::cos( theta ) * TNL::cos( alpha ) + TNL::cos( phi ) * TNL::sin( alpha );
-         sz = -TNL::sin( theta ) * TNL::cos( alpha );
+         sx = noa::TNL::cos( phi ) * noa::TNL::cos( theta ) * noa::TNL::cos( alpha ) - noa::TNL::sin( phi ) * noa::TNL::sin( alpha );
+         sy = noa::TNL::sin( phi ) * noa::TNL::cos( theta ) * noa::TNL::cos( alpha ) + noa::TNL::cos( phi ) * noa::TNL::sin( alpha );
+         sz = -TNL::sin( theta ) * noa::TNL::cos( alpha );
 
          // extract views for capturing in the lambda function
          const auto _k = k.getConstView();
@@ -226,7 +226,7 @@ struct TurbulenceGenerator
          auto _sz = sz.getView();
 
          // loop over all wave numbers
-         TNL::Algorithms::parallelFor< Device >(
+         noa::TNL::Algorithms::parallelFor< Device >(
             unsigned( 0 ),
             nmodes,
             [ velocityScale, dk, k_e, k_eta, _k, _sx, _sy, _sz ] __cuda_callable__( unsigned m ) mutable
@@ -235,10 +235,10 @@ struct TurbulenceGenerator
 
                // von Karman spectrum
                const Real E =
-                  ( c_E / k_e * TNL::pow( kappa / k_e, 4 ) / TNL::pow( 1 + TNL::pow( kappa / k_e, 2 ), Real( 17.0 / 6.0 ) )
-                    * TNL::exp( -2 * TNL::pow( kappa / k_eta, 2 ) ) );
+                  ( c_E / k_e * noa::TNL::pow( kappa / k_e, 4 ) / noa::TNL::pow( 1 + noa::TNL::pow( kappa / k_e, 2 ), Real( 17.0 / 6.0 ) )
+                    * noa::TNL::exp( -2 * noa::TNL::pow( kappa / k_eta, 2 ) ) );
 
-               const Real utn = velocityScale * TNL::sqrt( E * dk );
+               const Real utn = velocityScale * noa::TNL::sqrt( E * dk );
 
                // multiply sigma with the spectrum amplitude (see eq (27.8) in [2])
                _sx[ m ] *= 2 * utn;
@@ -272,7 +272,7 @@ struct TurbulenceGenerator
                // loop over all wave numbers
                for( unsigned m = 0; m < nmodes; m++ ) {
                   const Real beta = _kx[ m ] * _xc[ x ] + _ky[ m ] * _yc[ y ] + _kz[ m ] * _zc[ z ] + _psi[ m ];
-                  const Real cosBeta = TNL::cos( beta );
+                  const Real cosBeta = noa::TNL::cos( beta );
 
                   // update synthetic velocity field - see eq (27.8) in [2]
                   ut += cosBeta * _sx[ m ];
@@ -346,14 +346,14 @@ struct TurbulenceGenerator
 private:
    // specialization for host devices
    template< typename RNG, typename Array >
-   static std::enable_if_t< ! std::is_same< typename Array::DeviceType, TNL::Devices::Cuda >::value >
+   static std::enable_if_t< ! std::is_same< typename Array::DeviceType, noa::TNL::Devices::Cuda >::value >
    generateAngles( RNG&& rng, Array& phi, Array& psi, Array& alpha, Array& theta )
    {
       using Value = typename Array::ValueType;
 
-      std::uniform_real_distribution< Value > dis_phi( 0, 2 * TNL::pi );
-      std::uniform_real_distribution< Value > dis_psi( 0, 2 * TNL::pi );
-      std::uniform_real_distribution< Value > dis_alpha( 0, 2 * TNL::pi );
+      std::uniform_real_distribution< Value > dis_phi( 0, 2 * noa::TNL::pi );
+      std::uniform_real_distribution< Value > dis_psi( 0, 2 * noa::TNL::pi );
+      std::uniform_real_distribution< Value > dis_alpha( 0, 2 * noa::TNL::pi );
       std::uniform_real_distribution< Value > dis_ang( 0, 1 );
 
       // TODO: assert that all arrays have equal sizes
@@ -369,11 +369,11 @@ private:
 
    // specialization for CUDA
    template< typename RNG, typename Array >
-   static std::enable_if_t< std::is_same< typename Array::DeviceType, TNL::Devices::Cuda >::value >
+   static std::enable_if_t< std::is_same< typename Array::DeviceType, noa::TNL::Devices::Cuda >::value >
    generateAngles( RNG&& rng, Array& phi, Array& psi, Array& alpha, Array& theta )
    {
       // create auxiliary host arrays
-      using HostArray = typename Array::template Self< typename Array::ValueType, TNL::Devices::Sequential >;
+      using HostArray = typename Array::template Self< typename Array::ValueType, noa::TNL::Devices::Sequential >;
       HostArray _phi( phi.getSize() );
       HostArray _psi( psi.getSize() );
       HostArray _alpha( alpha.getSize() );

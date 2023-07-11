@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/SparseMatrixView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/DenseMatrixView.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 /**
  * \brief Function for wrapping an array of values into a dense matrix view.
@@ -20,7 +19,7 @@ namespace Matrices {
  * \tparam Device is a device on which the array is allocated.
  * \tparam Real is a type of array elements.
  * \tparam Index is a type for indexing of matrix elements.
- * \tparam Organization is matrix elements organization - see \ref TNL::Algorithms::Segments::ElementsOrganization.
+ * \tparam Organization is matrix elements organization - see \ref noa::TNL::Algorithms::Segments::ElementsOrganization.
  * \param rows is a number of matrix rows.
  * \param columns is a number of matrix columns.
  * \param values is the array with matrix elements values.
@@ -38,7 +37,7 @@ template< typename Device,
           typename Real,
           typename Index,
           ElementsOrganization Organization = Algorithms::Segments::DefaultElementsOrganization< Device >::getOrganization() >
-DenseMatrixView< Real, Device, Index, Organization >
+[[nodiscard]] DenseMatrixView< Real, Device, Index, Organization >
 wrapDenseMatrix( const Index& rows, const Index& columns, Real* values )
 {
    using MatrixView = DenseMatrixView< Real, Device, Index, Organization >;
@@ -73,7 +72,7 @@ wrapDenseMatrix( const Index& rows, const Index& columns, Real* values )
  * \include SparseMatrixViewExample_wrapCSR.out
  */
 template< typename Device, typename Real, typename Index >
-SparseMatrixView< Real, Device, Index, GeneralMatrix, Algorithms::Segments::CSRViewDefault >
+[[nodiscard]] SparseMatrixView< Real, Device, Index, GeneralMatrix, Algorithms::Segments::CSRViewDefault >
 wrapCSRMatrix( const Index& rows, const Index& columns, Index* rowPointers, Real* values, Index* columnIndexes )
 {
    using MatrixView = SparseMatrixView< Real, Device, Index, GeneralMatrix, Algorithms::Segments::CSRViewDefault >;
@@ -99,7 +98,7 @@ struct EllpackMatrixWrapper
    using EllpackSegments = Algorithms::Segments::EllpackView< Device_, Index_, Organization, Alignment >;
    using MatrixView = SparseMatrixView< Real, Device, Index, GeneralMatrix, EllpackSegments >;
 
-   static MatrixView
+   [[nodiscard]] static MatrixView
    wrap( const Index& rows, const Index& columns, const Index& nonzerosPerRow, Real* values, Index* columnIndexes )
    {
       using ValuesViewType = typename MatrixView::ValuesViewType;
@@ -135,7 +134,7 @@ struct EllpackMatrixWrapper
  * \include SparseMatrixViewExample_wrapEllpack.out
  */
 template< typename Device, ElementsOrganization Organization, typename Real, typename Index, int Alignment = 1 >
-auto
+[[nodiscard]] auto
 wrapEllpackMatrix( const Index rows, const Index columns, const Index nonzerosPerRow, Real* values, Index* columnIndexes )
    -> decltype( EllpackMatrixWrapper< Device, Organization, Real, Index, Alignment >::wrap( rows,
                                                                                             columns,
@@ -147,5 +146,4 @@ wrapEllpackMatrix( const Index rows, const Index columns, const Index nonzerosPe
       rows, columns, nonzerosPerRow, values, columnIndexes );
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

@@ -19,8 +19,7 @@
 
 #include "ArrayView.h"
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 // explicit initialization by raw data pointer and size
 template< typename Value, typename Device, typename Index >
@@ -112,8 +111,8 @@ __cuda_callable__
 void
 ArrayView< Value, Device, Index >::swap( ArrayView& view )
 {
-   TNL::swap( data, view.data );
-   TNL::swap( size, view.size );
+   noa::TNL::swap( data, view.data );
+   noa::TNL::swap( size, view.size );
 }
 
 template< typename Value, typename Device, typename Index >
@@ -397,5 +396,4 @@ operator>>( File&& file, ArrayView< Value, Device, Index > view )
    return f >> view;
 }
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

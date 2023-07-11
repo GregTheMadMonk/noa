@@ -14,9 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/KernelLaunch.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Math.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace detail {
+namespace noa::TNL::Algorithms::detail {
 
 template< typename Device = Devices::Sequential >
 struct ParallelFor1D
@@ -89,7 +87,7 @@ struct ParallelFor1D< Devices::Cuda >
       launch_config.blockSize.y = 1;
       launch_config.blockSize.z = 1;
       launch_config.gridSize.x =
-         TNL::min( Cuda::getMaxGridXSize(), Cuda::getNumberOfBlocks( end - begin, launch_config.blockSize.x ) );
+         noa::TNL::min( Cuda::getMaxGridXSize(), Cuda::getNumberOfBlocks( end - begin, launch_config.blockSize.x ) );
       launch_config.gridSize.y = 1;
       launch_config.gridSize.z = 1;
 
@@ -100,13 +98,11 @@ struct ParallelFor1D< Devices::Cuda >
       else {
          // decrease the grid size and align to the number of multiprocessors
          const int desGridSize = 32 * Cuda::DeviceInfo::getCudaMultiprocessors( Cuda::DeviceInfo::getActiveDevice() );
-         launch_config.gridSize.x = TNL::min( desGridSize, Cuda::getNumberOfBlocks( end - begin, launch_config.blockSize.x ) );
+         launch_config.gridSize.x = noa::TNL::min( desGridSize, Cuda::getNumberOfBlocks( end - begin, launch_config.blockSize.x ) );
          constexpr auto kernel = ParallelFor1DKernel< true, Index, Function, FunctionArgs... >;
          Cuda::launchKernel( kernel, launch_config, begin, end, f, args... );
       }
    }
 };
 
-}  // namespace detail
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::detail

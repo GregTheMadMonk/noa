@@ -10,11 +10,10 @@
 
 #include <stdexcept>
 
-namespace noa::TNL {
 /**
  * \brief Namespace for TNL exceptions.
  */
-namespace Exceptions {
+namespace noa::TNL::Exceptions {
 
 struct CudaSupportMissing : public std::runtime_error
 {
@@ -24,5 +23,4 @@ struct CudaSupportMissing : public std::runtime_error
    {}
 };
 
-}  // namespace Exceptions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Exceptions

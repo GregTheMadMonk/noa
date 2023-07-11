@@ -8,9 +8,7 @@
 
 #include "CG.h"
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 template< typename Matrix >
 bool
@@ -120,6 +118,4 @@ CG< Matrix >::setSize( const VectorViewType& x )
    z.setLike( x );
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear

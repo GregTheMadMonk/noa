@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticArray.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace DistributedMeshes {
+namespace noa::TNL::Meshes::DistributedMeshes {
 
 template< typename MeshFunctionType, int dim = MeshFunctionType::getMeshDimension() >
 class CopyEntitiesHelper;
@@ -117,6 +115,4 @@ public:
    }
 };
 
-}  // namespace DistributedMeshes
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::DistributedMeshes

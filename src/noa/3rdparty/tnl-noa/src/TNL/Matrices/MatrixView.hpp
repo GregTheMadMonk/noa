@@ -13,8 +13,7 @@
 
 #include <utility>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Real, typename Device, typename Index >
 __cuda_callable__
@@ -134,5 +133,4 @@ void
 MatrixView< Real, Device, Index >::print( std::ostream& str ) const
 {}
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

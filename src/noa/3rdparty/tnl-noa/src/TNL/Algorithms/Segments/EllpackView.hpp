@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/EllpackView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/LambdaAdapter.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Index, typename Fetch, typename Reduction, typename ResultKeeper, typename Real >
 __global__
@@ -30,7 +28,7 @@ EllpackCudaReductionKernelFull( Index first,
    const int warpSize = 32;
    const int gridID = 0;
    const Index segmentIdx =
-      first + ( ( gridID * TNL::Cuda::getMaxGridXSize() ) + ( blockIdx.x * blockDim.x ) + threadIdx.x ) / warpSize;
+      first + ( ( gridID * noa::TNL::Cuda::getMaxGridXSize() ) + ( blockIdx.x * blockDim.x ) + threadIdx.x ) / warpSize;
    if( segmentIdx >= last )
       return;
 
@@ -72,7 +70,7 @@ EllpackCudaReductionKernelCompact( Index first,
    const int warpSize = 32;
    const int gridID = 0;
    const Index segmentIdx =
-      first + ( ( gridID * TNL::Cuda::getMaxGridXSize() ) + ( blockIdx.x * blockDim.x ) + threadIdx.x ) / warpSize;
+      first + ( ( gridID * noa::TNL::Cuda::getMaxGridXSize() ) + ( blockIdx.x * blockDim.x ) + threadIdx.x ) / warpSize;
    if( segmentIdx >= last )
       return;
 
@@ -123,7 +121,7 @@ EllpackView< Device, Index, Organization, Alignment >::getSerializationType()
 {
    // FIXME: the serialized data DEPEND on the Organization and Alignment parameters, so it should be reflected in the
    // serialization type
-   return "Ellpack< [any_device], " + TNL::getSerializationType< IndexType >() + " >";
+   return "Ellpack< [any_device], " + noa::TNL::getSerializationType< IndexType >() + " >";
 }
 
 template< typename Device, typename Index, ElementsOrganization Organization, int Alignment >
@@ -383,6 +381,4 @@ EllpackView< Device, Index, Organization, Alignment >::print( Fetch&& fetch ) co
    return SegmentsPrinter< EllpackView, Fetch >( *this, fetch );
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

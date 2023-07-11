@@ -35,10 +35,11 @@
  * using template class specializations.
  */
 
-#include <stdint.h>
+#include <cstdint>
 
-namespace noa::TNL {
-namespace Cuda {
+#include <noa/3rdparty/tnl-noa/src/TNL/Cuda/DummyDefs.h>
+
+namespace noa::TNL::Cuda {
 
 #ifdef __CUDACC__
 template< typename T, std::size_t _alignment = CHAR_BIT * sizeof( T ) >
@@ -146,5 +147,4 @@ getInterleaving( const Index index )
    return index + index / Cuda::getNumberOfSharedMemoryBanks();
 }
 
-}  // namespace Cuda
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Cuda

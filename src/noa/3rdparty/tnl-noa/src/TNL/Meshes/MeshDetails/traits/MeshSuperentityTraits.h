@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/traits/MeshEntityTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename MeshConfig, typename Device, typename EntityTopology, int Dimension >
 class MeshSuperentityTraits
@@ -27,5 +26,4 @@ public:
    using SuperentityType = typename MeshEntityTraits< MeshConfig, Device, Dimension >::EntityType;
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

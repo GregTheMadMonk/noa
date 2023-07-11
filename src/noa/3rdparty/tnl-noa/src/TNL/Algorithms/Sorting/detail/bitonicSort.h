@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/blockBitonicSort.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/helpers.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 /**
  * this kernel simulates 1 exchange
@@ -21,7 +19,7 @@ namespace Sorting {
 template< typename Value, typename CMP >
 __global__
 void
-bitonicMergeGlobal( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr, CMP Cmp, int monotonicSeqLen, int bitonicLen )
+bitonicMergeGlobal( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > arr, CMP Cmp, int monotonicSeqLen, int bitonicLen )
 {
 #ifdef __CUDACC__
    int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -58,7 +56,7 @@ bitonicMergeGlobal( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr,
 template< typename Value, typename CMP >
 __global__
 void
-bitonicMergeSharedMemory( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr,
+bitonicMergeSharedMemory( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > arr,
                           CMP Cmp,
                           int monotonicSeqLen,
                           int bitonicLen )
@@ -71,7 +69,7 @@ bitonicMergeSharedMemory( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda 
 
    // 1st index and last index of subarray that this threadBlock should merge
    int myBlockStart = blockIdx.x * sharedMemLen;
-   int myBlockEnd = TNL::min( arr.getSize(), myBlockStart + sharedMemLen );
+   int myBlockEnd = noa::TNL::min( arr.getSize(), myBlockStart + sharedMemLen );
 
    // copy from globalMem into sharedMem
    for( int i = threadIdx.x; myBlockStart + i < myBlockEnd; i += blockDim.x )
@@ -122,7 +120,7 @@ bitonicMergeSharedMemory( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda 
 template< typename Value, typename CMP >
 __global__
 void
-bitoniSort1stStepSharedMemory( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr, CMP Cmp )
+bitoniSort1stStepSharedMemory( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > arr, CMP Cmp )
 {
 #ifdef __CUDACC__
    extern __shared__ int externMem[];
@@ -131,7 +129,7 @@ bitoniSort1stStepSharedMemory( TNL::Containers::ArrayView< Value, TNL::Devices::
    int sharedMemLen = 2 * blockDim.x;
 
    int myBlockStart = blockIdx.x * sharedMemLen;
-   int myBlockEnd = TNL::min( arr.getSize(), myBlockStart + sharedMemLen );
+   int myBlockEnd = noa::TNL::min( arr.getSize(), myBlockStart + sharedMemLen );
 
    // copy from globalMem into sharedMem
    for( int i = threadIdx.x; myBlockStart + i < myBlockEnd; i += blockDim.x )
@@ -172,7 +170,7 @@ bitoniSort1stStepSharedMemory( TNL::Containers::ArrayView< Value, TNL::Devices::
 
 template< typename Value, typename CMP >
 void
-bitonicSortWithShared( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > view,
+bitonicSortWithShared( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > view,
                        const CMP& Cmp,
                        int gridDim,
                        int blockDim,
@@ -216,7 +214,7 @@ bitonicSortWithShared( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > v
 
 template< typename Value, typename CMP >
 void
-bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > view, const CMP& Cmp, int gridDim, int blockDim )
+bitonicSort( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > view, const CMP& Cmp, int gridDim, int blockDim )
 
 {
    Cuda::LaunchConfiguration launch_config;
@@ -238,7 +236,7 @@ bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > view, const
 //---------------------------------------------
 template< typename Value, typename CMP >
 void
-bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > src, int begin, int end, const CMP& Cmp )
+bitonicSort( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > src, int begin, int end, const CMP& Cmp )
 {
 #ifdef __CUDACC__
    auto view = src.getView( begin, end );
@@ -276,7 +274,7 @@ bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > src, int be
 
 template< typename Value, typename CMP >
 void
-bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr, int begin, int end )
+bitonicSort( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > arr, int begin, int end )
 {
    bitonicSort( arr,
                 begin,
@@ -289,14 +287,14 @@ bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr, int be
 
 template< typename Value, typename CMP >
 void
-bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr, const CMP& Cmp )
+bitonicSort( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > arr, const CMP& Cmp )
 {
    bitonicSort( arr, 0, arr.getSize(), Cmp );
 }
 
 template< typename Value >
 void
-bitonicSort( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > arr )
+bitonicSort( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > arr )
 {
    bitonicSort( arr,
                 [] __cuda_callable__( const Value& a, const Value& b )
@@ -310,11 +308,11 @@ template< typename Value, typename CMP >
 void
 bitonicSort( std::vector< Value >& vec, int begin, int end, const CMP& Cmp )
 {
-   TNL::Containers::Array< Value, TNL::Devices::Cuda > Arr( vec );
+   noa::TNL::Containers::Array< Value, noa::TNL::Devices::Cuda > Arr( vec );
    auto view = Arr.getView();
    bitonicSort( view, begin, end, Cmp );
 
-   TNL::Algorithms::MultiDeviceMemoryOperations< TNL::Devices::Host, TNL::Devices::Cuda >::copy(
+   noa::TNL::Algorithms::MultiDeviceMemoryOperations< noa::TNL::Devices::Host, noa::TNL::Devices::Cuda >::copy(
       vec.data(), view.getData(), view.getSize() );
 }
 
@@ -351,7 +349,7 @@ bitonicSort( std::vector< Value >& vec )
 
 template< typename Value >
 void
-bitonicSort( TNL::Containers::Array< Value, TNL::Devices::Host >& vec )
+bitonicSort( noa::TNL::Containers::Array< Value, noa::TNL::Devices::Host >& vec )
 {
    bitonicSort( vec,
                 [] __cuda_callable__( const Value& a, const Value& b )
@@ -425,6 +423,4 @@ bitonicSort( int begin, int end, const CMP& Cmp, SWAP Swap )
    TNL_CHECK_CUDA_DEVICE;
 }
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

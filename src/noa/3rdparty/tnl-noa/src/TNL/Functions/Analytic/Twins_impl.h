@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/Analytic/Twins.h>
 
-namespace noa::TNL {
-namespace Functions {
-namespace Analytic {
+namespace noa::TNL::Functions::Analytic {
 
 template< typename Real, int Dimension >
 bool
@@ -65,7 +63,7 @@ Twins< 2, Real >::getPartialDerivative( const Point& v, const Real& time ) const
    if( ZDiffOrder != 0 )
       return 0.0;
    if( XDiffOrder == 0 && YDiffOrder == 0 )
-      return -0.5 * ::sin( TNL::pi * x ) * ::sin( TNL::pi * x ) * ( 1 - ( y - 2 ) * ( y - 2 ) )
+      return -0.5 * ::sin( noa::TNL::pi * x ) * ::sin( noa::TNL::pi * x ) * ( 1 - ( y - 2 ) * ( y - 2 ) )
            * ( 1 - ::tanh( 10 * ( ::sqrt( x * x + y * y ) - 0.6 ) ) );
    return 0.0;
 }
@@ -106,6 +104,4 @@ Twins< 3, Real >::operator()( const PointType& v, const Real& time ) const
    return this->template getPartialDerivative< 0, 0, 0 >( v, time );
 }
 
-}  // namespace Analytic
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions::Analytic

@@ -54,8 +54,7 @@ inline void test_get_first_border_in_tetrahedron() {
         }
         TNL_ASSERT_EQ(i, 7, "incorrect final index");
     };
-    Algorithms::ParallelFor<DeviceType>::exec(0, 1, check_tetrahedron_kernel);
-
+    Algorithms::parallelFor<DeviceType>(0, 1, check_tetrahedron_kernel);
     auto check_incorrect_ray_kernel = [=] __cuda_callable__ (int) mutable {
         PointDevice direction = PointDevice(1, 1, 1);
         direction /= sqrt(dot(direction, direction));
@@ -65,7 +64,7 @@ inline void test_get_first_border_in_tetrahedron() {
 
         TNL_ASSERT_FALSE((bool)result.is_intersection_with_triangle, "incorrect result with incorrect ray");
     };
-    Algorithms::ParallelFor<DeviceType>::exec(0, 1, check_incorrect_ray_kernel);
+    Algorithms::parallelFor<DeviceType>(0, 1, check_incorrect_ray_kernel);
 
     auto check_back_corner_ray_kernel = [=] __cuda_callable__ (int) mutable {
         PointDevice direction = PointDevice(1, 1, 1);
@@ -95,7 +94,7 @@ inline void test_get_first_border_in_tetrahedron() {
         }
         TNL_ASSERT_TRUE(i == 7, "incorrect number of elements in test with corners");
     };
-    Algorithms::ParallelFor<DeviceType>::exec(0, 1, check_back_corner_ray_kernel);
+    Algorithms::parallelFor<DeviceType>(0, 1, check_back_corner_ray_kernel);
 }
 
 template <class DeviceType>
@@ -142,5 +141,5 @@ inline void check_side_cases() {
             TNL_ASSERT_FALSE((bool)next_tetrahedron, "incorrect next tetrahedron");
         }
     };
-    Algorithms::ParallelFor<DeviceType>::exec(0, 1, kernel);
+    Algorithms::parallelFor<DeviceType>(0, 1, kernel);
 }

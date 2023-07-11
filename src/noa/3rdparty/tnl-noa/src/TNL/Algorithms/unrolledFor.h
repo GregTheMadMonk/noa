@@ -8,8 +8,7 @@
 
 #include <utility>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 namespace detail {
 
@@ -83,5 +82,4 @@ unrolledFor( Func&& f )
    detail::unrolled_for_dispatch< Index, begin, end, unrollFactor >( std::forward< Func >( f ) );
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

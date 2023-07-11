@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/SubentityVertexMap.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Vertex.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Topologies {
+namespace noa::TNL::Meshes::Topologies {
 
 template< int dimension_ >
 struct Simplex
@@ -169,6 +167,4 @@ public:
 
 }  // namespace SimplexDetails
 
-}  // namespace Topologies
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Topologies

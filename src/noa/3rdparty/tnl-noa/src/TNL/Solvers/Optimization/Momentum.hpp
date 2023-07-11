@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Optimization/Momentum.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Optimization {
+namespace noa::TNL::Solvers::Optimization {
 
 template< typename Vector, typename SolverMonitor >
 void
@@ -92,7 +90,7 @@ Momentum< Vector, SolverMonitor >::solve( VectorView& w, GradientGetter&& getGra
                                                              w_view[ i ] += v_view[ i ];
                                                              return abs( v_view[ i ] );
                                                           },
-                                                          TNL::Plus() )
+                                                          noa::TNL::Plus() )
                         / ( this->relaxation * (RealType) w.getSize() ) );
 
       if( ! this->nextIteration() )
@@ -106,6 +104,4 @@ Momentum< Vector, SolverMonitor >::solve( VectorView& w, GradientGetter&& getGra
    return false;  // just to avoid warnings
 }
 
-}  // namespace Optimization
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Optimization

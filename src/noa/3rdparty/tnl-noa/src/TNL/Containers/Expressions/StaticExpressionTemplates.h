@@ -74,19 +74,19 @@ struct StaticBinaryExpressionTemplate< T1, T2, Operation, VectorExpressionVariab
       return Operation{}( op1[ i ], op2[ i ] );
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    x() const
    {
       return ( *this )[ 0 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    y() const
    {
       return ( *this )[ 1 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    z() const
    {
       return ( *this )[ 2 ];
@@ -124,19 +124,19 @@ struct StaticBinaryExpressionTemplate< T1, T2, Operation, VectorExpressionVariab
       return Operation{}( op1[ i ], op2 );
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    x() const
    {
       return ( *this )[ 0 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    y() const
    {
       return ( *this )[ 1 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    z() const
    {
       return ( *this )[ 2 ];
@@ -174,19 +174,19 @@ struct StaticBinaryExpressionTemplate< T1, T2, Operation, ArithmeticVariable, Ve
       return Operation{}( op1, op2[ i ] );
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    x() const
    {
       return ( *this )[ 0 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    y() const
    {
       return ( *this )[ 1 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    z() const
    {
       return ( *this )[ 2 ];
@@ -226,19 +226,19 @@ struct StaticUnaryExpressionTemplate
       return Operation{}( operand[ i ] );
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    x() const
    {
       return ( *this )[ 0 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    y() const
    {
       return ( *this )[ 1 ];
    }
 
-   constexpr RealType
+   [[nodiscard]] constexpr RealType
    z() const
    {
       return ( *this )[ 2 ];
@@ -264,40 +264,40 @@ protected:
          return StaticBinaryExpressionTemplate< ET1, ET2, functor >( a, b );                                         \
       }
 
-TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator+, TNL::Plus )
-TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator-, TNL::Minus )
-TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator*, TNL::Multiplies )
-TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator/, TNL::Divides )
-TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator%, TNL::Modulus )
-TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, min, TNL::Min )
-TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, max, TNL::Max )
+TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator+, noa::TNL::Plus )
+TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator-, noa::TNL::Minus )
+TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator*, noa::TNL::Multiplies )
+TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator/, noa::TNL::Divides )
+TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, operator%, noa::TNL::Modulus )
+TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, min, noa::TNL::Min )
+TNL_MAKE_STATIC_BINARY_EXPRESSION( constexpr, max, noa::TNL::Max )
 
-TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator+, TNL::UnaryPlus )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator-, TNL::UnaryMinus )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator!, TNL::LogicalNot )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator~, TNL::BitNot )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, abs, TNL::Abs )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, exp, TNL::Exp )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sqrt, TNL::Sqrt )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, cbrt, TNL::Cbrt )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, log, TNL::Log )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, log10, TNL::Log10 )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, log2, TNL::Log2 )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sin, TNL::Sin )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, cos, TNL::Cos )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, tan, TNL::Tan )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, asin, TNL::Asin )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, acos, TNL::Acos )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, atan, TNL::Atan )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sinh, TNL::Sinh )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, cosh, TNL::Cosh )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, tanh, TNL::Tanh )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, asinh, TNL::Asinh )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, acosh, TNL::Acosh )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, atanh, TNL::Atanh )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, floor, TNL::Floor )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, ceil, TNL::Ceil )
-TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sign, TNL::Sign )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator+, noa::TNL::UnaryPlus )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator-, noa::TNL::UnaryMinus )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator!, noa::TNL::LogicalNot )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( constexpr, operator~, noa::TNL::BitNot )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, abs, noa::TNL::Abs )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, exp, noa::TNL::Exp )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sqrt, noa::TNL::Sqrt )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, cbrt, noa::TNL::Cbrt )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, log, noa::TNL::Log )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, log10, noa::TNL::Log10 )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, log2, noa::TNL::Log2 )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sin, noa::TNL::Sin )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, cos, noa::TNL::Cos )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, tan, noa::TNL::Tan )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, asin, noa::TNL::Asin )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, acos, noa::TNL::Acos )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, atan, noa::TNL::Atan )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sinh, noa::TNL::Sinh )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, cosh, noa::TNL::Cosh )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, tanh, noa::TNL::Tanh )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, asinh, noa::TNL::Asinh )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, acosh, noa::TNL::Acosh )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, atanh, noa::TNL::Atanh )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, floor, noa::TNL::Floor )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, ceil, noa::TNL::Ceil )
+TNL_MAKE_STATIC_UNARY_EXPRESSION( __cuda_callable__, sign, noa::TNL::Sign )
 
    #undef TNL_MAKE_STATIC_UNARY_EXPRESSION
    #undef TNL_MAKE_STATIC_BINARY_EXPRESSION
@@ -451,7 +451,7 @@ __cuda_callable__
 auto
 l2Norm( const ET1& a )
 {
-   using TNL::sqrt;
+   using noa::TNL::sqrt;
    return sqrt( sum( a * a ) );
 }
 
@@ -475,7 +475,7 @@ template< typename ET1,
 __cuda_callable__
 auto
 lpNorm( const ET1& a, const Real& p )
-   // since (1.0 / p) has type double, TNL::pow returns double
+   // since (1.0 / p) has type double, noa::TNL::pow returns double
    -> double
 //-> RemoveET< decltype(pow( StaticExpressionLpNorm( a, p ), 1.0 / p )) >
 {
@@ -483,7 +483,7 @@ lpNorm( const ET1& a, const Real& p )
       return l1Norm( a );
    if( p == 2.0 )
       return l2Norm( a );
-   using TNL::pow;
+   using noa::TNL::pow;
    return pow( sum( pow( abs( a ), p ) ), 1.0 / p );
 }
 
@@ -570,7 +570,7 @@ operator<<( std::ostream& str, const StaticUnaryExpressionTemplate< T, Operation
 
 }  // namespace Expressions
 
-// Make all operators visible in the TNL::Containers namespace to be considered
+// Make all operators visible in the noa::TNL::Containers namespace to be considered
 // even for StaticVector
 using Expressions::operator!;
 using Expressions::operator~;
@@ -587,7 +587,7 @@ using Expressions::operator<=;
 using Expressions::operator>;
 using Expressions::operator>=;
 
-// Make all functions visible in the TNL::Containers namespace
+// Make all functions visible in the noa::TNL::Containers namespace
 using Expressions::abs;
 using Expressions::acos;
 using Expressions::acosh;
@@ -751,7 +751,7 @@ addAndReduceAbs( Vector& lhs,
    for( int i = 0; i < Vector::getSize(); i++ ) {
       const Result aux = expression[ i ];
       lhs[ i ] += aux;
-      result = reduction( result, TNL::abs( aux ) );
+      result = reduction( result, noa::TNL::abs( aux ) );
    }
    return result;
 }
@@ -768,7 +768,7 @@ addAndReduceAbs( Vector& lhs,
    for( int i = 0; i < Vector::getSize(); i++ ) {
       const Result aux = expression[ i ];
       lhs[ i ] += aux;
-      result = reduction( result, TNL::abs( aux ) );
+      result = reduction( result, noa::TNL::abs( aux ) );
    }
    return result;
 }

@@ -14,8 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/reduce.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 template< typename Element, typename Index >
 void
@@ -145,5 +144,4 @@ MemoryOperations< Devices::Host >::compare( const Element1* destination, const E
    }
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

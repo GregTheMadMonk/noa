@@ -11,8 +11,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/GridTypeResolver.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename ConfigTag, typename Device >
 template< typename Reader, typename Functor >
@@ -107,10 +106,9 @@ GridTypeResolver< ConfigTag, Device >::detail< Reader, Functor >::resolveTermina
       return std::forward< Functor >( functor )( reader, GridType{} );
    }
    else {
-      std::cerr << "The mesh type " << TNL::getType< GridType >() << " is disabled in the build configuration." << std::endl;
+      std::cerr << "The mesh type " << noa::TNL::getType< GridType >() << " is disabled in the build configuration." << std::endl;
       return false;
    }
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

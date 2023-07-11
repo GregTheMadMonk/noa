@@ -9,17 +9,16 @@
 #include <iomanip>
 #include <limits>
 
-// check if we are on a POSIX system or Windows,
-// see https://stackoverflow.com/a/4575466
-#if ! defined( _WIN32 ) && ! defined( _WIN64 )
+#include <noa/3rdparty/tnl-noa/src/TNL/3rdparty/spy.hpp>
+
+#ifndef SPY_OS_IS_WINDOWS
    #include <sys/ioctl.h>
    #include <unistd.h>
 #endif
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 template< typename Real, typename Index >
 void
@@ -200,7 +199,7 @@ template< typename Real, typename Index >
 int
 IterativeSolverMonitor< Real, Index >::getLineWidth()
 {
-#if ! defined( _WIN32 ) && ! defined( _WIN64 )
+#ifndef SPY_OS_IS_WINDOWS
    struct winsize w;
    ioctl( STDOUT_FILENO, TIOCGWINSZ, &w );
    return w.ws_col;
@@ -209,5 +208,4 @@ IterativeSolverMonitor< Real, Index >::getLineWidth()
 #endif
 }
 
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers

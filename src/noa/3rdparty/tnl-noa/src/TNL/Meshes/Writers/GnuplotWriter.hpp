@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/GnuplotWriter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Traits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 template< typename Mesh >
 GnuplotWriter< Mesh >::GnuplotWriter( std::ostream& str ) : str( str )
@@ -116,6 +114,4 @@ GnuplotWriter< Mesh >::write( std::ostream& str, const Containers::StaticVector<
    str << d.x() << " " << d.y() << " " << d.z() << " ";
 }
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers

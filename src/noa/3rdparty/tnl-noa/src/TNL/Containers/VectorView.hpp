@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/VectorView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/detail/VectorAssignment.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 template< typename Real, typename Device, typename Index >
 __cuda_callable__
@@ -98,5 +97,4 @@ VectorView< Real, Device, Index >::operator%=( const VectorExpression& expressio
    return *this;
 }
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

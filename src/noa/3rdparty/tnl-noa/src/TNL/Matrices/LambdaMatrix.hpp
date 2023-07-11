@@ -14,8 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/details/SparseMatrix.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename MatrixElementsLambda, typename CompressedRowLengthsLambda, typename Real, typename Device, typename Index >
 LambdaMatrix< MatrixElementsLambda, CompressedRowLengthsLambda, Real, Device, Index >::LambdaMatrix(
@@ -342,5 +341,4 @@ operator<<( std::ostream& str,
    return str;
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/LaunchHelpers.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/SharedMemory.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Real, typename Device, typename Index, typename RealAllocator >
 Matrix< Real, Device, Index, RealAllocator >::Matrix( const RealAllocatorType& allocator )
@@ -148,5 +147,4 @@ void
 Matrix< Real, Device, Index, RealAllocator >::print( std::ostream& str ) const
 {}
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

@@ -6,9 +6,8 @@
 
 #pragma once
 
-namespace noa::TNL {
 //! \brief Namespace for TNL execution models
-namespace Devices {
+namespace noa::TNL::Devices {
 
 struct Sequential
 {
@@ -17,5 +16,4 @@ struct Sequential
    {};
 };
 
-}  // namespace Devices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Devices

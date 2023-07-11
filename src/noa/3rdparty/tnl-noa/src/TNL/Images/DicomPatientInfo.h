@@ -16,8 +16,7 @@
    #include <dcmtk/ofstd/ofstring.h>
 #endif
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 class DicomHeader;
 
@@ -69,7 +68,6 @@ private:
    String patientOrientation;
 };
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomPatientInfo_impl.h>

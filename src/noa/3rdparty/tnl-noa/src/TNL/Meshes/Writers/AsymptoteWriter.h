@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 template< typename Mesh >
 class AsymptoteWriter
@@ -136,6 +134,4 @@ public:
    }
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers

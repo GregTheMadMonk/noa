@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/StaticEuler.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 /////
 // Specialization of the Euler solver for numeric types
@@ -191,7 +189,7 @@ StaticEuler< Containers::StaticVector< Size_, Real > >::solve( VectorType& u, RH
             continue;
          }
       }
-      this->setResidue( addAndReduceAbs( u, currentTau * k1, TNL::Plus(), (RealType) 0.0 )
+      this->setResidue( addAndReduceAbs( u, currentTau * k1, noa::TNL::Plus(), (RealType) 0.0 )
                         / ( currentTau * (RealType) u.getSize() ) );
 
       /////
@@ -224,6 +222,4 @@ StaticEuler< Containers::StaticVector< Size_, Real > >::solve( VectorType& u, RH
    return false;  // just to avoid warnings
 }
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE

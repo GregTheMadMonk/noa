@@ -10,10 +10,8 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
 //! \brief Namespace for mesh writers.
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 /**
  * \brief Writer of data linked with meshes into [VTK format](https://kitware.github.io/vtk-examples/site/VTKFileFormats/).
@@ -118,8 +116,6 @@ protected:
    VTK::DataType currentSection = VTK::DataType::CellData;
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/VTKWriter.hpp>

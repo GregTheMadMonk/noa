@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomPatientInfo.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomSeriesInfo.h>
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 inline DicomHeader::DicomHeader()
 {
@@ -75,5 +74,4 @@ DicomHeader::getSeriesInfo()
    return *seriesInfoObj;
 }
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images

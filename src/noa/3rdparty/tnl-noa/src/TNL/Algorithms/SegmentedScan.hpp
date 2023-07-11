@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaSupportMissing.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 template< detail::ScanType Type >
 template< typename Vector, typename Reduction, typename Flags >
@@ -83,5 +82,4 @@ SegmentedScan< Devices::Cuda, Type >::perform( Vector& v,
 #endif
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

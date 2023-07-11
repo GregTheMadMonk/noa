@@ -12,8 +12,7 @@
    #include <dcmtk/dcmdata/dcdeftag.h>
 #endif
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 class DicomHeader;
 
@@ -89,7 +88,6 @@ private:
    int width, height, depth;
 };
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomImageInfo_impl.h>

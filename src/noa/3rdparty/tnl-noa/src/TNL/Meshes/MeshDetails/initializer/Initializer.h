@@ -44,8 +44,7 @@
  *     space is not wasted.
  */
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename MeshConfig, typename DimensionTag >
 class InitializerLayer;
@@ -242,5 +241,4 @@ public:
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

@@ -8,8 +8,8 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
+
 template< typename MeshFunctionType,
           typename OutMesh,
           typename OutDof,
@@ -124,5 +124,4 @@ public:
    }
 };
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

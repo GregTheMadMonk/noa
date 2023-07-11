@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticArray.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Expressions/StaticExpressionTemplates.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 /**
  * \brief Vector with constant size.
@@ -151,22 +150,6 @@ public:
    template< typename VectorExpression >
    constexpr StaticVector&
    operator%=( const VectorExpression& expression );
-
-   /**
-    * \brief Cast operator for changing of the \e Value type.
-    *
-    * Returns static array having \e ValueType set to \e OtherValue, i.e.
-    * StaticArray< Size, OtherValue >.
-    *
-    * \tparam OtherValue is the \e Value type of the static array the casting
-    * will be performed to.
-    *
-    * \return instance of StaticVector< Size, OtherValue >
-    */
-   template< typename OtherReal >
-   // NOTE: without __cuda_callable__, nvcc 11.8 would complain that it is __host__ only, even though it is constexpr
-   __cuda_callable__
-   constexpr operator StaticVector< Size, OtherReal >() const;
 };
 
 // Enable expression templates for StaticVector
@@ -176,14 +159,66 @@ struct HasEnabledStaticExpressionTemplates< StaticVector< Size, Real > > : std::
 {};
 }  // namespace Expressions
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers
+
+// specializations to make StaticVector work with C++17 structured bindings
+// (all these specializations exist for std::array)
+namespace std {
+
+template< int N, class T >
+struct tuple_size< noa::TNL::Containers::StaticVector< N, T > > : std::integral_constant< std::size_t, N >
+{};
+
+template< std::size_t I, int N, class T >
+struct tuple_element< I, noa::TNL::Containers::StaticVector< N, T > >
+{
+   using type = T;
+};
+
+}  // namespace std
+
+// the `get` function must be defined in the noa::TNL::Containers namespace,
+// because structured binding finds it by ADL
+namespace noa::TNL::Containers {
+
+template< std::size_t I, int N, class T >
+constexpr T&
+get( StaticVector< N, T >& a ) noexcept
+{
+   static_assert( I < N );
+   return a[ I ];
+}
+
+template< std::size_t I, int N, class T >
+constexpr T&&
+get( StaticVector< N, T >&& a ) noexcept
+{
+   static_assert( I < N );
+   return std::move( a[ I ] );
+}
+
+template< std::size_t I, int N, class T >
+constexpr const T&
+get( const StaticVector< N, T >& a ) noexcept
+{
+   static_assert( I < N );
+   return a[ I ];
+}
+
+template< std::size_t I, int N, class T >
+constexpr const T&&
+get( const StaticVector< N, T >&& a ) noexcept
+{
+   static_assert( I < N );
+   return std::move( a[ I ] );
+}
+
+}  // namespace noa::TNL::Containers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.hpp>
 
 // TODO: move to some other source file
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 template< typename Real >
 __cuda_callable__
@@ -212,7 +247,7 @@ TriangleArea( const StaticVector< 2, Real >& a, const StaticVector< 2, Real >& b
    u2.z() = 0;
 
    const StaticVector< 3, Real > v = VectorProduct( u1, u2 );
-   return 0.5 * TNL::sqrt( dot( v, v ) );
+   return 0.5 * noa::TNL::sqrt( dot( v, v ) );
 }
 
 template< typename Real >
@@ -230,8 +265,7 @@ TriangleArea( const StaticVector< 3, Real >& a, const StaticVector< 3, Real >& b
    u2.z() = c.z() - a.z();
 
    const StaticVector< 3, Real > v = VectorProduct( u1, u2 );
-   return 0.5 * TNL::sqrt( dot( v, v ) );
+   return 0.5 * noa::TNL::sqrt( dot( v, v ) );
 }
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

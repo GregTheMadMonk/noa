@@ -21,9 +21,7 @@
    #include <noa/3rdparty/tnl-noa/src/TNL/Timer.h>
 #endif
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace detail {
+namespace noa::TNL::Algorithms::detail {
 
 /****
  * Arrays smaller than the following constant
@@ -152,7 +150,7 @@ Reduction< Devices::Host >::reduce( const Index begin, const Index end, Fetch&& 
    if( Devices::Host::isOMPEnabled() && blocks >= 2 ) {
       // global result variable
       Result result = identity;
-      const int threads = TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
+      const int threads = noa::TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
       #pragma omp parallel num_threads(threads)
       {
          // initialize array for thread-local results
@@ -210,7 +208,7 @@ Reduction< Devices::Host >::reduceWithArgument( const Index begin,
    if( Devices::Host::isOMPEnabled() && blocks >= 2 ) {
       // global result variable
       std::pair< Result, Index > result( identity, -1 );
-      const int threads = TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
+      const int threads = noa::TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
       #pragma omp parallel num_threads(threads)
       {
          // initialize array for thread-local results
@@ -419,6 +417,4 @@ Reduction< Devices::Cuda >::reduceWithArgument( const Index begin,
    }
 }
 
-}  // namespace detail
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::detail

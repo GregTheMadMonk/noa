@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Comm.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Utils.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Real, typename Index >
 PDESolver< Real, Index >::PDESolver() : ioTimer( 0 ), computeTimer( 0 ), totalTimer( 0 ), solverMonitorPointer( 0 )
@@ -91,6 +89,4 @@ PDESolver< Real, Index >::setTotalTimer( Timer& totalTimer )
    this->totalTimer = &totalTimer;
 }
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE

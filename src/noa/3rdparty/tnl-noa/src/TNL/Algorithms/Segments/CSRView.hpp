@@ -12,9 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/CSR.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/LambdaAdapter.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Device, typename Index, typename Kernel >
 __cuda_callable__
@@ -39,9 +37,9 @@ template< typename Device, typename Index, typename Kernel >
 std::string
 CSRView< Device, Index, Kernel >::getSerializationType()
 {
-   return "CSR< [any_device], " + TNL::getSerializationType< IndexType >() + ", " +
+   return "CSR< [any_device], " + noa::TNL::getSerializationType< IndexType >() + ", " +
           // FIXME: the serialized data do not depend on the the kernel type so it should not be in the serialization type
-          TNL::getSerializationType< KernelType >() + " >";
+          noa::TNL::getSerializationType< KernelType >() + " >";
 }
 
 template< typename Device, typename Index, typename Kernel >
@@ -197,7 +195,7 @@ CSRView< Device, Index, Kernel >::reduceSegments( IndexType first,
                                                   const Real& zero ) const
 {
    if constexpr( ! std::is_same< DeviceType, Devices::Cuda >::value )
-      TNL::Algorithms::Segments::CSRScalarKernel< IndexType, DeviceType >::reduceSegments(
+      noa::TNL::Algorithms::Segments::CSRScalarKernel< IndexType, DeviceType >::reduceSegments(
          offsets, first, last, fetch, reduction, keeper, zero );
    else
       kernel.reduceSegments( offsets, first, last, fetch, reduction, keeper, zero );
@@ -246,6 +244,4 @@ CSRView< Device, Index, Kernel >::print( Fetch&& fetch ) const -> SegmentsPrinte
    return SegmentsPrinter< CSRView, Fetch >( *this, fetch );
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

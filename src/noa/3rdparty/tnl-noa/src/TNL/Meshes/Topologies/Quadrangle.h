@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Edge.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Topologies {
+namespace noa::TNL::Meshes::Topologies {
 
 struct Quadrangle
 {
@@ -104,6 +102,4 @@ struct SubentityVertexMap< Quadrangle, Edge, 3, 1 >
    static constexpr int index = 0;
 };
 
-}  // namespace Topologies
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Topologies

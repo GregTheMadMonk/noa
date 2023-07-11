@@ -12,9 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/SubdomainOverlapsGetter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Wrappers.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace DistributedMeshes {
+namespace noa::TNL::Meshes::DistributedMeshes {
 
 template< int Dimension, typename Real, typename Device, typename Index >
 void
@@ -143,7 +141,7 @@ template< int Dimension, typename Real, typename Device, typename Index >
 int
 DistributedMesh< Grid< Dimension, Real, Device, Index > >::getGhostLevels() const
 {
-   return TNL::max( TNL::max( lowerOverlap ), TNL::max( upperOverlap ) );
+   return noa::TNL::max( noa::TNL::max( lowerOverlap ), noa::TNL::max( upperOverlap ) );
 }
 
 template< int Dimension, typename Real, typename Device, typename Index >
@@ -474,6 +472,4 @@ operator<<( std::ostream& str, const DistributedMesh< Grid< Dimension, Real, Dev
    return str;
 }
 
-}  // namespace DistributedMeshes
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::DistributedMeshes

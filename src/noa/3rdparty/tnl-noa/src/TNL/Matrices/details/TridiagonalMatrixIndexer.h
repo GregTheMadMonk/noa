@@ -6,11 +6,10 @@
 
 #pragma once
 
+#include <noa/3rdparty/tnl-noa/src/TNL/DiscreteMath.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/ElementsOrganization.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace details {
+namespace noa::TNL::Matrices::details {
 
 template< typename Index, Algorithms::Segments::ElementsOrganization Organization >
 class TridiagonalMatrixIndexer
@@ -18,7 +17,7 @@ class TridiagonalMatrixIndexer
 public:
    using IndexType = Index;
 
-   static constexpr bool
+   [[nodiscard]] static constexpr bool
    getRowMajorOrder()
    {
       return Organization == Algorithms::Segments::RowMajorOrder;
@@ -29,7 +28,7 @@ public:
 
    __cuda_callable__
    TridiagonalMatrixIndexer( const IndexType& rows, const IndexType& columns )
-   : rows( rows ), columns( columns ), nonemptyRows( TNL::min( rows, columns ) + ( rows > columns ) )
+   : rows( rows ), columns( columns ), nonemptyRows( noa::TNL::min( rows, columns ) + ( rows > columns ) )
    {}
 
    __cuda_callable__
@@ -43,44 +42,47 @@ public:
       this->rows = rows;
       this->columns = columns;
       this->nonemptyRows = min( rows, columns ) + ( rows > columns );
+      if( noa::TNL::integerMultiplyOverflow( IndexType( 3 ), this->nonemptyRows ) )
+         throw std::overflow_error( "TridiagonalMatrix: multiplication overflow - the storage size required for the matrix is "
+                                    "larger than the maximal value of used index type." );
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getRowSize( const IndexType rowIdx ) const
    {
       return 3;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const IndexType&
    getRows() const
    {
       return this->rows;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const IndexType&
    getColumns() const
    {
       return this->columns;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const IndexType&
    getNonemptyRowsCount() const
    {
       return this->nonemptyRows;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getStorageSize() const
    {
       return 3 * this->nonemptyRows;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getGlobalIndex( const Index rowIdx, const Index localIdx ) const
    {
@@ -99,6 +101,4 @@ protected:
    IndexType rows, columns, nonemptyRows;
 };
 
-}  // namespace details
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::details

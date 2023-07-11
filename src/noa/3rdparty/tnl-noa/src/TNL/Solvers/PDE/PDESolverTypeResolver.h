@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/PDE/TimeDependentPDESolver.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/PDE/TimeIndependentPDESolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Problem, typename TimeStepper, bool TimeDependent = Problem::isTimeDependent() >
 class PDESolverTypeResolver
@@ -31,6 +29,4 @@ public:
    using SolverType = TimeIndependentPDESolver< Problem >;
 };
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE

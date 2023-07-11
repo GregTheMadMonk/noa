@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Expressions/ExpressionVariableType.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Wrappers.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace Expressions {
+namespace noa::TNL::Containers::Expressions {
 
 ////
 // Non-static comparison
@@ -241,6 +239,4 @@ struct DistributedComparison< T1, T2, VectorExpressionVariable, ArithmeticVariab
    }
 };
 
-}  // namespace Expressions
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::Expressions

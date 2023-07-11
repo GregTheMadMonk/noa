@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Traverser.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Mesh, typename DifferentialOperator, typename BoundaryConditions, typename RowsCapacitiesType >
 template< typename EntityType >
@@ -30,5 +29,4 @@ MatrixSetter< Mesh, DifferentialOperator, BoundaryConditions, RowsCapacitiesType
    }
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

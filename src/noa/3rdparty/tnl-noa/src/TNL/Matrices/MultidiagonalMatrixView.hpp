@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MultidiagonalMatrixView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Real, typename Device, typename Index, ElementsOrganization Organization >
 __cuda_callable__
@@ -43,8 +42,8 @@ template< typename Real, typename Device, typename Index, ElementsOrganization O
 std::string
 MultidiagonalMatrixView< Real, Device, Index, Organization >::getSerializationType()
 {
-   return "Matrices::MultidiagonalMatrix< " + TNL::getSerializationType< RealType >() + ", [any_device], "
-        + TNL::getSerializationType< IndexType >() + ", " + TNL::getSerializationType( Organization )
+   return "Matrices::MultidiagonalMatrix< " + noa::TNL::getSerializationType< RealType >() + ", [any_device], "
+        + noa::TNL::getSerializationType< IndexType >() + ", " + noa::TNL::getSerializationType( Organization )
         + ", [any_allocator], [any_allocator] >";
 }
 
@@ -408,7 +407,7 @@ MultidiagonalMatrixView< Real, Device, Index, Organization >::forRows( IndexType
       auto rowView = view.getRow( rowIdx );
       function( rowView );
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, ElementsOrganization Organization >
@@ -424,7 +423,7 @@ MultidiagonalMatrixView< Real, Device, Index, Organization >::forRows( IndexType
       auto rowView = view.getRow( rowIdx );
       function( rowView );
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, ElementsOrganization Organization >
@@ -694,5 +693,4 @@ MultidiagonalMatrixView< Real, Device, Index, Organization >::getPaddingIndex() 
    return -1;
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

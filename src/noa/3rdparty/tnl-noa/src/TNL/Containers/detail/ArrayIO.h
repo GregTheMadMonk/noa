@@ -13,9 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/File.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace detail {
+namespace noa::TNL::Containers::detail {
 
 template< typename Value, typename Index, typename Allocator, bool Elementwise = std::is_base_of< Object, Value >::value >
 struct ArrayIO
@@ -27,7 +25,7 @@ struct ArrayIO< Value, Index, Allocator, true >
    static std::string
    getSerializationType()
    {
-      return "TNL::Containers::Array< " + TNL::getSerializationType< Value >() + " >";
+      return "TNL::Containers::Array< " + noa::TNL::getSerializationType< Value >() + " >";
    }
 
    static void
@@ -92,7 +90,7 @@ struct ArrayIO< Value, Index, Allocator, false >
    static std::string
    getSerializationType()
    {
-      return "TNL::Containers::Array< " + TNL::getSerializationType< Value >() + " >";
+      return "TNL::Containers::Array< " + noa::TNL::getSerializationType< Value >() + " >";
    }
 
    template< typename TargetValue = Value >
@@ -252,6 +250,4 @@ struct ArrayIO< Value, Index, Allocator, false >
    }
 };
 
-}  // namespace detail
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::detail

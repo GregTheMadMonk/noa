@@ -14,13 +14,12 @@
    #include <omp.h>
 #endif
 
-namespace noa::TNL {
-namespace Devices {
+namespace noa::TNL::Devices {
 
 class Host
 {
 public:
-   //! For compatibility with \ref TNL::Devices::Cuda only. In the future, it may be used to specify parameters for OpenMP
+   //! For compatibility with \ref noa::TNL::Devices::Cuda only. In the future, it may be used to specify parameters for OpenMP
    //! execution.
    struct LaunchConfiguration
    {};
@@ -131,5 +130,4 @@ protected:
    }
 };
 
-}  // namespace Devices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Devices

@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/SlicedEllpack.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Ellpack.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int SliceSize >
 template< typename SizesContainer >
@@ -36,7 +34,7 @@ SlicedEllpack< Device, Index, IndexAllocator, Organization, SliceSize >::getSeri
 {
    // FIXME: the serialized data DEPEND on the Organization and Alignment parameters, so it should be reflected in the
    // serialization type
-   return "SlicedEllpack< [any_device], " + TNL::getSerializationType< IndexType >() + " >";
+   return "SlicedEllpack< [any_device], " + noa::TNL::getSerializationType< IndexType >() + " >";
 }
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int SliceSize >
@@ -86,7 +84,7 @@ SlicedEllpack< Device, Index, IndexAllocator, Organization, SliceSize >::setSegm
    };
    auto reduce = [] __cuda_callable__( IndexType & aux, const IndexType i ) -> IndexType
    {
-      return TNL::max( aux, i );
+      return noa::TNL::max( aux, i );
    };
    auto keep = [ = ] __cuda_callable__( IndexType i, IndexType res ) mutable
    {
@@ -305,6 +303,4 @@ SlicedEllpack< Device, Index, IndexAllocator, Organization, SliceSize >::print( 
    return SegmentsPrinter< SlicedEllpack, Fetch >( *this, fetch );
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polygon.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Topologies {
+namespace noa::TNL::Meshes::Topologies {
 
 struct Polyhedron
 {
@@ -35,6 +33,4 @@ struct Subtopology< Polyhedron, 2 >
    using Topology = Polygon;
 };
 
-}  // namespace Topologies
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Topologies

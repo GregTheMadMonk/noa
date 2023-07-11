@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 template< int, typename >
 class VectorField;
@@ -152,7 +151,6 @@ public:
    write( const VectorFieldType& function, std::ostream& str );
 };
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/VectorFieldGnuplotWriter_impl.h>

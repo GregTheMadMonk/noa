@@ -9,10 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
-namespace detail {
+namespace noa::TNL::Meshes::Writers::detail {
 
 // TODO: specialization for disabled entities
 // Unstructured meshes, entities
@@ -357,7 +354,4 @@ struct MeshEntitiesVTUCollector< Meshes::Grid< 3, MeshReal, Device, MeshIndex >,
    }
 };
 
-}  // namespace detail
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers::detail

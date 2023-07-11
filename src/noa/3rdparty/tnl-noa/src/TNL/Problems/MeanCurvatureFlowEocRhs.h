@@ -14,8 +14,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/Domain.h>
 
-namespace noa::TNL {
-namespace Problems {
+namespace noa::TNL::Problems {
 
 template< typename ExactOperator, typename TestFunction, int Dimension >
 class MeanCurvatureFlowEocRhs : public Domain< Dimension, SpaceDomain >
@@ -48,5 +47,4 @@ protected:
    TestFunction testFunction;
 };
 
-}  // namespace Problems
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Problems

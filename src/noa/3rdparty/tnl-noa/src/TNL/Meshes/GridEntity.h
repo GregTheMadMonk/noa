@@ -10,8 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< int, int, int >
 class NeighbourGridEntityGetter;
@@ -113,7 +112,7 @@ public:
     *
     * Entity normals define the grid entity orientation.
     * Index of entity orientation is rather internal information. Constructor without this parameter may be used preferably.
-    * The index can be computed using the method \ref TNL::Meshes::Grid::getOrientation.
+    * The index can be computed using the method \ref noa::TNL::Meshes::Grid::getOrientation.
     *
     * \param grid is a reference on a grid the entity belongs to.
     * \param coordinates are coordinates of the grid entity.
@@ -137,7 +136,7 @@ public:
     *
     * \return grid entity coordinates in a form of constant reference.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const CoordinatesType&
    getCoordinates() const;
 
@@ -146,7 +145,7 @@ public:
     *
     * \return grid entity coordinates in a form of a reference.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    CoordinatesType&
    getCoordinates();
 
@@ -173,7 +172,7 @@ public:
     *
     * \return the grid entity index in the grid.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getIndex() const;
 
@@ -182,7 +181,7 @@ public:
     *
     * \return `true` if the entity is a boundary entity and `false` otherwise.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    bool
    isBoundary() const;
 
@@ -191,7 +190,7 @@ public:
     *
     * \return the centre of the grid entity.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    PointType
    getCenter() const;
 
@@ -200,7 +199,7 @@ public:
     *
     * \return the measure of the grid entity.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RealType
    getMeasure() const;
 
@@ -209,7 +208,7 @@ public:
     *
     * \return reference to the grid the grid entity belongs to.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const Grid&
    getMesh() const;
 
@@ -227,7 +226,7 @@ public:
    /**
     * \brief Returns the packed normals vector of the grid entity.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const CoordinatesType&
    getNormals() const;
 
@@ -240,7 +239,7 @@ public:
     *
     * \return basis vector.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    CoordinatesType
    getBasis() const;
 
@@ -250,14 +249,14 @@ public:
     * Orientation is always paired with the normals. In other words, if orientations, entity dimensions and dimensions are
     * equal, then normals are equal also.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getOrientation() const;
 
    /**
     * \brief Setter of the grid entity orientation index.
     *
-    * This is rather internal information. The index can be computed using the method \ref TNL::Meshes::Grid::getOrientation.
+    * This is rather internal information. The index can be computed using the method \ref noa::TNL::Meshes::Grid::getOrientation.
     *
     * \param orientation is a index of the grid entity orientation.
     */
@@ -276,7 +275,7 @@ public:
     * \return neighbour grid entity.
     */
    template< int Dimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    GridEntity< Grid, Dimension >
    getNeighbourEntity( const CoordinatesType& offset ) const;
 
@@ -289,7 +288,7 @@ public:
     * \return neighbour grid entity.
     */
    template< int Dimension, int Orientation >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    GridEntity< Grid, Dimension >
    getNeighbourEntity( const CoordinatesType& offset ) const;
 
@@ -298,7 +297,7 @@ public:
     *
     * \return the point at the origin of the grid entity.
     */
-   PointType
+   [[nodiscard]] PointType
    getPoint() const;
 
    /**
@@ -306,7 +305,7 @@ public:
     *
     * \return a reference on the grid the grid entity belongs to.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const Grid&
    getGrid() const;
 
@@ -332,7 +331,6 @@ template< class Grid, int EntityDimension >
 std::ostream&
 operator<<( std::ostream& str, const GridEntity< Grid, EntityDimension >& entity );
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridEntity.hpp>

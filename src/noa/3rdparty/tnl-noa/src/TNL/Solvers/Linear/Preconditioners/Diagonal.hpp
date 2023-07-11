@@ -12,10 +12,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
-namespace Preconditioners {
+namespace noa::TNL::Solvers::Linear::Preconditioners {
 
 template< typename Matrix >
 void
@@ -95,7 +92,4 @@ Diagonal< Matrices::DistributedMatrix< Matrix > >::solve( ConstVectorViewType b,
    x.startSynchronization();
 }
 
-}  // namespace Preconditioners
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear::Preconditioners

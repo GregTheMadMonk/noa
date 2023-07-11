@@ -15,10 +15,8 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Traits.h>
 
-namespace noa::TNL {
-namespace Meshes {
 //! \brief Namespace for mesh readers.
-namespace Readers {
+namespace noa::TNL::Meshes::Readers {
 
 struct MeshReaderError : public std::runtime_error
 {
@@ -80,7 +78,7 @@ public:
     * \brief Method which loads the intermediate mesh representation into a
     * mesh object.
     *
-    * This overload applies to structured grids, i.e. \ref TNL::Meshes::Grid.
+    * This overload applies to structured grids, i.e. \ref noa::TNL::Meshes::Grid.
     *
     * When the method exits, the intermediate mesh representation is destroyed
     * to save memory. However, depending on the specific file format, the mesh
@@ -139,7 +137,7 @@ public:
     * \brief Method which loads the intermediate mesh representation into a
     * mesh object.
     *
-    * This overload applies to unstructured meshes, i.e. \ref TNL::Meshes::Mesh.
+    * This overload applies to unstructured meshes, i.e. \ref noa::TNL::Meshes::Mesh.
     *
     * When the method exits, the intermediate mesh representation is destroyed
     * to save memory. However, depending on the specific file format, the mesh
@@ -264,49 +262,48 @@ public:
       if( NumberOfFaces > 0 )
          meshBuilder.deduplicateFaces();
 
-      if( ! meshBuilder.build( mesh ) )
-         throw MeshReaderError( "MeshReader", "MeshBuilder failed" );
+      meshBuilder.build( mesh );
    }
 
-   virtual VariantVector
+   [[nodiscard]] virtual VariantVector
    readPointData( const std::string& arrayName )
    {
       throw Exceptions::NotImplementedError(
          "readPointData is not implemented in the mesh reader for this specific file format." );
    }
 
-   virtual VariantVector
+   [[nodiscard]] virtual VariantVector
    readCellData( const std::string& arrayName )
    {
       throw Exceptions::NotImplementedError(
          "readCellData is not implemented in the mesh reader for this specific file format." );
    }
 
-   std::string
+   [[nodiscard]] std::string
    getMeshType() const
    {
       return meshType;
    }
 
-   int
+   [[nodiscard]] int
    getMeshDimension() const
    {
       return meshDimension;
    }
 
-   int
+   [[nodiscard]] int
    getSpaceDimension() const
    {
       return spaceDimension;
    }
 
-   VTK::EntityShape
+   [[nodiscard]] VTK::EntityShape
    getCellShape() const
    {
       return cellShape;
    }
 
-   std::string
+   [[nodiscard]] std::string
    getRealType() const
    {
       if( forcedRealType.empty() )
@@ -314,7 +311,7 @@ public:
       return forcedRealType;
    }
 
-   std::string
+   [[nodiscard]] std::string
    getGlobalIndexType() const
    {
       if( forcedGlobalIndexType.empty() )
@@ -322,7 +319,7 @@ public:
       return forcedGlobalIndexType;
    }
 
-   std::string
+   [[nodiscard]] std::string
    getLocalIndexType() const
    {
       return forcedLocalIndexType;
@@ -365,7 +362,7 @@ protected:
    std::string forcedGlobalIndexType;
    std::string forcedLocalIndexType = "std::int16_t";  // not stored in any file format
 
-   // intermediate representation of a grid (this is relevant only for TNL::Meshes::Grid)
+   // intermediate representation of a grid (this is relevant only for noa::TNL::Meshes::Grid)
    std::vector< std::int64_t > gridExtent;
    std::vector< double > gridOrigin, gridSpacing;
 
@@ -412,6 +409,4 @@ protected:
    }
 };
 
-}  // namespace Readers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Readers

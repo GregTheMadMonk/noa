@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 
 namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace Algorithms::Segments {
 
 enum ElementsOrganization
 {
@@ -33,8 +32,7 @@ struct DefaultElementsOrganization
    }
 };
 
-}  // namespace Segments
-}  // namespace Algorithms
+}  // namespace Algorithms::Segments
 
 inline std::string
 getSerializationType( Algorithms::Segments::ElementsOrganization Organization )

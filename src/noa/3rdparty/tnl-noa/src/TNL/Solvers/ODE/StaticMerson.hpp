@@ -11,9 +11,7 @@
 
 #include "StaticMerson.h"
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 template< typename Real >
 void
@@ -137,7 +135,7 @@ StaticMerson< Real >::solve( VectorType& u, RHSFunction&& rhsFunction, Args... a
       /////
       // Compute the new time step.
       if( adaptivity != 0.0 && error != 0.0 ) {
-         currentTau *= 0.8 * TNL::pow( adaptivity / error, 0.2 );
+         currentTau *= 0.8 * noa::TNL::pow( adaptivity / error, 0.2 );
          currentTau = min( currentTau, this->getMaxTau() );
       }
       if( time + currentTau > this->getStopTime() )
@@ -260,7 +258,7 @@ StaticMerson< Containers::StaticVector< Size_, Real > >::solve( VectorType& u, R
          RealType lastResidue = this->getResidue();
          time += currentTau;
 
-         this->setResidue( addAndReduceAbs( u, currentTau / 6.0 * ( k1 + 4.0 * k4 + k5 ), TNL::Plus(), (RealType) 0.0 )
+         this->setResidue( addAndReduceAbs( u, currentTau / 6.0 * ( k1 + 4.0 * k4 + k5 ), noa::TNL::Plus(), (RealType) 0.0 )
                            / ( currentTau * (RealType) u.getSize() ) );
 
          /////
@@ -293,6 +291,4 @@ StaticMerson< Containers::StaticVector< Size_, Real > >::solve( VectorType& u, R
    return this->checkConvergence();
 }
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE

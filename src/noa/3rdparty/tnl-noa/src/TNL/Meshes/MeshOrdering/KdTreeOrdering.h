@@ -18,8 +18,7 @@
    #include <CGAL/Search_traits_adapter.h>
    #include <CGAL/Kd_tree.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 struct KdTreeOrdering
 {
@@ -27,8 +26,8 @@ struct KdTreeOrdering
    static void
    getPermutations( const Mesh& mesh, PermutationArray& perm, PermutationArray& iperm )
    {
-      static_assert( std::is_same< typename Mesh::DeviceType, TNL::Devices::Host >::value, "" );
-      static_assert( std::is_same< typename PermutationArray::DeviceType, TNL::Devices::Host >::value, "" );
+      static_assert( std::is_same< typename Mesh::DeviceType, noa::TNL::Devices::Host >::value, "" );
+      static_assert( std::is_same< typename PermutationArray::DeviceType, noa::TNL::Devices::Host >::value, "" );
       using GlobalIndexType = typename Mesh::GlobalIndexType;
       using PointType = typename Mesh::PointType;
       using RealType = typename Mesh::RealType;
@@ -87,7 +86,6 @@ struct KdTreeOrdering
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes
 
 #endif  // HAVE_CGAL

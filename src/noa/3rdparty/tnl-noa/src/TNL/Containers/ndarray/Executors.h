@@ -14,9 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ndarray/Meta.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ndarray/SizesHolder.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace detail {
+namespace noa::TNL::Containers::detail {
 
 template< typename Permutation, typename Device2 >
 struct Functor_call_with_unpermuted_arguments
@@ -315,6 +313,4 @@ struct ExecutorDispatcher< Permutation, Devices::Cuda >
    }
 };
 
-}  // namespace detail
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::detail

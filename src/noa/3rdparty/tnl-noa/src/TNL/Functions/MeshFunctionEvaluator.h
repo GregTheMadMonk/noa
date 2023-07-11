@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/FunctionAdapter.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 template< typename OutMeshFunction, typename InFunction, typename Real >
 class MeshFunctionEvaluatorTraverserUserData
@@ -141,7 +140,6 @@ public:
    }
 };
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/MeshFunctionEvaluator_impl.h>

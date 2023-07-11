@@ -20,9 +20,7 @@
 
 #include <noa/3rdparty/tinyxml2.hh>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Readers {
+namespace noa::TNL::Meshes::Readers {
 
 static const std::map< std::string, std::string > VTKDataTypes{ { "Int8", "std::int8_t" },   { "UInt8", "std::uint8_t" },
                                                                 { "Int16", "std::int16_t" }, { "UInt16", "std::uint16_t" },
@@ -93,7 +91,7 @@ protected:
       return value;
    }
 
-   static const tinyxml2::XMLElement*
+   [[nodiscard]] static const tinyxml2::XMLElement*
    getChildSafe( const tinyxml2::XMLElement* parent, const std::string& name )
    {
       const tinyxml2::XMLElement* child = parent->FirstChildElement( name.c_str() );
@@ -125,7 +123,7 @@ protected:
          throw MeshReaderError( "XMLVTK", "unsupported NumberOfComponents in " + elemName + ": " + NumberOfComponents );
    }
 
-   static const tinyxml2::XMLElement*
+   [[nodiscard]] static const tinyxml2::XMLElement*
    getDataArrayByName( const tinyxml2::XMLElement* parent, const std::string& name )
    {
       const tinyxml2::XMLElement* found = nullptr;
@@ -158,7 +156,7 @@ protected:
    }
 
    template< typename T >
-   VariantVector
+   [[nodiscard]] VariantVector
    readAsciiBlock( const char* block ) const
    {
       // handle empty array
@@ -183,7 +181,7 @@ protected:
    }
 
    template< typename HeaderType, typename T >
-   VariantVector
+   [[nodiscard]] VariantVector
    readBinaryBlock( const char* block ) const
    {
       // handle empty array
@@ -237,7 +235,7 @@ protected:
    }
 
    template< typename T >
-   VariantVector
+   [[nodiscard]] VariantVector
    readBinaryBlock( const char* block ) const
    {
       if( headerType == "std::int8_t" )
@@ -260,7 +258,7 @@ protected:
          throw MeshReaderError( "XMLVTK", "unsupported header type: " + headerType );
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readDataArray( const tinyxml2::XMLElement* elem, const std::string& arrayName ) const
    {
       verifyElement( elem, "DataArray" );
@@ -319,7 +317,7 @@ protected:
          throw MeshReaderError( "XMLVTK", "unsupported DataArray format: " + format );
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readPointOrCellData( const std::string& sectionName, const std::string& arrayName )
    {
       const tinyxml2::XMLElement* piece = getChildSafe( datasetElement, "Piece" );
@@ -400,7 +398,7 @@ public:
 #endif
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readPointData( const std::string& arrayName ) override
    {
 #ifdef HAVE_TINYXML2
@@ -410,7 +408,7 @@ public:
 #endif
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readCellData( const std::string& arrayName ) override
    {
 #ifdef HAVE_TINYXML2
@@ -448,6 +446,4 @@ protected:
 #endif
 };
 
-}  // namespace Readers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Readers

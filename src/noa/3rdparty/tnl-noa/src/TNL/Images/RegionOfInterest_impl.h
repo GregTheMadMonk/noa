@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/Image.h>
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 template< typename Index >
 RegionOfInterest< Index >::RegionOfInterest() : top( -1 ), bottom( -1 ), left( -1 ), right( -1 )
@@ -154,5 +153,4 @@ RegionOfInterest< Index >::isIn( const Index row, const Index column ) const
    return false;
 }
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images

@@ -6,16 +6,12 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Meshes {
 //! \brief Namespace for unstructured mesh entity topologies
-namespace Topologies {
+namespace noa::TNL::Meshes::Topologies {
 
 struct Vertex
 {
    static constexpr int dimension = 0;
 };
 
-}  // namespace Topologies
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Topologies

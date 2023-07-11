@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/Templates/BooleanOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/Templates/Functions.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< class, int >
 class GridEntity;
@@ -114,8 +113,7 @@ public:
    static constexpr int spaceStepsPowersSize = 5;
 
    using SpaceProductsContainer =
-      Containers::StaticVector< std::integral_constant< Index, Templates::pow( spaceStepsPowersSize, Dimension ) >::value,
-                                Real >;
+      Containers::StaticVector< std::integral_constant< Index, discretePow( spaceStepsPowersSize, Dimension ) >::value, Real >;
 
    /**
     * \brief Grid constructor with no parameters.
@@ -135,7 +133,7 @@ public:
    Grid( Dimensions... dimensions );
 
    /**
-    * \brief Grid constructor with grid dimensions given as \ref TNL::Meshes::Grid::CoordinatesType.
+    * \brief Grid constructor with grid dimensions given as \ref noa::TNL::Meshes::Grid::CoordinatesType.
     *
     * \param dimensions are dimensions along particular axes of the grid.
     */
@@ -178,7 +176,7 @@ public:
     *
     *\return Coordinate vector with number of edges along each axis.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const CoordinatesType&
    getDimensions() const noexcept;
 
@@ -188,7 +186,7 @@ public:
     * \param[in] dimension is a dimension of grid entities to be counted.
     * \return number of entities of specific dimension.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Index
    getEntitiesCount( IndexType dimension ) const;
 
@@ -201,7 +199,7 @@ public:
     */
    template< int EntityDimension,
              std::enable_if_t< Templates::isInClosedInterval( 0, EntityDimension, Dimension ), bool > = true >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Index
    getEntitiesCount() const noexcept;
 
@@ -214,7 +212,7 @@ public:
     */
    template< typename Entity,
              std::enable_if_t< Templates::isInClosedInterval( 0, Entity::getEntityDimension(), Dimension ), bool > = true >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Index
    getEntitiesCount() const noexcept;
 
@@ -228,7 +226,7 @@ public:
    template< typename... DimensionIndex,
              std::enable_if_t< Templates::conjunction_v< std::is_convertible< Index, DimensionIndex >... >, bool > = true,
              std::enable_if_t< ( sizeof...( DimensionIndex ) > 0 ), bool > = true >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Containers::StaticVector< sizeof...( DimensionIndex ), Index >
    getEntitiesCounts( DimensionIndex... indices ) const;
 
@@ -237,7 +235,7 @@ public:
     *
     * \return vector of count of entities for all dimensions.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const EntitiesCounts&
    getEntitiesCounts() const noexcept;
 
@@ -248,7 +246,7 @@ public:
     * \param[in] orientation is orientation of the entities.
     * \return number of entities of specific dimension and orientation.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Index
    getOrientedEntitiesCount( IndexType dimension, IndexType orientation ) const;
 
@@ -263,7 +261,7 @@ public:
              int EntityOrientation,
              std::enable_if_t< Templates::isInClosedInterval( 0, EntityDimension, Dimension ), bool > = true,
              std::enable_if_t< Templates::isInClosedInterval( 0, EntityOrientation, Dimension ), bool > = true >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Index
    getOrientedEntitiesCount() const noexcept;
 
@@ -289,7 +287,7 @@ public:
     * \return normals of the grid entity.
     */
    template< int EntityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    CoordinatesType
    getNormals( Index orientation ) const noexcept;
 
@@ -315,7 +313,7 @@ public:
     * \return normals of the grid entity.
     */
    template< int EntityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    CoordinatesType
    getBasis( Index orientation ) const noexcept;
 
@@ -327,7 +325,7 @@ public:
     * \return index of grid entity orientation.
     */
    template< int EntityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getOrientation( const CoordinatesType& normals ) const noexcept;
 
@@ -344,7 +342,7 @@ public:
     * \return coordinates of the grid entity.
     */
    template< int EntityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    CoordinatesType
    getEntityCoordinates( IndexType entityIdx, CoordinatesType& normals, Index& orientation ) const noexcept;
 
@@ -382,7 +380,7 @@ public:
     *
     * \return the origin of the grid.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const PointType&
    getOrigin() const noexcept;
 
@@ -413,7 +411,7 @@ public:
     *
     * \return the space steps of the grid.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const PointType&
    getSpaceSteps() const noexcept;
 
@@ -429,7 +427,7 @@ public:
    template< typename... Powers,
              std::enable_if_t< Templates::conjunction_v< std::is_convertible< Index, Powers >... >, bool > = true,
              std::enable_if_t< sizeof...( Powers ) == Dimension, bool > = true >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Real
    getSpaceStepsProducts( Powers... powers ) const;
 
@@ -441,11 +439,11 @@ public:
     * \param[in] powers is vector of numbers telling power of particular space steps.
     * \return product of given space steps powers.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Real
    getSpaceStepsProducts( const CoordinatesType& powers ) const;
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Real
    getCellMeasure() const
    {
@@ -463,7 +461,7 @@ public:
     * \return product of given space steps powers.
     */
    template< Index... Powers, std::enable_if_t< sizeof...( Powers ) == Dimension, bool > = true >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Real
    getSpaceStepsProducts() const noexcept;
 
@@ -472,7 +470,7 @@ public:
     *
     * \return the smallest space step.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Real
    getSmallestSpaceStep() const noexcept;
 
@@ -481,7 +479,7 @@ public:
     *
     * \return the proportions of the grid.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const PointType&
    getProportions() const noexcept;
 
@@ -496,7 +494,7 @@ public:
     * \return grid entity of given type.
     */
    template< typename EntityType >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    EntityType
    getEntity( IndexType entityIdx ) const;
 
@@ -511,7 +509,7 @@ public:
     * \return grid entity of given type.
     */
    template< typename EntityType >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    EntityType
    getEntity( const CoordinatesType& coordinates ) const;
 
@@ -526,7 +524,7 @@ public:
     * \return grid entity of given type.
     */
    template< int EntityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    EntityType< EntityDimension >
    getEntity( IndexType entityIdx ) const;
 
@@ -541,7 +539,7 @@ public:
     * \return grid entity of given type.
     */
    template< int EntityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    EntityType< EntityDimension >
    getEntity( const CoordinatesType& coordinates ) const;
 
@@ -553,7 +551,7 @@ public:
     * \return index of the entity.
     */
    template< typename Entity >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    Index
    getEntityIndex( const Entity& entity ) const;
 
@@ -587,7 +585,7 @@ public:
     *
     * \return const CoordinatesType& is "lower left" corner of subdomain for distributed grid.
     */
-   const CoordinatesType&
+   [[nodiscard]] const CoordinatesType&
    getLocalBegin() const;
 
    /**
@@ -595,7 +593,7 @@ public:
     *
     * \return const CoordinatesType& is "upper right" corner of subdomain for distributed grid.
     */
-   const CoordinatesType&
+   [[nodiscard]] const CoordinatesType&
    getLocalEnd() const;
 
    /**
@@ -619,7 +617,7 @@ public:
     *
     * \return begin of the region of interior cells.
     */
-   const CoordinatesType&
+   [[nodiscard]] const CoordinatesType&
    getInteriorBegin() const;
 
    /**
@@ -627,7 +625,7 @@ public:
     *
     * \return end of the region of interior cells.
     */
-   const CoordinatesType&
+   [[nodiscard]] const CoordinatesType&
    getInteriorEnd() const;
 
    /**
@@ -636,7 +634,7 @@ public:
     * \param[in] logger is a logger used to write the grid.
     */
    void
-   writeProlog( TNL::Logger& logger ) const noexcept;
+   writeProlog( noa::TNL::Logger& logger ) const noexcept;
 
    /**
     * \brief Iterate over all mesh entities with given dimension and perform given lambda function
@@ -653,7 +651,7 @@ public:
     * auto func = [=] __cuda_callable__( const typename Grid< Dimension, Real, Device, Index >::template EntityType<
     * EntityDimension >&entity ) mutable {};
     * ```
-    * where \e entity represents given grid entity. See \ref TNL::Meshes::GridEntity.
+    * where \e entity represents given grid entity. See \ref noa::TNL::Meshes::GridEntity.
     *
     * \param args are packed arguments that are going to be passed to the lambda function.
     */
@@ -677,7 +675,7 @@ public:
     * auto func = [=] __cuda_callable__( const typename Grid< Dimension, Real, Device, Index >::template EntityType<
     * EntityDimension >&entity ) mutable {};
     * ```
-    * where \e entity represents given grid entity. See \ref TNL::Meshes::GridEntity.
+    * where \e entity represents given grid entity. See \ref noa::TNL::Meshes::GridEntity.
     * \param args are packed arguments that are going to be passed to the lambda function.
     */
    template< int EntityDimension, typename Func, typename... FuncArgs >
@@ -699,7 +697,7 @@ public:
     * auto func = [=] __cuda_callable__( const typename Grid< Dimension, Real, Device, Index >::template EntityType<
     * EntityDimension >&entity ) mutable {};
     * ```
-    * where \e entity represents given grid entity. See \ref TNL::Meshes::GridEntity.
+    * where \e entity represents given grid entity. See \ref noa::TNL::Meshes::GridEntity.
     * \param args are packed arguments that are going to be passed to the lambda function.
     */
    template< int EntityDimension, typename Func, typename... FuncArgs >
@@ -718,7 +716,7 @@ public:
     * auto func = [=] __cuda_callable__( const typename Grid< Dimension, Real, Device, Index >::template EntityType<
     * EntityDimension >&entity ) mutable {};
     * ```
-    * where \e entity represents given grid entity. See \ref TNL::Meshes::GridEntity.
+    * where \e entity represents given grid entity. See \ref noa::TNL::Meshes::GridEntity.
     * \param args are packed arguments that are going to be passed to the lambda function.
     */
    template< int EntityDimension, typename Func, typename... FuncArgs >
@@ -739,7 +737,7 @@ public:
     * auto func = [=] __cuda_callable__( const typename Grid< Dimension, Real, Device, Index >::template EntityType<
     * EntityDimension >&entity ) mutable {};
     * ```
-    * where \e entity represents given grid entity. See \ref TNL::Meshes::GridEntity.
+    * where \e entity represents given grid entity. See \ref noa::TNL::Meshes::GridEntity.
     * \param args are packed arguments that are going to be passed to the lambda function.
     */
    template< int EntityDimension, typename Func, typename... FuncArgs >
@@ -759,7 +757,7 @@ public:
     * auto func = [=] __cuda_callable__( const typename Grid< Dimension, Real, Device, Index >::template EntityType<
     * EntityDimension >&entity ) mutable {};
     * ```
-    * where \e entity represents given grid entity. See \ref TNL::Meshes::GridEntity.
+    * where \e entity represents given grid entity. See \ref noa::TNL::Meshes::GridEntity.
     * \param func is an instance of the lambda function to be performed on each grid entity.
     * \param args are packed arguments that are going to be passed to the lambda function.
     */
@@ -866,7 +864,7 @@ template< int Dimension, typename Real, typename Device, typename Index >
 std::ostream&
 operator<<( std::ostream& str, const Grid< Dimension, Real, Device, Index >& grid )
 {
-   TNL::Logger logger( 100, str );
+   noa::TNL::Logger logger( 100, str );
 
    grid.writeProlog( logger );
 
@@ -912,8 +910,7 @@ operator!=( const Grid< Dimension, Real, Device, Index >& lhs, const Grid< Dimen
    return ! ( lhs == rhs );
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.hpp>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridEntity.h>

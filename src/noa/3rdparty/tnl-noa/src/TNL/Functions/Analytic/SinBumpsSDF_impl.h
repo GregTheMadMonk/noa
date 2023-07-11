@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/Analytic/SinBumpsSDF.h>
 
-namespace noa::TNL {
-namespace Functions {
-namespace Analytic {
+namespace noa::TNL::Functions::Analytic {
 
 template< typename Point >
 void
@@ -67,8 +65,8 @@ SinBumpsSDF< 1, Real >::setup( const Config::ParameterContainer& parameters, con
 {
    this->amplitude = parameters.getParameter< double >( prefix + "amplitude" );
    this->waveLength.x() = parameters.getParameter< double >( prefix + "wave-length-x" );
-   while( this->waveLength.x() > 2.0 * TNL::pi )
-      this->waveLength.x() -= 2.0 * TNL::pi;
+   while( this->waveLength.x() > 2.0 * noa::TNL::pi )
+      this->waveLength.x() -= 2.0 * noa::TNL::pi;
    this->wavesNumber.x() = ceil( parameters.getParameter< double >( prefix + "waves-number-x" ) );
    this->phase.x() = parameters.getParameter< double >( prefix + "phase-x" );
    return true;
@@ -81,7 +79,7 @@ Real
 SinBumpsSDF< 1, Real >::getPartialDerivative( const PointType& v, const Real& time ) const
 {
    const RealType& x = v.x();
-   RealType xp = abs( x ) + sign( x ) * this->phase.x() * this->waveLength.x() / ( 2.0 * TNL::pi );
+   RealType xp = abs( x ) + sign( x ) * this->phase.x() * this->waveLength.x() / ( 2.0 * noa::TNL::pi );
    if( this->wavesNumber.x() != 0.0 && xp > this->wavesNumber.x() * this->waveLength.x() )
       return 0.0;
    if( YDiffOrder != 0 || ZDiffOrder != 0 )
@@ -89,7 +87,7 @@ SinBumpsSDF< 1, Real >::getPartialDerivative( const PointType& v, const Real& ti
    if( XDiffOrder == 0 )
       return sign( xp - round( ( 2.0 * xp ) / this->waveLength.x() ) * this->waveLength.x() / 2.0 )
            * ( xp - round( ( 2.0 * xp ) / this->waveLength.x() ) * this->waveLength.x() / 2.0 )
-           * sign( ::sin( this->phase.x() + 2.0 * TNL::pi * x / this->waveLength.x() ) );
+           * sign( ::sin( this->phase.x() + 2.0 * noa::TNL::pi * x / this->waveLength.x() ) );
    if( XDiffOrder == 1 )
       return 1.0;
    return 0.0;
@@ -109,10 +107,10 @@ SinBumpsSDF< 2, Real >::setup( const Config::ParameterContainer& parameters, con
    this->amplitude = parameters.getParameter< double >( prefix + "amplitude" );
    this->waveLength.x() = parameters.getParameter< double >( prefix + "wave-length-x" );
    this->waveLength.y() = parameters.getParameter< double >( prefix + "wave-length-y" );
-   while( this->waveLength.x() > 2.0 * TNL::pi )
-      this->waveLength.x() -= 2.0 * TNL::pi;
-   while( this->waveLength.y() > 2.0 * TNL::pi )
-      this->waveLength.y() -= 2.0 * TNL::pi;
+   while( this->waveLength.x() > 2.0 * noa::TNL::pi )
+      this->waveLength.x() -= 2.0 * noa::TNL::pi;
+   while( this->waveLength.y() > 2.0 * noa::TNL::pi )
+      this->waveLength.y() -= 2.0 * noa::TNL::pi;
    this->wavesNumber.x() = ceil( parameters.getParameter< double >( prefix + "waves-number-x" ) );
    this->wavesNumber.y() = ceil( parameters.getParameter< double >( prefix + "waves-number-y" ) );
    this->phase.x() = parameters.getParameter< double >( prefix + "phase-x" );
@@ -128,8 +126,8 @@ SinBumpsSDF< 2, Real >::getPartialDerivative( const PointType& v, const Real& ti
 {
    const RealType& x = v.x();
    const RealType& y = v.y();
-   RealType xp = ::sqrt( x * x ) + sign( x ) * this->phase.x() * this->waveLength.x() / ( 2.0 * TNL::pi );
-   RealType yp = ::sqrt( y * y ) + sign( y ) * this->phase.y() * this->waveLength.y() / ( 2.0 * TNL::pi );
+   RealType xp = ::sqrt( x * x ) + sign( x ) * this->phase.x() * this->waveLength.x() / ( 2.0 * noa::TNL::pi );
+   RealType yp = ::sqrt( y * y ) + sign( y ) * this->phase.y() * this->waveLength.y() / ( 2.0 * noa::TNL::pi );
    if( ( xp > this->wavesNumber.x() * this->waveLength.x() && this->wavesNumber.x() != 0.0 )
        || ( yp > this->wavesNumber.y() * this->waveLength.y() && this->wavesNumber.y() != 0.0 ) )
       return 0.0;
@@ -144,8 +142,8 @@ SinBumpsSDF< 2, Real >::getPartialDerivative( const PointType& v, const Real& ti
       sxy = sy;
    if( XDiffOrder == 0 && YDiffOrder == 0 && ZDiffOrder == 0 ) {
       return sxy
-           * sign( ::sin( this->phase.x() + 2.0 * TNL::pi * x / this->waveLength.x() )
-                   * ::sin( this->phase.y() + 2.0 * TNL::pi * y / this->waveLength.y() ) );
+           * sign( ::sin( this->phase.x() + 2.0 * noa::TNL::pi * x / this->waveLength.x() )
+                   * ::sin( this->phase.y() + 2.0 * noa::TNL::pi * y / this->waveLength.y() ) );
    }
    return 0.0;
 }
@@ -165,12 +163,12 @@ SinBumpsSDF< 3, Real >::setup( const Config::ParameterContainer& parameters, con
    this->waveLength.x() = parameters.getParameter< double >( prefix + "wave-length-x" );
    this->waveLength.y() = parameters.getParameter< double >( prefix + "wave-length-y" );
    this->waveLength.z() = parameters.getParameter< double >( prefix + "wave-length-z" );
-   while( this->waveLength.x() > 2.0 * TNL::pi )
-      this->waveLength.x() -= 2.0 * TNL::pi;
-   while( this->waveLength.y() > 2.0 * TNL::pi )
-      this->waveLength.y() -= 2.0 * TNL::pi;
-   while( this->waveLength.z() > 2.0 * TNL::pi )
-      this->waveLength.z() -= 2.0 * TNL::pi;
+   while( this->waveLength.x() > 2.0 * noa::TNL::pi )
+      this->waveLength.x() -= 2.0 * noa::TNL::pi;
+   while( this->waveLength.y() > 2.0 * noa::TNL::pi )
+      this->waveLength.y() -= 2.0 * noa::TNL::pi;
+   while( this->waveLength.z() > 2.0 * noa::TNL::pi )
+      this->waveLength.z() -= 2.0 * noa::TNL::pi;
    this->wavesNumber.x() = ceil( parameters.getParameter< double >( prefix + "waves-number-x" ) );
    this->wavesNumber.y() = ceil( parameters.getParameter< double >( prefix + "waves-number-y" ) );
    this->wavesNumber.z() = ceil( parameters.getParameter< double >( prefix + "waves-number-z" ) );
@@ -189,9 +187,9 @@ SinBumpsSDF< 3, Real >::getPartialDerivative( const PointType& v, const Real& ti
    const RealType& x = v.x();
    const RealType& y = v.y();
    const RealType& z = v.z();
-   RealType xp = ::sqrt( x * x ) + sign( x ) * ( this->phase.x() ) * ( this->waveLength.x() ) / ( 2.0 * TNL::pi );
-   RealType yp = ::sqrt( y * y ) + sign( y ) * ( this->phase.y() ) * ( this->waveLength.y() ) / ( 2.0 * TNL::pi );
-   RealType zp = ::sqrt( z * z ) + sign( z ) * ( this->phase.z() ) * ( this->waveLength.z() ) / ( 2.0 * TNL::pi );
+   RealType xp = ::sqrt( x * x ) + sign( x ) * ( this->phase.x() ) * ( this->waveLength.x() ) / ( 2.0 * noa::TNL::pi );
+   RealType yp = ::sqrt( y * y ) + sign( y ) * ( this->phase.y() ) * ( this->waveLength.y() ) / ( 2.0 * noa::TNL::pi );
+   RealType zp = ::sqrt( z * z ) + sign( z ) * ( this->phase.z() ) * ( this->waveLength.z() ) / ( 2.0 * noa::TNL::pi );
    if( ( xp > this->wavesNumber.x() * this->waveLength.x() && this->wavesNumber.x() != 0.0 )
        || ( yp > this->wavesNumber.y() * this->waveLength.y() && this->wavesNumber.y() != 0.0 )
        || ( ::sqrt( z * z ) > this->wavesNumber.z() * this->waveLength.z() && this->wavesNumber.z() != 0.0 ) )
@@ -211,13 +209,11 @@ SinBumpsSDF< 3, Real >::getPartialDerivative( const PointType& v, const Real& ti
       sxyz = sz;
    if( XDiffOrder == 0 && YDiffOrder == 0 && ZDiffOrder == 0 ) {
       return sxyz
-           * sign( ::sin( this->phase.x() + 2.0 * TNL::pi * x / this->waveLength.x() )
-                   * ::sin( this->phase.y() + 2.0 * TNL::pi * y / this->waveLength.y() )
-                   * ::sin( this->phase.z() + 2.0 * TNL::pi * z / this->waveLength.z() ) );
+           * sign( ::sin( this->phase.x() + 2.0 * noa::TNL::pi * x / this->waveLength.x() )
+                   * ::sin( this->phase.y() + 2.0 * noa::TNL::pi * y / this->waveLength.y() )
+                   * ::sin( this->phase.z() + 2.0 * noa::TNL::pi * z / this->waveLength.z() ) );
    }
    return 0.0;
 }
 
-}  // namespace Analytic
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions::Analytic

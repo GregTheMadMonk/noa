@@ -14,8 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 template< typename Device >
 struct Multireduction;
@@ -89,7 +88,6 @@ struct Multireduction< Devices::Cuda >
    reduce( Result identity, DataFetcher dataFetcher, Reduction reduction, Index size, int n, Result* hostResult );
 };
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms
 
 #include "Multireduction.hpp"

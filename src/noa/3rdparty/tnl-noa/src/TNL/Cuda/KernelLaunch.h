@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaSupportMissing.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>
 
-namespace noa::TNL {
-namespace Cuda {
+namespace noa::TNL::Cuda {
 
 /**
  * Holds the parameters necessary to "launch" a CUDA kernel (i.e. schedule it for
@@ -66,7 +65,7 @@ launchKernel( RawKernel kernel_function, LaunchConfiguration launch_configuratio
 
 #ifdef TNL_DEBUG_KERNEL_LAUNCHES
    // clang-format off
-   std::cout << "Type of kernel function: " << TNL::getType( kernel_function ) << "\n";
+   std::cout << "Type of kernel function: " << noa::TNL::getType( kernel_function ) << "\n";
    std::cout << "Kernel launch configuration:\n"
              << "\t- grid size: " << launch_configuration.gridSize.x << " x "
                                   << launch_configuration.gridSize.y << " x "
@@ -100,7 +99,7 @@ launchKernel( RawKernel kernel_function, LaunchConfiguration launch_configuratio
    // to add the kernel function type to the error message
    const cudaError_t status = cudaGetLastError();
    if( status != cudaSuccess ) {
-      std::string msg = "detected after launching kernel " + TNL::getType( kernel_function ) + "\nSource: line "
+      std::string msg = "detected after launching kernel " + noa::TNL::getType( kernel_function ) + "\nSource: line "
                       + std::to_string( __LINE__ ) + " in " + __FILE__;
       throw Exceptions::CudaRuntimeError( status, msg );
    }
@@ -125,5 +124,4 @@ launchKernelAsync( RawKernel kernel_function, LaunchConfiguration launch_configu
    launchKernel( kernel_function, launch_configuration, std::forward< KernelParameters >( parameters )... );
 }
 
-}  // namespace Cuda
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Cuda

@@ -10,8 +10,7 @@
 //#include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Traverser.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 template< typename OutMeshFunction, typename InFunction >
 template< typename OutMeshFunctionPointer, typename InFunctionPointer >
@@ -154,5 +153,4 @@ MeshFunctionEvaluator< OutMeshFunction, InFunction >::evaluateEntities( OutMeshF
    }*/
 }
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

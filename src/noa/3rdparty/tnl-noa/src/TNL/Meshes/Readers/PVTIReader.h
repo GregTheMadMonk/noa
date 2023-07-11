@@ -13,13 +13,11 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Readers/VTIReader.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/layers/EntityTags/Traits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Readers {
+namespace noa::TNL::Meshes::Readers {
 
 class PVTIReader : public XMLVTK
 {
-   std::string
+   [[nodiscard]] std::string
    getSourcePath( const std::string& source )
    {
       namespace fs = std::filesystem;
@@ -306,13 +304,13 @@ public:
       throw MeshReaderError( "MeshReader", "the PVTI reader cannot be used to load a distributed unstructured mesh." );
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readPointData( const std::string& arrayName ) override
    {
       return localReader.readPointData( arrayName );
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readCellData( const std::string& arrayName ) override
    {
       return localReader.readCellData( arrayName );
@@ -341,6 +339,4 @@ protected:
    VariantVector pointTags, cellTags;
 };
 
-}  // namespace Readers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Readers

@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Quadrangle.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Topologies {
+namespace noa::TNL::Meshes::Topologies {
 
 struct Hexahedron
 {
@@ -356,6 +354,4 @@ struct SubentityVertexMap< Hexahedron, Quadrangle, 5, 3 >
    static constexpr int index = 7;
 };
 
-}  // namespace Topologies
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Topologies

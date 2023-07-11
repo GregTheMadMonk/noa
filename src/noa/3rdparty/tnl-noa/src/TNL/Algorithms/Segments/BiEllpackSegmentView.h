@@ -9,28 +9,26 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/ElementsOrganization.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Index, ElementsOrganization Organization, int WarpSize = 32 >
 class BiEllpackSegmentView
 {
 public:
-   static constexpr int
+   [[nodiscard]] static constexpr int
    getWarpSize()
    {
       return WarpSize;
    }
 
-   static constexpr int
+   [[nodiscard]] static constexpr int
    getLogWarpSize()
    {
       static_assert( WarpSize == 32, "nvcc does not allow constexpr log2" );
       return 5;
    }  // TODO: return std::log2( WarpSize ); };
 
-   static constexpr int
+   [[nodiscard]] static constexpr int
    getGroupsCount()
    {
       return getLogWarpSize() + 1;
@@ -52,18 +50,18 @@ public:
                          const IndexType offset,
                          const IndexType inStripIdx,
                          const GroupsWidthType& groupsWidth )
-   : segmentIdx( segmentIdx ), groupOffset( offset ), inStripIdx( inStripIdx ), segmentSize( TNL::sum( groupsWidth ) ),
+   : segmentIdx( segmentIdx ), groupOffset( offset ), inStripIdx( inStripIdx ), segmentSize( noa::TNL::sum( groupsWidth ) ),
      groupsWidth( groupsWidth )
    {}
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSize() const
    {
       return this->segmentSize;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getGlobalIndex( IndexType localIdx ) const
    {
@@ -76,7 +74,7 @@ public:
          offset += groupsWidth[ groupIdx++ ] * groupHeight;
          groupHeight /= 2;
       }
-      TNL_ASSERT_LE( groupIdx, TNL::log2( getWarpSize() - inStripIdx + 1 ), "Local index exceeds segment bounds." );
+      TNL_ASSERT_LE( groupIdx, noa::TNL::log2( getWarpSize() - inStripIdx + 1 ), "Local index exceeds segment bounds." );
       if( Organization == RowMajorOrder ) {
          // std::cerr << " offset = " << offset << " inStripIdx = " << inStripIdx << " localIdx = " << localIdx
          //           << " return = " << offset + inStripIdx * groupsWidth[ groupIdx ] + localIdx << std::endl;
@@ -86,7 +84,7 @@ public:
          return offset + inStripIdx + localIdx * groupHeight;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const IndexType&
    getSegmentIndex() const
    {
@@ -99,6 +97,4 @@ protected:
    GroupsWidthType groupsWidth;
 };
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

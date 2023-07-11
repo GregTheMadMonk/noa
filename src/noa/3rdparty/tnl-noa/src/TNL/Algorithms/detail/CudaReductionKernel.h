@@ -16,9 +16,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MultiDeviceMemoryOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaSupportMissing.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace detail {
+namespace noa::TNL::Algorithms::detail {
 
 #ifdef __CUDACC__
 /* Template for cooperative reduction across the CUDA block of threads.
@@ -610,7 +608,7 @@ protected:
       const Index size = end - begin;
       Cuda::LaunchConfiguration launch_config;
       launch_config.blockSize.x = maxThreadsPerBlock;
-      launch_config.gridSize.x = TNL::min( Cuda::getNumberOfBlocks( size, launch_config.blockSize.x ), desGridSize );
+      launch_config.gridSize.x = noa::TNL::min( Cuda::getNumberOfBlocks( size, launch_config.blockSize.x ), desGridSize );
       // shared memory is allocated statically inside the kernel
 
       // Check just to future-proof the code setting blockSize.x
@@ -649,7 +647,7 @@ protected:
       const Index size = end - begin;
       Cuda::LaunchConfiguration launch_config;
       launch_config.blockSize.x = maxThreadsPerBlock;
-      launch_config.gridSize.x = TNL::min( Cuda::getNumberOfBlocks( size, launch_config.blockSize.x ), desGridSize );
+      launch_config.gridSize.x = noa::TNL::min( Cuda::getNumberOfBlocks( size, launch_config.blockSize.x ), desGridSize );
       // shared memory is allocated statically inside the kernel
 
       // Check just to future-proof the code setting blockSize.x
@@ -683,6 +681,4 @@ protected:
    Index reducedSize;
 };
 
-}  // namespace detail
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::detail

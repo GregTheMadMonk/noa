@@ -13,17 +13,15 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/bitonicSort.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/detail/CudaScanKernel.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 #ifdef __CUDACC__
 
 template< typename Value, typename CMP >
 __device__
 void
-externSort( Containers::ArrayView< Value, TNL::Devices::Cuda > src,
-            Containers::ArrayView< Value, TNL::Devices::Cuda > dst,
+externSort( Containers::ArrayView< Value, noa::TNL::Devices::Cuda > src,
+            Containers::ArrayView< Value, noa::TNL::Devices::Cuda > dst,
             const CMP& Cmp,
             Value* sharedMem )
 {
@@ -33,7 +31,7 @@ externSort( Containers::ArrayView< Value, TNL::Devices::Cuda > src,
 template< typename Value, typename CMP >
 __device__
 void
-externSort( Containers::ArrayView< Value, TNL::Devices::Cuda > src, const CMP& Cmp )
+externSort( Containers::ArrayView< Value, noa::TNL::Devices::Cuda > src, const CMP& Cmp )
 {
    bitonicSort_Block( src, Cmp );
 }
@@ -58,8 +56,8 @@ stackPush( int stackArrBegin[],
 template< typename Value, typename CMP, int stackSize, bool useShared >
 __device__
 void
-singleBlockQuickSort( Containers::ArrayView< Value, TNL::Devices::Cuda > arr,
-                      Containers::ArrayView< Value, TNL::Devices::Cuda > aux,
+singleBlockQuickSort( Containers::ArrayView< Value, noa::TNL::Devices::Cuda > arr,
+                      Containers::ArrayView< Value, noa::TNL::Devices::Cuda > aux,
                       const CMP& Cmp,
                       int _iteration,
                       Value* sharedMem,
@@ -136,10 +134,10 @@ singleBlockQuickSort( Containers::ArrayView< Value, TNL::Devices::Cuda > arr,
       countElem( src.getView( begin, end ), Cmp, smaller, bigger, pivot );
 
       // synchronization is in this function already
-      using BlockScan = Algorithms::detail::CudaBlockScan< Algorithms::detail::ScanType::Inclusive, 0, TNL::Plus, int >;
+      using BlockScan = Algorithms::detail::CudaBlockScan< Algorithms::detail::ScanType::Inclusive, 0, noa::TNL::Plus, int >;
       __shared__ typename BlockScan::Storage storage;
-      int smallerPrefSumInc = BlockScan::scan( TNL::Plus{}, 0, smaller, threadIdx.x, storage );
-      int biggerPrefSumInc = BlockScan::scan( TNL::Plus{}, 0, bigger, threadIdx.x, storage );
+      int smallerPrefSumInc = BlockScan::scan( noa::TNL::Plus{}, 0, smaller, threadIdx.x, storage );
+      int biggerPrefSumInc = BlockScan::scan( noa::TNL::Plus{}, 0, bigger, threadIdx.x, storage );
 
       if( threadIdx.x == blockDim.x - 1 )  // has sum of all smaller and greater elements than pivot in src
       {
@@ -257,6 +255,4 @@ stackPush( int stackArrBegin[],
 
 #endif
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

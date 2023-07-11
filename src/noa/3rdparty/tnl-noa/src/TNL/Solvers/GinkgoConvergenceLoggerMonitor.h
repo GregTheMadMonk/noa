@@ -10,8 +10,7 @@
 
 #include <ginkgo/ginkgo.hpp>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 /**
  * \brief A Ginkgo \e Convergence logger with a TNL iterative solver monitor.
@@ -173,5 +172,4 @@ private:
    }
 };
 
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers

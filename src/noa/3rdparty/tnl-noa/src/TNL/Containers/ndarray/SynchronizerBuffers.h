@@ -10,14 +10,12 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/NDArray.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace detail {
+namespace noa::TNL::Containers::detail {
 
 template< typename DistributedNDArray, std::size_t level >
 struct SynchronizerBuffersLayer
 {
-   SynchronizerBuffersLayer&
+   [[nodiscard]] SynchronizerBuffersLayer&
    getDimBuffers( std::integral_constant< std::size_t, level > )
    {
       return *this;
@@ -81,13 +79,11 @@ struct SynchronizerBuffers : public SynchronizerBuffersLayerHelper< DistributedN
    using SynchronizerBuffersLayerHelper< DistributedNDArray >::getDimBuffers;
 
    template< std::size_t level >
-   auto&
+   [[nodiscard]] auto&
    getDimBuffers()
    {
       return this->getDimBuffers( std::integral_constant< std::size_t, level >{} );
    }
 };
 
-}  // namespace detail
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::detail

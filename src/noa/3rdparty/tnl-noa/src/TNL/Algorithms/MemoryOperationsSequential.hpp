@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperations.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 template< typename Element, typename Index >
 __cuda_callable__
@@ -120,5 +119,4 @@ MemoryOperations< Devices::Sequential >::compare( const Element1* destination, c
    return true;
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

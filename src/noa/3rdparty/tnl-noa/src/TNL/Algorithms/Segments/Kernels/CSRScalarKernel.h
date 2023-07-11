@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/VectorView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/LambdaAdapter.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Index, typename Device >
 struct CSRScalarKernel
@@ -30,15 +28,15 @@ struct CSRScalarKernel
    void
    reset();
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ViewType
    getView();
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstViewType
    getConstView() const;
 
-   static TNL::String
+   [[nodiscard]] static noa::TNL::String
    getKernelType();
 
    template< typename OffsetsView, typename Fetch, typename Reduction, typename ResultKeeper, typename Real, typename... Args >
@@ -53,8 +51,6 @@ struct CSRScalarKernel
                    Args... args );
 };
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Kernels/CSRScalarKernel.hpp>

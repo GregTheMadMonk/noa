@@ -35,6 +35,11 @@
 #include <petscmat.h>
 #endif
 
+#ifdef HAVE_HYPRE
+#include <TNL/Hypre.h>
+#include <TNL/Matrices/HypreCSRMatrix.h>
+#endif
+
 // Uncomment the following line to enable benchmarking the sandbox sparse matrix.
 //#define WITH_TNL_BENCHMARK_SPMV_SANDBOX_MATRIX
 #ifdef WITH_TNL_BENCHMARK_SPMV_SANDBOX_MATRIX
@@ -48,9 +53,7 @@ using namespace TNL::Matrices;
 #include <Benchmarks/SpMV/ReferenceFormats/LightSpMVBenchmark.h>
 #include <Benchmarks/SpMV/ReferenceFormats/CSR5Benchmark.h>
 
-namespace TNL {
-   namespace Benchmarks {
-      namespace SpMV {
+namespace TNL::Benchmarks::SpMV {
 
 using BenchmarkType = TNL::Benchmarks::Benchmark< JsonLogging >;
 
@@ -709,30 +712,12 @@ benchmarkSpmv( BenchmarkType& benchmark,
                const Config::ParameterContainer& parameters,
                bool verboseMR )
 {
-   // The following is another workaround because of a bug in nvcc versions 10 and 11.
-   // If we use the current matrix formats, not the legacy ones, we get
-   // ' error: redefinition of ‘void TNL::Algorithms::__wrapper__device_stub_CudaReductionKernel...'
-   // It seems that there is a problem with lambda functions identification when we create
-   // two instances of TNL::Matrices::SparseMatrix. The second one comes from calling of
-   // `benchmarkSpMV< Real, SparseMatrix_CSR_Scalar >( benchmark, hostOutVector, inputFileName, verboseMR );`
-   // and simillar later in this function.
-#define USE_LEGACY_FORMATS
-#ifdef USE_LEGACY_FORMATS
-   // Here we use 'int' instead of 'Index' because of compatibility with cusparse.
-   using CSRHostMatrix = SpMV::ReferenceFormats::Legacy::CSR< Real, Devices::Host, int >;
-#  ifdef __CUDACC__
-   using CSRCudaMatrix = SpMV::ReferenceFormats::Legacy::CSR< Real, Devices::Cuda, int >;
-   using CusparseMatrix = TNL::CusparseCSRLegacy< Real >;
-   using LightSpMVCSRHostMatrix = SpMV::ReferenceFormats::Legacy::CSR< Real, Devices::Host, uint32_t >;
-   #endif
-#else
    // Here we use 'int' instead of 'Index' because of compatibility with cusparse.
    using CSRHostMatrix = TNL::Matrices::SparseMatrix< Real, TNL::Devices::Host, int >;
    #ifdef __CUDACC__
    using CSRCudaMatrix = TNL::Matrices::SparseMatrix< Real, TNL::Devices::Cuda, int >;
    using CusparseMatrix = TNL::CusparseCSR< Real >;
    #endif
-#endif
 
    using HostVector = Containers::Vector< Real, Devices::Host, int >;
 
@@ -747,7 +732,7 @@ benchmarkSpmv( BenchmarkType& benchmark,
    benchmark.setDatasetSize( datasetSize );
 
    ////
-   // Nonzero elements per row statiistics
+   // Nonzero elements per row statistics
    //
    TNL::Containers::Vector< int > nonzerosPerRow( csrHostMatrix.getRows() );
    TNL::Containers::Vector< double > aux;
@@ -779,9 +764,10 @@ benchmarkSpmv( BenchmarkType& benchmark,
    benchmark.setMetadataWidths({
       { "matrix name", 32 },
       { "format", 46 },
+      { "threads", 5 },
    });
 
-   HostVector hostInVector( csrHostMatrix.getRows() ), hostOutVector( csrHostMatrix.getRows() );
+   HostVector hostInVector( csrHostMatrix.getColumns() ), hostOutVector( csrHostMatrix.getRows() );
 
    auto resetHostVectors = [&]() {
       hostInVector = 1.0;
@@ -793,8 +779,17 @@ benchmarkSpmv( BenchmarkType& benchmark,
    };
 
    SpmvBenchmarkResult< Real, Devices::Host, int > csrBenchmarkResults( hostOutVector, hostOutVector );
-   benchmark.setMetadataElement({ "format", "CSR" });
-   benchmark.time< Devices::Host >( resetHostVectors, "CPU", spmvCSRHost, csrBenchmarkResults );
+   const int maxThreadsCount = Devices::Host::getMaxThreadsCount();
+   int threads = 1;
+   while( true ) {
+      benchmark.setMetadataElement({ "format", "CSR" });
+      benchmark.setMetadataElement({ "threads", convertToString( threads ).getString() });
+      Devices::Host::setMaxThreadsCount( threads );
+      benchmark.time< Devices::Host >( resetHostVectors, "CPU", spmvCSRHost, csrBenchmarkResults );
+      if( threads == maxThreadsCount )
+         break;
+      threads = min( 2 * threads, maxThreadsCount );
+   }
 
 #ifdef HAVE_PETSC
    Mat petscMatrix;
@@ -826,6 +821,41 @@ benchmarkSpmv( BenchmarkType& benchmark,
    benchmark.time< Devices::Host >( resetPetscVectors, "CPU", petscSpmvCSRHost, petscBenchmarkResults );
 #endif
 
+#if defined( HAVE_HYPRE ) && ! defined( HYPRE_USING_CUDA )
+   // Initialize HYPRE and set some global options, notably HYPRE_SetSpGemmUseCusparse(0);
+   if constexpr( std::is_same< HYPRE_Real, Real >::value &&
+                 std::is_same< HYPRE_Int, int >::value ) {
+      TNL::Hypre hypre;
+      using HypreCSR = TNL::Matrices::HypreCSRMatrix;
+      HypreCSR hypreCSRMatrix( csrHostMatrix.getRows(),
+                               csrHostMatrix.getColumns(),
+                               csrHostMatrix.getValues().getView(),
+                               csrHostMatrix.getColumnIndexes().getView(),
+                               csrHostMatrix.getSegments().getOffsets().getView());
+      auto hostInVectorView = hostInVector.getView();
+      auto hostOutVectorView = hostOutVector.getView();
+
+      auto spmvHypreCSRHost = [&]() {
+         hypreCSRMatrix.vectorProduct( hostInVectorView, hostOutVectorView );
+      };
+
+      SpmvBenchmarkResult< Real, Devices::Host, int > hypreBenchmarkResults( hostOutVector, hostOutVector );
+      threads = 1;
+      while( true ) {
+         benchmark.setMetadataElement({ "format", "Hypre" });
+         benchmark.setMetadataElement({ "threads", convertToString( threads ).getString() });
+         Devices::Host::setMaxThreadsCount( threads );
+         benchmark.time< Devices::Host >( resetHostVectors, "CPU", spmvHypreCSRHost, hypreBenchmarkResults );
+         if( threads == maxThreadsCount )
+            break;
+         threads = min( 2 * threads, maxThreadsCount );
+      }
+   }
+   else {
+      std::cerr << "Current Real or Index type does not agree with HYPRE_Real or HYPRE_Index." << std::endl;
+   }
+#endif
+
 
 #ifdef __CUDACC__
    using CudaVector = Containers::Vector< Real, Devices::Cuda, int >;
@@ -838,12 +868,12 @@ benchmarkSpmv( BenchmarkType& benchmark,
    CSRCudaMatrix csrCudaMatrix;
    csrCudaMatrix = csrHostMatrix;
 
-   CusparseMatrix cusparseMatrix;
-   cusparseMatrix.init( csrCudaMatrix, &cusparseHandle );
-
    CudaVector cudaInVector( csrCudaMatrix.getColumns() ), cudaOutVector( csrCudaMatrix.getRows() );
 
-   auto resetCusparseVectors = [&]() {
+   CusparseMatrix cusparseMatrix;
+   cusparseMatrix.init( csrCudaMatrix, cudaInVector, cudaOutVector, &cusparseHandle );
+
+   auto resetCudaVectors = [&]() {
       cudaInVector = 1.0;
       cudaOutVector = 0.0;
    };
@@ -854,7 +884,34 @@ benchmarkSpmv( BenchmarkType& benchmark,
 
    SpmvBenchmarkResult< Real, Devices::Cuda, int > cudaBenchmarkResults( hostOutVector, cudaOutVector );
    benchmark.setMetadataElement({ "format", "cusparse" });
-   benchmark.time< Devices::Cuda >( resetCusparseVectors, "GPU", spmvCusparse, cudaBenchmarkResults );
+   benchmark.time< Devices::Cuda >( resetCudaVectors, "GPU", spmvCusparse, cudaBenchmarkResults );
+
+#if defined( HAVE_HYPRE ) && defined( HYPRE_USING_CUDA )
+   // Initialize HYPRE and set some global options, notably HYPRE_SetSpGemmUseCusparse(0);
+   if constexpr( std::is_same< HYPRE_Real, Real >::value &&
+                 std::is_same< HYPRE_Int, int >::value ) {
+      TNL::Hypre hypre;
+      using HypreCSR = TNL::Matrices::HypreCSRMatrix;
+      HypreCSR hypreCSRMatrix( csrCudaMatrix.getRows(),
+                               csrCudaMatrix.getColumns(),
+                               csrCudaMatrix.getValues().getView(),
+                               csrCudaMatrix.getColumnIndexes().getView(),
+                               csrCudaMatrix.getSegments().getOffsets().getView());
+      auto cudaInVectorView = cudaInVector.getView();
+      auto cudaOutVectorView = cudaOutVector.getView();
+
+      auto spmvHypreCSRCuda = [&]() {
+         hypreCSRMatrix.vectorProduct( cudaInVectorView, cudaOutVectorView );
+      };
+
+      SpmvBenchmarkResult< Real, Devices::Cuda, int > hypreCudaBenchmarkResults( hostOutVector, cudaOutVector );
+      benchmark.setMetadataElement({ "format", "Hypre" });
+      benchmark.time< Devices::Cuda >( resetCudaVectors, "GPU", spmvHypreCSRCuda, hypreCudaBenchmarkResults );
+   }
+   else {
+      std::cerr << "Current Real or Index type does not agree with HYPRE_Real or HYPRE_Index." << std::endl;
+   }
+#endif
 
 #ifdef HAVE_CSR5
    ////
@@ -873,11 +930,17 @@ benchmarkSpmv( BenchmarkType& benchmark,
    csrCudaMatrix.reset();
 #endif
 
+// FIXME: LightSpMV fails with CUDA 12
+#if __CUDACC_VER_MAJOR__ < 12
    ////
    // Perform benchmark on CUDA device with LightSpMV as a reference GPU format
    //
+   using LightSpMVCSRHostMatrix = SpMV::ReferenceFormats::Legacy::CSR< Real, Devices::Host, uint32_t >;
    LightSpMVCSRHostMatrix lightSpMVCSRHostMatrix;
-   lightSpMVCSRHostMatrix = csrHostMatrix;
+   lightSpMVCSRHostMatrix.setDimensions( csrHostMatrix.getRows(), csrHostMatrix.getColumns() );
+   lightSpMVCSRHostMatrix.getValues() = csrHostMatrix.getValues();
+   lightSpMVCSRHostMatrix.getColumnIndexes() = csrHostMatrix.getColumnIndexes();
+   lightSpMVCSRHostMatrix.getRowPointers() = csrHostMatrix.getSegments().getOffsets();
    LightSpMVBenchmark< Real > lightSpMVBenchmark( lightSpMVCSRHostMatrix, LightSpMVBenchmarkKernelVector );
    auto resetLightSpMVVectors = [&]() {
       lightSpMVBenchmark.resetVectors();
@@ -893,6 +956,7 @@ benchmarkSpmv( BenchmarkType& benchmark,
    benchmark.setMetadataElement({ "format", "LightSpMV Warp" });
    benchmark.time< Devices::Cuda >( resetLightSpMVVectors, "GPU", spmvLightSpMV, cudaBenchmarkResults );
 #endif
+#endif
    csrHostMatrix.reset();
 
    /////
@@ -904,7 +968,12 @@ benchmarkSpmv( BenchmarkType& benchmark,
    /////
    // Benchmarking TNL formats
    //
+#if ! defined ( __CUDACC__ )
+   if(  parameters.getParameter< bool >( "with-all-cpu-tests" ) )
+      dispatchSpMV< Real >( benchmark, hostOutVector, inputFileName, parameters, verboseMR );
+#else
    dispatchSpMV< Real >( benchmark, hostOutVector, inputFileName, parameters, verboseMR );
+#endif
 
    /////
    // Benchmarking symmetric sparse matrices
@@ -949,6 +1018,4 @@ extern template void dispatchSymmetric< double >( BenchmarkType&, const Containe
 extern template void dispatchSymmetricBinary< float >( BenchmarkType&, const Matrices::SparseMatrix< float, Devices::Host >&, const Containers::Vector< float, Devices::Host, int >&, const String&, const Config::ParameterContainer&, bool );
 extern template void dispatchSymmetricBinary< double >( BenchmarkType&, const Matrices::SparseMatrix< float, Devices::Host >&, const Containers::Vector< double, Devices::Host, int >&, const String&, const Config::ParameterContainer&, bool );
 
-      } // namespace SpMV
-   } // namespace Benchmarks
-} // namespace TNL
+} // namespace TNL::Benchmarks::SpMV

@@ -17,8 +17,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polyhedron.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/IsDynamicTopology.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename MeshConfig, typename Device, typename EntityTopology >
 class MeshEntity;
@@ -111,5 +110,4 @@ public:
    using DualGraph = Matrices::SparseMatrix< bool, Device, GlobalIndexType, Matrices::GeneralMatrix, SlicedEllpackSegments >;
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

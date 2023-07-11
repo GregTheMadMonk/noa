@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/VTIWriter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/DistributedGrid.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 // NOTE: Grid should be the local grid type, not DistributedMesh<Grid<...>>
 template< typename Grid >
@@ -118,8 +116,6 @@ protected:
    closePPointData();
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/PVTIWriter.hpp>

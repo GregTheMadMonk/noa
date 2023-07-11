@@ -8,17 +8,17 @@
 
 #pragma once
 
+#include <noa/3rdparty/tnl-noa/src/TNL/DiscreteMath.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Functional.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/task.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/quicksort_kernel.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/quicksort_1Block.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/Quicksorter.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/reduce.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/scan.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 template< typename Value >
 template< typename Array, typename Compare >
@@ -302,7 +302,7 @@ getSetsNeededFunction( int elemPerBlock, const Quicksorter< Value, Devices::Cuda
       int size = task.partitionEnd - task.partitionBegin;
       return size / elemPerBlock + ( size % elemPerBlock != 0 );
    };
-   return reduce< Devices::Cuda >( 0, quicksort.host_1stPhaseTasksAmount, fetch, TNL::Plus{} );
+   return reduce< Devices::Cuda >( 0, quicksort.host_1stPhaseTasksAmount, fetch, noa::TNL::Plus{} );
 }
 
 template< typename Value >
@@ -341,14 +341,18 @@ Quicksorter< Value, Devices::Cuda >::initTasks( int elemPerBlock, const CMP& Cmp
    auto& tasks = iteration % 2 == 0 ? cuda_tasks : cuda_newTasks;
 
    //--------------------------------------------------------
-   Cuda::LaunchConfiguration launch_config;
-   launch_config.blockSize.x = threadsPerBlock;
-   launch_config.gridSize.x = host_1stPhaseTasksAmount / threadsPerBlock + ( host_1stPhaseTasksAmount % threadsPerBlock != 0 );
-   Cuda::launchKernelSync( cudaCalcBlocksNeeded< int >,
-                           launch_config,
-                           tasks.getView( 0, host_1stPhaseTasksAmount ),
-                           elemPerBlock,
-                           cuda_reductionTaskInitMem.getView( 0, host_1stPhaseTasksAmount ) );
+   {
+      const auto& cuda_tasks = tasks.getConstView( 0, host_1stPhaseTasksAmount );
+      auto blocksNeeded = cuda_reductionTaskInitMem.getView( 0, host_1stPhaseTasksAmount );
+      parallelFor< Devices::Cuda >( 0,
+                                    host_1stPhaseTasksAmount,
+                                    [ = ] __cuda_callable__( int i ) mutable
+                                    {
+                                       const TASK& task = cuda_tasks[ i ];
+                                       int size = task.partitionEnd - task.partitionBegin;
+                                       blocksNeeded[ i ] = noa::TNL::roundUpDivision( size, elemPerBlock );
+                                    } );
+   }
    // cuda_reductionTaskInitMem[i] == how many blocks task i needs
 
    inplaceInclusiveScan( cuda_reductionTaskInitMem );
@@ -361,6 +365,8 @@ Quicksorter< Value, Devices::Cuda >::initTasks( int elemPerBlock, const CMP& Cmp
       return blocksNeeded;
 
    //--------------------------------------------------------
+   Cuda::LaunchConfiguration launch_config;
+   launch_config.blockSize.x = threadsPerBlock;
    launch_config.gridSize.x = host_1stPhaseTasksAmount;
    Cuda::launchKernelSync(
       cudaInitTask< Value, CMP >,
@@ -383,6 +389,4 @@ Quicksorter< Value, Devices::Cuda >::processNewTasks()
    host_2ndPhaseTasksAmount = min( cuda_2ndPhaseTasksAmount.getElement( 0 ), maxTasks );
 }
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

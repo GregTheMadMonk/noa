@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/BuildConfigTags.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/BuildConfigTags.h>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 class FastBuildConfigTag
 {};
@@ -101,6 +100,4 @@ struct GridIndexTag< Solvers::FastBuildConfigTag, long int >
    static constexpr bool enabled = false;
 };
 
-}  // namespace BuildConfigTags
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers

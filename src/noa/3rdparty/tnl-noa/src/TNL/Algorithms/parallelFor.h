@@ -11,14 +11,13 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/detail/ParallelFor3D.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeTraits.h>
 
-namespace noa::TNL {
 /**
  * \brief Namespace for fundamental TNL algorithms
  *
  * It contains algorithms like for-loops, memory operations, (parallel) reduction,
  * multireduction, scan etc.
  */
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 /**
  * \brief Parallel for-loop function for 1D range specified with integral values.
@@ -68,8 +67,8 @@ parallelFor( const Begin& begin, const End& end, Function f, FunctionArgs... arg
  * \brief Parallel for-loop function for range specified with multi-index values.
  *
  * \tparam Device is a type of the device where the reduction will be performed.
- * \tparam Begin must satisfy the constraints checked by the \ref TNL::IsStaticArrayType type trait.
- * \tparam End must satisfy the constraints checked by the \ref TNL::IsStaticArrayType type trait.
+ * \tparam Begin must satisfy the constraints checked by the \ref noa::TNL::IsStaticArrayType type trait.
+ * \tparam End must satisfy the constraints checked by the \ref noa::TNL::IsStaticArrayType type trait.
  *
  * \param begin is the left bound of the iteration range `[begin, end)`.
  * \param end is the right bound of the iteration range `[begin, end)`.
@@ -123,5 +122,4 @@ parallelFor( const Begin& begin, const End& end, Function f, FunctionArgs... arg
    parallelFor< Device >( begin, end, launch_config, f, args... );
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

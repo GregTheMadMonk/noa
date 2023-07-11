@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/Euler.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 template< typename Vector, typename SolverMonitor >
 void
@@ -82,7 +80,7 @@ Euler< Vector, SolverMonitor >::solve( VectorType& _u, RHSFunction&& rhsFunction
             continue;
          }
       }
-      this->setResidue( addAndReduceAbs( u, currentTau * k1, TNL::Plus(), (RealType) 0.0 )
+      this->setResidue( addAndReduceAbs( u, currentTau * k1, noa::TNL::Plus(), (RealType) 0.0 )
                         / ( currentTau * (RealType) u.getSize() ) );
 
       /////
@@ -116,6 +114,4 @@ Euler< Vector, SolverMonitor >::solve( VectorType& _u, RHSFunction&& rhsFunction
    return false;  // just to avoid warnings
 }
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE

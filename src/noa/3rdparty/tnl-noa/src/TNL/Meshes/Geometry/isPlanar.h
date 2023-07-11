@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Geometry/getEntityMeasure.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 // Polygon
 template< typename MeshConfig, typename Device, std::enable_if_t< MeshConfig::spaceDimension == 3, bool > = true >
@@ -34,5 +33,4 @@ isPlanar( const Mesh< MeshConfig, Device >& mesh,
    return true;
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

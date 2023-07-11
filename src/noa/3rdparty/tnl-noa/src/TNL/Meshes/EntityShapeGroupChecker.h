@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/staticFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/EntityShapeGroup.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace VTK {
+namespace noa::TNL::Meshes::VTK {
 
 template< EntityShape GeneralShape_ >
 class EntityShapeGroupChecker
@@ -46,6 +44,4 @@ public:
    }
 };
 
-}  // namespace VTK
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::VTK

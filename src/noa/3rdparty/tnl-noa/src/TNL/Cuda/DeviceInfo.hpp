@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/DeviceInfo.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaSupportMissing.h>
 
-namespace noa::TNL {
-namespace Cuda {
+namespace noa::TNL::Cuda {
 
 inline int
 DeviceInfo::getNumberOfDevices()
@@ -232,5 +231,4 @@ DeviceInfo::getRegistersPerMultiprocessor( int deviceNum )
 #endif
 }
 
-}  // namespace Cuda
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Cuda

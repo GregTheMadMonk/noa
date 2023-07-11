@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/SubentityVertexMap.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 /****
  * Basic structure for mesh configuration.
@@ -85,5 +84,4 @@ struct DefaultConfig
    static constexpr int dualGraphMinCommonVertices = meshDimension;
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

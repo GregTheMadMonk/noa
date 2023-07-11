@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaRuntimeError.h>
 
-namespace noa::TNL {
-namespace Cuda {
+namespace noa::TNL::Cuda {
 
 #ifdef __CUDACC__
 /****
@@ -29,8 +28,7 @@ checkDevice()
 {}
 #endif
 
-}  // namespace Cuda
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Cuda
 
 #ifdef __CUDACC__
    #define TNL_CHECK_CUDA_DEVICE ::noa::TNL::Cuda::checkDevice( __FILE__, __LINE__, cudaGetLastError() )

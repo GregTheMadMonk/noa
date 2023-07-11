@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polyhedron.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Geometry/getEntityCenter.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 enum class EntityDecomposerVersion
 {
@@ -244,5 +243,4 @@ private:
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

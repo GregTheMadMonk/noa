@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/reduce.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/Sandbox/SparseSandboxMatrix.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace Sandbox {
+namespace noa::TNL::Matrices::Sandbox {
 
 template< typename Real, typename Device, typename Index, typename MatrixType, typename RealAllocator, typename IndexAllocator >
 SparseSandboxMatrix< Real, Device, Index, MatrixType, RealAllocator, IndexAllocator >::SparseSandboxMatrix(
@@ -51,7 +49,7 @@ SparseSandboxMatrix< Real, Device, Index, MatrixType, RealAllocator, IndexAlloca
 }
 
 template< typename Real, typename Device, typename Index, typename MatrixType, typename RealAllocator, typename IndexAllocator >
-template< typename RowCapacitiesVector, std::enable_if_t< TNL::IsArrayType< RowCapacitiesVector >::value, int > >
+template< typename RowCapacitiesVector, std::enable_if_t< noa::TNL::IsArrayType< RowCapacitiesVector >::value, int > >
 SparseSandboxMatrix< Real, Device, Index, MatrixType, RealAllocator, IndexAllocator >::SparseSandboxMatrix(
    const RowCapacitiesVector& rowCapacities,
    const IndexType columns,
@@ -920,6 +918,4 @@ SparseSandboxMatrix< Real, Device, Index, MatrixType, RealAllocator, IndexAlloca
    return this->columnIndexes;
 }
 
-}  // namespace Sandbox
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::Sandbox

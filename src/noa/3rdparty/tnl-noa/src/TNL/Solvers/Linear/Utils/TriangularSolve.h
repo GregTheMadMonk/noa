@@ -8,9 +8,7 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 /*
  * Solves `x` from `Lx = b`, where L is a square lower triangular matrix with
@@ -109,6 +107,4 @@ triangularSolveUpper( const Matrix& U, Vector1& x, const Vector2& b )
    }
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear

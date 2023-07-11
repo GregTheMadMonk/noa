@@ -6,8 +6,7 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 enum DomainType
 {
@@ -24,18 +23,17 @@ class Domain
 public:
    using DeviceType = void;
 
-   static constexpr int
+   [[nodiscard]] static constexpr int
    getDomainDimension()
    {
       return Dimension;
    }
 
-   static constexpr DomainType
+   [[nodiscard]] static constexpr DomainType
    getDomainType()
    {
       return DomainType_;
    }
 };
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

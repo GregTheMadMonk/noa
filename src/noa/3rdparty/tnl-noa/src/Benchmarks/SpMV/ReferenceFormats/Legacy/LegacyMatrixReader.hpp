@@ -7,11 +7,7 @@
 #include <TNL/Timer.h>
 #include <TNL/Matrices/MatrixReader.h>
 
-namespace TNL {
-   namespace Benchmarks {
-      namespace SpMV {
-         namespace ReferenceFormats {
-            namespace Legacy {
+namespace TNL::Benchmarks::SpMV::ReferenceFormats::Legacy {
 
 
 template< typename Matrix >
@@ -155,8 +151,8 @@ bool LegacyMatrixReader< Matrix >::checkMtxHeader( const String& header,
    if( parsedLine[ 2 ] != "coordinates" &&
        parsedLine[ 2 ] != "coordinate" )
       throw std::runtime_error( std::string( "Error: Only 'coordinates' format is supported now, not " ) + parsedLine[ 2 ].getString() );
-   if( parsedLine[ 3 ] != "real" )
-      throw std::runtime_error( std::string( "Only 'real' matrices are supported, not " ) + parsedLine[ 3 ].getString() );
+   if( parsedLine[ 3 ] != "real" && parsedLine[ 3 ] != "integer" )
+      throw std::runtime_error( std::string( "Only 'real' and 'integer' matrices are supported, not " ) + parsedLine[ 3 ].getString() );
    if( parsedLine[ 4 ] != "general" )
    {
       if( parsedLine[ 4 ] == "symmetric" )
@@ -390,8 +386,4 @@ class MatrixReaderDeviceDependentCode< Devices::Cuda >
 };
 /// \endcond
 
-            }// namespace Legacy
-         }// namespace ReferenceFormats
-      }// namespace SpMV
-   } // namespace Benchmarks
-} // namespace TNL
+} // namespace TNL::Benchmarks::SpMV::ReferenceFormats::Legacy

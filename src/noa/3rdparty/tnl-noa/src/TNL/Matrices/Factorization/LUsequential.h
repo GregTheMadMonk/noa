@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace Factorization {
+namespace noa::TNL::Matrices::Factorization {
 
 template< typename Matrix >
 __cuda_callable__
@@ -78,6 +76,4 @@ LU_sequential_solve( const Matrix& A, const Vector1& b, Vector2& x )
    LU_sequential_solve_inplace( A, x );
 }
 
-}  // namespace Factorization
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::Factorization

@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/Domain.h>
 
-namespace noa::TNL {
-namespace Operators {
-namespace Analytic {
+namespace noa::TNL::Operators::Analytic {
 
 template< int Dimensions, typename Real = double >
 class Heaviside : public Functions::Domain< Dimensions, Functions::SpaceDomain >
@@ -64,6 +62,4 @@ protected:
    RealType multiplicator;
 };
 
-}  // namespace Analytic
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators::Analytic

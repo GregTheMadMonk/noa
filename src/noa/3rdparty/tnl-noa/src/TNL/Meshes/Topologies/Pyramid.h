@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/SubentityVertexCount.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polygon.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Topologies {
+namespace noa::TNL::Meshes::Topologies {
 
 struct Pyramid
 {
@@ -245,6 +243,4 @@ struct SubentityVertexMap< Pyramid, Polygon, 4, 2 >
    static constexpr int index = 4;
 };
 
-}  // namespace Topologies
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Topologies

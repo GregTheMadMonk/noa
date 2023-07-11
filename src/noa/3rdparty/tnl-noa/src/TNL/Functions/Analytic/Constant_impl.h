@@ -6,9 +6,7 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Functions {
-namespace Analytic {
+namespace noa::TNL::Functions::Analytic {
 
 template< int Dimension, typename Real >
 __cuda_callable__
@@ -54,6 +52,4 @@ Constant< Dimension, Real >::getPartialDerivative( const PointType& v, const Rea
    return constant;
 }
 
-}  // namespace Analytic
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions::Analytic

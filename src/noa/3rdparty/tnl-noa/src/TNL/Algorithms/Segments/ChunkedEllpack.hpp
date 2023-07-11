@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/ChunkedEllpack.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Ellpack.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization >
 template< typename SizesContainer >
@@ -35,7 +33,7 @@ std::string
 ChunkedEllpack< Device, Index, IndexAllocator, Organization >::getSerializationType()
 {
    // FIXME: the serialized data DEPEND on the Organization parameter, so it should be reflected in the serialization type
-   return "ChunkedEllpack< [any_device], " + TNL::getSerializationType< IndexType >() + " >";
+   return "ChunkedEllpack< [any_device], " + noa::TNL::getSerializationType< IndexType >() + " >";
 }
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization >
@@ -160,7 +158,7 @@ ChunkedEllpack< Device, Index, IndexAllocator, Organization >::setSlice( Segment
    IndexType maxChunkInSlice( 0 );
    for( IndexType i = sliceBegin; i < sliceEnd; i++ ) {
       TNL_ASSERT_NE( this->rowToChunkMapping[ i ], 0, "" );
-      maxChunkInSlice = TNL::max( maxChunkInSlice, roundUpDivision( rowLengths[ i ], this->rowToChunkMapping[ i ] ) );
+      maxChunkInSlice = noa::TNL::max( maxChunkInSlice, roundUpDivision( rowLengths[ i ], this->rowToChunkMapping[ i ] ) );
    }
 
    /****
@@ -415,6 +413,4 @@ ChunkedEllpack< Device, Index, IndexAllocator, Organization >::printStructure( s
    this->getView().printStructure( str );
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

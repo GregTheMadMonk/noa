@@ -10,9 +10,7 @@
 
 #include <algorithm>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 struct STLSort
 {
@@ -29,6 +27,4 @@ struct STLSort
    }
 };
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

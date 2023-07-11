@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/Analytic/SinWave.h>
 
-namespace noa::TNL {
-namespace Functions {
-namespace Analytic {
+namespace noa::TNL::Functions::Analytic {
 
 template< int dimensions, typename Real >
 SinWaveBase< dimensions, Real >::SinWaveBase() : waveLength( 1.0 ), amplitude( 1.0 ), phase( 0 ), wavesNumber( 0 )
@@ -23,7 +21,7 @@ SinWaveBase< dimensions, Real >::setup( const Config::ParameterContainer& parame
    this->waveLength = parameters.getParameter< double >( prefix + "wave-length" );
    this->amplitude = parameters.getParameter< double >( prefix + "amplitude" );
    this->phase = parameters.getParameter< double >( prefix + "phase" );
-   parameters.getParameter< double >( prefix + "waves-number" );
+   this->wavesNumber = parameters.getParameter< double >( prefix + "waves-number" );
    return true;
 }
 
@@ -79,7 +77,7 @@ SinWave< 1, Real >::getPartialDerivative( const PointType& v, const Real& time )
    if( YDiffOrder != 0 || ZDiffOrder != 0 )
       return 0.0;
    if( XDiffOrder == 0 ) {
-      RealType arg = 2.0 * TNL::pi * x / this->waveLength;
+      RealType arg = 2.0 * noa::TNL::pi * x / this->waveLength;
       if( this->wavesNumber ) {
          if( abs( arg ) > this->wavesNumber )
             arg = sign( x ) * this->wavesNumber;
@@ -89,10 +87,10 @@ SinWave< 1, Real >::getPartialDerivative( const PointType& v, const Real& time )
       return this->amplitude * ::sin( this->phase + arg );
    }
    if( XDiffOrder == 1 )
-      return 2.0 * TNL::pi / this->waveLength * this->amplitude * ::cos( this->phase + 2.0 * TNL::pi * x / this->waveLength );
+      return 2.0 * noa::TNL::pi / this->waveLength * this->amplitude * ::cos( this->phase + 2.0 * noa::TNL::pi * x / this->waveLength );
    if( XDiffOrder == 2 )
-      return -4.0 * TNL::pi * TNL::pi / ( this->waveLength * this->waveLength ) * this->amplitude
-           * ::sin( this->phase + 2.0 * TNL::pi * x / this->waveLength );
+      return -4.0 * noa::TNL::pi * noa::TNL::pi / ( this->waveLength * this->waveLength ) * this->amplitude
+           * ::sin( this->phase + 2.0 * noa::TNL::pi * x / this->waveLength );
    return 0.0;
 }
 
@@ -115,31 +113,31 @@ SinWave< 2, Real >::getPartialDerivative( const PointType& v, const Real& time )
    if( ZDiffOrder != 0 )
       return 0.0;
    if( XDiffOrder == 0 && YDiffOrder == 0 ) {
-      return this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
+      return this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
    }
    if( XDiffOrder == 1 && YDiffOrder == 0 )
-      return 2.0 * TNL::pi * x / ( this->waveLength * ::sqrt( x * x + y * y ) ) * this->amplitude
-           * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
+      return 2.0 * noa::TNL::pi * x / ( this->waveLength * ::sqrt( x * x + y * y ) ) * this->amplitude
+           * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
    if( XDiffOrder == 2 && YDiffOrder == 0 )
-      return 2.0 * TNL::pi * x * x
+      return 2.0 * noa::TNL::pi * x * x
               / ( this->waveLength * ::sqrt( x * x + y * y ) * ::sqrt( x * x + y * y ) * ::sqrt( x * x + y * y ) )
-              * this->amplitude * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
-           - 4.0 * TNL::pi * TNL::pi * x * x / ( this->waveLength * this->waveLength * ( x * x + y * y ) ) * this->amplitude
-                * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
+              * this->amplitude * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
+           - 4.0 * noa::TNL::pi * noa::TNL::pi * x * x / ( this->waveLength * this->waveLength * ( x * x + y * y ) ) * this->amplitude
+                * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
    if( XDiffOrder == 0 && YDiffOrder == 1 )
-      return 2.0 * TNL::pi * y / ( this->waveLength * ::sqrt( x * x + y * y ) ) * this->amplitude
-           * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
+      return 2.0 * noa::TNL::pi * y / ( this->waveLength * ::sqrt( x * x + y * y ) ) * this->amplitude
+           * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
    if( XDiffOrder == 0 && YDiffOrder == 2 )
-      return 2.0 * TNL::pi * y * y
+      return 2.0 * noa::TNL::pi * y * y
               / ( this->waveLength * ::sqrt( x * x + y * y ) * ::sqrt( x * x + y * y ) * ::sqrt( x * x + y * y ) )
-              * this->amplitude * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
-           - 4.0 * TNL::pi * TNL::pi * y * y / ( this->waveLength * this->waveLength * ( x * x + y * y ) ) * this->amplitude
-                * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
+              * this->amplitude * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
+           - 4.0 * noa::TNL::pi * noa::TNL::pi * y * y / ( this->waveLength * this->waveLength * ( x * x + y * y ) ) * this->amplitude
+                * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength );
    if( XDiffOrder == 1 && YDiffOrder == 1 )
-      return -4.0 * TNL::pi * TNL::pi * x * y / ( this->waveLength * this->waveLength * ( x * x + y * y ) ) * this->amplitude
-              * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
-           - 2.0 * TNL::pi * this->amplitude * x * y
-                * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
+      return -4.0 * noa::TNL::pi * noa::TNL::pi * x * y / ( this->waveLength * this->waveLength * ( x * x + y * y ) ) * this->amplitude
+              * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
+           - 2.0 * noa::TNL::pi * this->amplitude * x * y
+                * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y ) / this->waveLength )
                 / ( this->waveLength * ::sqrt( ( x * x + y * y ) * ( x * x + y * y ) * ( x * x + y * y ) ) );
    return 0.0;
 }
@@ -162,57 +160,57 @@ SinWave< 3, Real >::getPartialDerivative( const PointType& v, const Real& time )
    const RealType& y = v.y();
    const RealType& z = v.z();
    if( XDiffOrder == 0 && YDiffOrder == 0 && ZDiffOrder == 0 ) {
-      return this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
+      return this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
    }
    if( XDiffOrder == 1 && YDiffOrder == 0 && ZDiffOrder == 0 )
-      return 2.0 * TNL::pi * x / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) ) * this->amplitude
-           * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
+      return 2.0 * noa::TNL::pi * x / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) ) * this->amplitude
+           * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
    if( XDiffOrder == 2 && YDiffOrder == 0 && ZDiffOrder == 0 )
-      return 2.0 * TNL::pi * ( y * y + z * z )
+      return 2.0 * noa::TNL::pi * ( y * y + z * z )
               / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) * ::sqrt( x * x + y * y + z * z )
                   * ::sqrt( x * x + y * y + z * z ) )
-              * this->amplitude * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
-           - 4.0 * TNL::pi * TNL::pi * x * x / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
-                * this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
+              * this->amplitude * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+           - 4.0 * noa::TNL::pi * noa::TNL::pi * x * x / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
+                * this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
    if( XDiffOrder == 0 && YDiffOrder == 1 && ZDiffOrder == 0 )
-      return 2.0 * TNL::pi * y / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) ) * this->amplitude
-           * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
+      return 2.0 * noa::TNL::pi * y / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) ) * this->amplitude
+           * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
    if( XDiffOrder == 0 && YDiffOrder == 2 && ZDiffOrder == 0 )
-      return 2.0 * TNL::pi * ( x * x + z * z )
+      return 2.0 * noa::TNL::pi * ( x * x + z * z )
               / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) * ::sqrt( x * x + y * y + z * z )
                   * ::sqrt( x * x + y * y + z * z ) )
-              * this->amplitude * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
-           - 4.0 * TNL::pi * TNL::pi * y * y / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
-                * this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
+              * this->amplitude * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+           - 4.0 * noa::TNL::pi * noa::TNL::pi * y * y / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
+                * this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
    if( XDiffOrder == 0 && YDiffOrder == 0 && ZDiffOrder == 1 )
-      return 2.0 * TNL::pi * z / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) ) * this->amplitude
-           * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
+      return 2.0 * noa::TNL::pi * z / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) ) * this->amplitude
+           * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
    if( XDiffOrder == 0 && YDiffOrder == 0 && ZDiffOrder == 2 )
-      return 2.0 * TNL::pi * ( x * x + y * y )
+      return 2.0 * noa::TNL::pi * ( x * x + y * y )
               / ( this->waveLength * ::sqrt( x * x + y * y + z * z ) * ::sqrt( x * x + y * y + z * z )
                   * ::sqrt( x * x + y * y + z * z ) )
-              * this->amplitude * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
-           - 4.0 * TNL::pi * TNL::pi * z * z / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
-                * this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
+              * this->amplitude * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+           - 4.0 * noa::TNL::pi * noa::TNL::pi * z * z / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
+                * this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength );
    if( XDiffOrder == 1 && YDiffOrder == 1 && ZDiffOrder == 0 )
-      return -4.0 * TNL::pi * TNL::pi * x * y / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
-              * this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
-           - 2.0 * TNL::pi * this->amplitude * x * y
-                * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+      return -4.0 * noa::TNL::pi * noa::TNL::pi * x * y / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
+              * this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+           - 2.0 * noa::TNL::pi * this->amplitude * x * y
+                * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
                 / ( this->waveLength
                     * ::sqrt( ( x * x + y * y + z * z ) * ( x * x + y * y + z * z ) * ( x * x + y * y + z * z ) ) );
    if( XDiffOrder == 1 && YDiffOrder == 0 && ZDiffOrder == 1 )
-      return -4.0 * TNL::pi * TNL::pi * x * z / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
-              * this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
-           - 2.0 * TNL::pi * this->amplitude * x * z
-                * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+      return -4.0 * noa::TNL::pi * noa::TNL::pi * x * z / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
+              * this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+           - 2.0 * noa::TNL::pi * this->amplitude * x * z
+                * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
                 / ( this->waveLength
                     * ::sqrt( ( x * x + y * y + z * z ) * ( x * x + y * y + z * z ) * ( x * x + y * y + z * z ) ) );
    if( XDiffOrder == 0 && YDiffOrder == 1 && ZDiffOrder == 1 )
-      return -4.0 * TNL::pi * TNL::pi * z * y / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
-              * this->amplitude * ::sin( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
-           - 2.0 * TNL::pi * this->amplitude * z * y
-                * ::cos( this->phase + 2.0 * TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+      return -4.0 * noa::TNL::pi * noa::TNL::pi * z * y / ( this->waveLength * this->waveLength * ( x * x + y * y + z * z ) )
+              * this->amplitude * ::sin( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
+           - 2.0 * noa::TNL::pi * this->amplitude * z * y
+                * ::cos( this->phase + 2.0 * noa::TNL::pi * ::sqrt( x * x + y * y + z * z ) / this->waveLength )
                 / ( this->waveLength
                     * ::sqrt( ( x * x + y * y + z * z ) * ( x * x + y * y + z * z ) * ( x * x + y * y + z * z ) ) );
    return 0.0;
@@ -226,6 +224,4 @@ SinWave< 3, Real >::operator()( const PointType& v, const Real& time ) const
    return this->template getPartialDerivative< 0, 0, 0 >( v, time );
 }
 
-}  // namespace Analytic
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions::Analytic

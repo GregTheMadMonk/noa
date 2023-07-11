@@ -12,9 +12,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixOperations.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 template< typename Matrix >
 void
@@ -301,6 +299,4 @@ BICGStabL< Matrix >::setSize( const VectorViewType& x )
    g_2.setSize( ell + 1 );
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear

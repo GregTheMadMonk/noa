@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 
-namespace noa::TNL {
-namespace Operators {
-namespace Analytic {
+namespace noa::TNL::Operators::Analytic {
 
 template< int Dimensions, typename Real >
 class Sign : public Functions::Domain< Dimensions, Functions::SpaceDomain >
@@ -103,6 +101,4 @@ protected:
    RealType positiveValue, negativeValue, zeroValue;
 };
 
-}  // namespace Analytic
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators::Analytic

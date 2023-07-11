@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/NormalsGetter.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Templates {
+namespace noa::TNL::Meshes::Templates {
 
 template< typename Index, int Orientation, int EntityDimension, int Dimension, int SkipValue >
 struct _ForEachOrientationMain;
@@ -64,9 +62,10 @@ struct _ForEachOrientationMain
 {};
 
 template< typename Index, int EntityDimension, int Dimension, int skipOrientation = -1 >
-struct ForEachOrientation
-: _ForEachOrientationMain< Index, combination( EntityDimension, Dimension ) - 1, EntityDimension, Dimension, skipOrientation >
+struct ForEachOrientation : _ForEachOrientationMain< Index,
+                                                     combinationsCount( EntityDimension, Dimension ) - 1,
+                                                     EntityDimension,
+                                                     Dimension,
+                                                     skipOrientation >
 {};
-}  // namespace Templates
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Templates

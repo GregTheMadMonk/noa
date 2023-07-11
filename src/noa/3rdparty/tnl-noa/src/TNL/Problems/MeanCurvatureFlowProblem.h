@@ -18,8 +18,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/CSR.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/MeshFunction.h>
 
-namespace noa::TNL {
-namespace Problems {
+namespace noa::TNL::Problems {
 
 template< typename Mesh,
           typename BoundaryCondition,
@@ -104,7 +103,6 @@ protected:
    RightHandSide rightHandSide;
 };
 
-}  // namespace Problems
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Problems
 
 #include "MeanCurvatureFlowProblem_impl.h"

@@ -42,20 +42,20 @@ protected:
    };
 
    template< typename MeshConfig, typename Device, typename Topology, int dim >
-   struct center< TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >, dim >
+   struct center< noa::TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >, dim >
    {
       static int
-      get( const TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >& entity )
+      get( const noa::TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >& entity )
       {
          throw Exceptions::NotImplementedError();
       }
    };
 
    template< typename MeshConfig, typename Device, typename Topology >
-   struct center< TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >, 0 >
+   struct center< noa::TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >, 0 >
    {
       static int
-      get( const TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >& entity )
+      get( const noa::TNL::Meshes::MeshEntity< MeshConfig, Device, Topology >& entity )
       {
          throw Exceptions::NotImplementedError();
       }

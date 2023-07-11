@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Optimization/GradientDescent.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Optimization {
+namespace noa::TNL::Solvers::Optimization {
 
 template< typename Vector, typename SolverMonitor >
 void
@@ -64,7 +62,7 @@ GradientDescent< Vector, SolverMonitor >::solve( VectorView& w, GradientGetter&&
       // Compute the gradient
       getGradient( w_view, gradient_view );
       RealType lastResidue = this->getResidue();
-      this->setResidue( addAndReduceAbs( w_view, -this->relaxation * gradient_view, TNL::Plus(), (RealType) 0.0 )
+      this->setResidue( addAndReduceAbs( w_view, -this->relaxation * gradient_view, noa::TNL::Plus(), (RealType) 0.0 )
                         / ( this->relaxation * (RealType) w.getSize() ) );
 
       if( ! this->nextIteration() )
@@ -78,6 +76,4 @@ GradientDescent< Vector, SolverMonitor >::solve( VectorView& w, GradientGetter&&
    return false;  // just to avoid warnings
 }
 
-}  // namespace Optimization
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Optimization

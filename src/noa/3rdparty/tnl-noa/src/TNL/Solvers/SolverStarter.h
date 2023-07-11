@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/SolverMonitor.h>
 #include <ostream>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 template< typename ConfigTag >
 class SolverStarter
@@ -38,7 +37,6 @@ protected:
    Timer ioTimer, computeTimer, totalTimer;
 };
 
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/SolverStarter.hpp>

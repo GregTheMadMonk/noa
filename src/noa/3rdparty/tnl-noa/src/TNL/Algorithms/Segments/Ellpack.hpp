@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Ellpack.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int Alignment >
 template< typename SizesContainer >
@@ -41,7 +39,7 @@ Ellpack< Device, Index, IndexAllocator, Organization, Alignment >::getSerializat
 {
    // FIXME: the serialized data DEPEND on the Organization and Alignment parameters, so it should be reflected in the
    // serialization type
-   return "Ellpack< [any_device], " + TNL::getSerializationType< IndexType >() + " >";
+   return "Ellpack< [any_device], " + noa::TNL::getSerializationType< IndexType >() + " >";
 }
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int Alignment >
@@ -98,6 +96,9 @@ Ellpack< Device, Index, IndexAllocator, Organization, Alignment >::setSegmentsSi
       this->alignedSize = this->size;
    else
       this->alignedSize = roundUpDivision( size, this->getAlignment() ) * this->getAlignment();
+   if( integerMultiplyOverflow( this->alignedSize, this->segmentSize ) )
+      throw( std::overflow_error( "Ellpack: multiplication overflow - the storage size required for the segments is larger "
+                                  "than the maximal value of used index type." ) );
 }
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int Alignment >
@@ -256,6 +257,4 @@ Ellpack< Device, Index, IndexAllocator, Organization, Alignment >::print( Fetch&
    return SegmentsPrinter< Ellpack, Fetch >( *this, fetch );
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

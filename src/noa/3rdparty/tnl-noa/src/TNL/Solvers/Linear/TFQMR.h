@@ -8,16 +8,14 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/LinearSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 /**
  * \brief Iterative solver of linear systems based on the Transpose-free quasi-minimal residual (TFQMR) method.
  *
  * See (Wikipedia)[https://second.wiki/wiki/algoritmo_tfqmr] for more details.
  *
- * See \ref TNL::Solvers::Linear::LinearSolver for example of showing how to use the linear solvers.
+ * See \ref noa::TNL::Solvers::Linear::LinearSolver for example of showing how to use the linear solvers.
  *
  * \tparam Matrix is type of matrix describing the linear system.
  */
@@ -72,8 +70,6 @@ protected:
    typename Traits< Matrix >::VectorType d, r, w, u, v, r_ast, Au, M_tmp;
 };
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/TFQMR.hpp>

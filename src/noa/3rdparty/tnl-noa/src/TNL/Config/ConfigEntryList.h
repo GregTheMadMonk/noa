@@ -10,8 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ConfigEntry.h>
 
-namespace noa::TNL {
-namespace Config {
+namespace noa::TNL::Config {
 
 template< typename EntryType >
 class ConfigEntryList : public ConfigEntry< EntryType, std::vector< EntryType > >
@@ -21,5 +20,4 @@ public:
    using ConfigEntry< EntryType, std::vector< EntryType > >::ConfigEntry;
 };
 
-}  // namespace Config
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Config

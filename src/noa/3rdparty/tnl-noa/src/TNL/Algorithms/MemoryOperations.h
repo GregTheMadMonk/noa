@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 template< typename DestinationDevice >
 struct MemoryOperations;
@@ -163,8 +162,7 @@ struct MemoryOperations< Devices::Cuda >
    compare( const Element1* destination, const Element2* source, Index size );
 };
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperationsSequential.hpp>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperationsHost.hpp>

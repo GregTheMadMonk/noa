@@ -16,11 +16,10 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/DistributedMesh.h>
 
-namespace noa::TNL {
 /**
  * \brief Namespace for numerical meshes and related objects.
  */
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename MeshConfig, typename Device, typename EntityTopology_ >
 class MeshEntity;
@@ -107,7 +106,7 @@ public:
     * \brief Returns the count of mesh entities of the given dimension.
     */
    template< int Dimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    GlobalIndexType
    getEntitiesCount() const;
 
@@ -119,7 +118,7 @@ public:
     * to the mesh and the supplied entity index, the creation should be fast.
     */
    template< int Dimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    EntityType< Dimension >
    getEntity( GlobalIndexType entityIndex ) const;
 
@@ -129,32 +128,32 @@ public:
 
    // duplicated for compatibility with grids
    template< typename EntityType >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    GlobalIndexType
    getEntitiesCount() const;
 
    template< typename EntityType >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    EntityType
    getEntity( GlobalIndexType entityIndex ) const;
 
    /**
     * \brief Returns the spatial coordinates of the vertex with given index.
     */
-   const typename MeshTraitsType::PointArrayType&
+   [[nodiscard]] const typename MeshTraitsType::PointArrayType&
    getPoints() const;
 
    typename MeshTraitsType::PointArrayType&
    getPoints();
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const PointType&
    getPoint( GlobalIndexType vertexIndex ) const;
 
    /**
     * \brief Returns the spatial coordinates of the vertex with given index.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    PointType&
    getPoint( GlobalIndexType vertexIndex );
 
@@ -162,7 +161,7 @@ public:
     * \brief Returns the count of subentities of the entity with given index.
     */
    template< int EntityDimension, int SubentityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    constexpr LocalIndexType
    getSubentitiesCount( GlobalIndexType entityIndex ) const;
 
@@ -170,7 +169,7 @@ public:
     * \brief Returns the global index of the subentity specified by its local index.
     */
    template< int EntityDimension, int SubentityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    GlobalIndexType
    getSubentityIndex( GlobalIndexType entityIndex, LocalIndexType subentityIndex ) const;
 
@@ -178,7 +177,7 @@ public:
     * \brief Returns the count of superentities of the entity with given index.
     */
    template< int EntityDimension, int SuperentityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    LocalIndexType
    getSuperentitiesCount( GlobalIndexType entityIndex ) const;
 
@@ -186,7 +185,7 @@ public:
     * \brief Returns the global index of the superentity specified by its local index.
     */
    template< int EntityDimension, int SuperentityDimension >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    GlobalIndexType
    getSuperentityIndex( GlobalIndexType entityIndex, LocalIndexType superentityIndex ) const;
 
@@ -194,7 +193,7 @@ public:
     * \brief Returns the count of neighbor cells of the cell with given index,
     * based on the information stored in the dual graph.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    LocalIndexType
    getCellNeighborsCount( GlobalIndexType cellIndex ) const;
 
@@ -202,7 +201,7 @@ public:
     * \brief Returns the global index of the cell's specific neighbor cell wigh given local index,
     * based on the information stored in the dual graph.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    GlobalIndexType
    getCellNeighborIndex( GlobalIndexType cellIndex, LocalIndexType neighborIndex ) const;
 
@@ -212,7 +211,7 @@ public:
     * The function \e f is executed as `f(i)`, where `GlobalIndexType i` is the global index of the
     * mesh entity to be processed. The mesh itself is not passed to the function `f`, it is the user's
     * responsibility to ensure proper access to the mesh if needed, e.g. by the means of lambda capture
-    * and/or using a \ref TNL::Pointers::SharedPointer "SharedPointer".
+    * and/or using a \ref noa::TNL::Pointers::SharedPointer "SharedPointer".
     */
    template< int EntityDimension, typename Device2 = DeviceType, typename Func >
    void
@@ -224,7 +223,7 @@ public:
     * The function \e f is executed as `f(i)`, where `GlobalIndexType i` is the global index of the
     * mesh entity to be processed. The mesh itself is not passed to the function `f`, it is the user's
     * responsibility to ensure proper access to the mesh if needed, e.g. by the means of lambda capture
-    * and/or using a \ref TNL::Pointers::SharedPointer "SharedPointer".
+    * and/or using a \ref noa::TNL::Pointers::SharedPointer "SharedPointer".
     */
    template< int EntityDimension, typename Device2 = DeviceType, typename Func >
    void
@@ -236,7 +235,7 @@ public:
     * The function \e f is executed as `f(i)`, where `GlobalIndexType i` is the global index of the
     * mesh entity to be processed. The mesh itself is not passed to the function `f`, it is the user's
     * responsibility to ensure proper access to the mesh if needed, e.g. by the means of lambda capture
-    * and/or using a \ref TNL::Pointers::SharedPointer "SharedPointer".
+    * and/or using a \ref noa::TNL::Pointers::SharedPointer "SharedPointer".
     */
    template< int EntityDimension, typename Device2 = DeviceType, typename Func >
    void
@@ -248,7 +247,7 @@ public:
     * The function \e f is executed as `f(i)`, where `GlobalIndexType i` is the global index of the
     * mesh entity to be processed. The mesh itself is not passed to the function `f`, it is the user's
     * responsibility to ensure proper access to the mesh if needed, e.g. by the means of lambda capture
-    * and/or using a \ref TNL::Pointers::SharedPointer "SharedPointer".
+    * and/or using a \ref noa::TNL::Pointers::SharedPointer "SharedPointer".
     */
    template< int EntityDimension, typename Device2 = DeviceType, typename Func >
    void
@@ -260,7 +259,7 @@ public:
     * The function \e f is executed as `f(i)`, where `GlobalIndexType i` is the global index of the
     * mesh entity to be processed. The mesh itself is not passed to the function `f`, it is the user's
     * responsibility to ensure proper access to the mesh if needed, e.g. by the means of lambda capture
-    * and/or using a \ref TNL::Pointers::SharedPointer "SharedPointer".
+    * and/or using a \ref noa::TNL::Pointers::SharedPointer "SharedPointer".
     */
    template< int EntityDimension, typename Device2 = DeviceType, typename Func >
    void
@@ -311,8 +310,7 @@ template< typename MeshConfig, typename Device >
 std::ostream&
 operator<<( std::ostream& str, const Mesh< MeshConfig, Device >& mesh );
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshEntity.h>
 

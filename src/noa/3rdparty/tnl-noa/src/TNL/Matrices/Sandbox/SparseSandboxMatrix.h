@@ -15,12 +15,10 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/Sandbox/SparseSandboxMatrixView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/DenseMatrix.h>
 
-namespace noa::TNL {
-namespace Matrices {
 /**
  * \brief Namespace for sandbox matrices.
  */
-namespace Sandbox {
+namespace noa::TNL::Matrices::Sandbox {
 
 /**
  * \brief Template of a sparse matrix that can be used for testing of new
@@ -44,7 +42,7 @@ namespace Sandbox {
  * interface of this templated class like:
  *
  * 1. Large set of existing unit tests.
- * 3. Matrix reading from MTX files - to use \ref TNL::Matrices::MatrixReader,
+ * 3. Matrix reading from MTX files - to use \ref noa::TNL::Matrices::MatrixReader,
  *    the following methods must be functional
  *    a. \ref SparseSandboxMatrix::setRowCapacities
  *    b. \ref SparseSandboxMatrix::setElement
@@ -56,8 +54,8 @@ namespace Sandbox {
  *
  * In the core of this class there is:
  *
- * 1. Vector 'values` (\ref TNL::Matrices::Matrix::values) which is inheritted
- *    from \ref TNL::Matrices::Matrix. This vector is used for storing of matrix
+ * 1. Vector 'values` (\ref noa::TNL::Matrices::Matrix::values) which is inheritted
+ *    from \ref noa::TNL::Matrices::Matrix. This vector is used for storing of matrix
  *    elements values.
  * 2. Vector `columnIndexes` (\ref SparseSandboxMatrix::columnIndexes). This
  *    vector is used for storing of matrix elements column indexes.
@@ -103,7 +101,7 @@ namespace Sandbox {
  * 4. Next you need to modify \ref SparseSandboxMatrix::setElement and
  *    \ref SparseSandboxMatrix::getElement methods and assignment operator at
  *    least for copying the matrix across different devices (i.e. from CPU to
- *    GPU). It will allow you to use \ref TNL::Matrices::MatrixReader.
+ *    GPU). It will allow you to use \ref noa::TNL::Matrices::MatrixReader.
  *    We recommend to have the same data layout on both CPU and GPU so that
  *    the transfer of the matrix from CPU to GPU is trivial.
  * 5. Finally proceed to \ref SparseSandboxMatrix::vectorProduct to implement
@@ -121,7 +119,7 @@ namespace Sandbox {
  * 10. You may implement \ref SparseSandboxMatrix::forRows and
  *     \ref SparseSandboxMatrix::forElements.
  * 11. Now you have complete implementation of new sparse matrix format. You
- *     may turn it into new type of segments (\ref TNL::Algorithms::Segments).
+ *     may turn it into new type of segments (\ref noa::TNL::Algorithms::Segments).
  *
  * During the implementation some unit tests may crash. If you do not need them
  * at the moment, you may comment them in files
@@ -149,7 +147,7 @@ public:
    using ValuesViewType = typename ValuesVectorType::ViewType;
    using ConstValuesViewType = typename ValuesViewType::ConstViewType;
    using ColumnsIndexesVectorType =
-      Containers::Vector< typename TNL::copy_const< Index >::template from< Real >::type, Device, Index, IndexAllocator >;
+      Containers::Vector< typename noa::TNL::copy_const< Index >::template from< Real >::type, Device, Index, IndexAllocator >;
    using ColumnsIndexesViewType = typename ColumnsIndexesVectorType::ViewType;
    using ConstColumnsIndexesViewType = typename ColumnsIndexesViewType::ConstViewType;
    using RowsCapacitiesType = Containers::Vector< std::remove_const_t< Index >, Device, Index, IndexAllocator >;
@@ -243,7 +241,7 @@ public:
     *
     * SANDBOX_TODO: You may replace it with containers for metadata of your format.
     */
-   using RowPointers = TNL::Containers::Vector< IndexType, DeviceType, IndexType >;
+   using RowPointers = noa::TNL::Containers::Vector< IndexType, DeviceType, IndexType >;
 
    /**
     * \brief Constructor only with values and column indexes allocators.
@@ -311,8 +309,8 @@ public:
     * The number of matrix rows is given by the size of \e rowCapacities vector.
     *
     * \tparam RowCapacitiesVector is the row capacities vector type. Usually it is some of
-    *    \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView, \ref TNL::Containers::Vector or
-    *    \ref TNL::Containers::VectorView.
+    *    \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView, \ref noa::TNL::Containers::Vector or
+    *    \ref noa::TNL::Containers::VectorView.
     * \param rowCapacities is a vector telling how many matrix elements must be
     *    allocated in each row.
     * \param columns is the number of matrix columns.
@@ -324,7 +322,7 @@ public:
     * \par Output
     * \include SparseMatrixExample_Constructor_rowCapacities_vector.out
     */
-   template< typename RowCapacitiesVector, std::enable_if_t< TNL::IsArrayType< RowCapacitiesVector >::value, int > = 0 >
+   template< typename RowCapacitiesVector, std::enable_if_t< noa::TNL::IsArrayType< RowCapacitiesVector >::value, int > = 0 >
    explicit SparseSandboxMatrix( const RowCapacitiesVector& rowCapacities,
                                  IndexType columns,
                                  const RealAllocatorType& realAllocator = RealAllocatorType(),
@@ -390,7 +388,7 @@ public:
     *
     * \return sparse matrix view.
     */
-   ViewType
+   [[nodiscard]] ViewType
    getView();
 
    /**
@@ -400,7 +398,7 @@ public:
     *
     * \return sparse matrix view.
     */
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const;
 
    /**
@@ -416,7 +414,7 @@ public:
     * \par Output
     * \include SparseMatrixExample_getSerializationType.out
     */
-   static std::string
+   [[nodiscard]] static std::string
    getSerializationType();
 
    /**
@@ -431,7 +429,7 @@ public:
     * \par Output
     * \include SparseMatrixExample_getSerializationType.out
     */
-   std::string
+   [[nodiscard]] std::string
    getSerializationTypeVirtual() const override;
 
    /**
@@ -551,7 +549,7 @@ public:
     * \param row index of matrix row.
     * \return number of matrix elements allocated for the row.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getRowCapacity( IndexType row ) const;
 
@@ -563,7 +561,7 @@ public:
     *
     * \return number of non-zero matrix elements.
     */
-   IndexType
+   [[nodiscard]] IndexType
    getNonzeroElementsCount() const override;
 
    /**
@@ -586,7 +584,7 @@ public:
     *
     * See \ref SparseMatrixRowView.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstRowView
    getRow( const IndexType& rowIdx ) const;
 
@@ -604,7 +602,7 @@ public:
     *
     * See \ref SparseMatrixRowView.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RowView
    getRow( const IndexType& rowIdx );
 
@@ -680,7 +678,7 @@ public:
     * \include SparseMatrixExample_getElement.out
     *
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RealType
    getElement( IndexType row, IndexType column ) const;
 
@@ -896,7 +894,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) mutable { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::SparseMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::SparseMatrix::RowView.
     *
     * \par Example
     * \include Matrices/SparseMatrix/SparseMatrixExample_forRows.cpp
@@ -923,7 +921,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::SparseMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::SparseMatrix::RowView.
     *
     * \par Example
     * \include Matrices/SparseMatrix/SparseMatrixExample_forRows.cpp
@@ -948,7 +946,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) mutable { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::SparseMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::SparseMatrix::RowView.
     *
     * \par Example
     * \include Matrices/SparseMatrix/SparseMatrixExample_forRows.cpp
@@ -973,7 +971,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::SparseMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::SparseMatrix::RowView.
     *
     * \par Example
     * \include Matrices/SparseMatrix/SparseMatrixExample_forRows.cpp
@@ -1048,12 +1046,12 @@ public:
     * `outVector = matrixMultiplicator * ( * this ) * inVector + outVectorMultiplicator * outVector`
     *
     * \tparam InVector is type of input vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     * \tparam OutVector is type of output vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     *
     * \param inVector is input vector.
@@ -1135,7 +1133,7 @@ public:
     * \return \e true if the RHS matrix is equal, \e false otherwise.
     */
    template< typename Matrix >
-   bool
+   [[nodiscard]] bool
    operator==( const Matrix& matrix ) const;
 
    /**
@@ -1145,7 +1143,7 @@ public:
     * \return \e true if the RHS matrix is equal, \e false otherwise.
     */
    template< typename Matrix >
-   bool
+   [[nodiscard]] bool
    operator!=( const Matrix& matrix ) const;
 
    /**
@@ -1196,7 +1194,7 @@ public:
     *
     * \return value of the padding index.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getPaddingIndex() const;
 
@@ -1225,7 +1223,7 @@ public:
     *
     * \return Constant reference to a vector with matrix elements column indexes.
     */
-   const ColumnsIndexesVectorType&
+   [[nodiscard]] const ColumnsIndexesVectorType&
    getColumnIndexes() const;
 
    /**
@@ -1233,7 +1231,7 @@ public:
     *
     * \return Reference to a vector with matrix elements column indexes.
     */
-   ColumnsIndexesVectorType&
+   [[nodiscard]] ColumnsIndexesVectorType&
    getColumnIndexes();
 
 protected:
@@ -1254,8 +1252,6 @@ protected:
    RowPointers rowPointers;
 };
 
-}  // namespace Sandbox
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::Sandbox
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/Sandbox/SparseSandboxMatrix.hpp>

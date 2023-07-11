@@ -14,13 +14,11 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Readers/VTUReader.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/layers/EntityTags/Traits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Readers {
+namespace noa::TNL::Meshes::Readers {
 
 class PVTUReader : public XMLVTK
 {
-   std::string
+   [[nodiscard]] std::string
    getSourcePath( const std::string& source )
    {
       namespace fs = std::filesystem;
@@ -230,7 +228,7 @@ public:
       this->pointTags = this->cellTags = pointGlobalIndices = cellGlobalIndices = {};
 
       // check if we need to split the communicator
-      const Index minCount = MPI::reduce( TNL::min( pointsCount, cellsCount ), MPI_MIN );
+      const Index minCount = MPI::reduce( noa::TNL::min( pointsCount, cellsCount ), MPI_MIN );
       if( minCount == 0 ) {
          // split the communicator, remove the ranks which did not get a subdomain
          const int color = ( pointsCount > 0 && cellsCount > 0 ) ? 0 : MPI_UNDEFINED;
@@ -245,13 +243,13 @@ public:
       }
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readPointData( const std::string& arrayName ) override
    {
       return localReader.readPointData( arrayName );
    }
 
-   VariantVector
+   [[nodiscard]] VariantVector
    readCellData( const std::string& arrayName ) override
    {
       return localReader.readCellData( arrayName );
@@ -280,6 +278,4 @@ protected:
    VariantVector pointTags, cellTags, pointGlobalIndices, cellGlobalIndices;
 };
 
-}  // namespace Readers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Readers

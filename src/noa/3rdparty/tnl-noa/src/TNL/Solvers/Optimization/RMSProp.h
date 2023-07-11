@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Optimization {
+namespace noa::TNL::Solvers::Optimization {
 
 /***
  * https://arxiv.org/pdf/1609.04747.pdf
@@ -51,8 +49,6 @@ protected:
    VectorType gradient, a;
 };
 
-}  // namespace Optimization
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Optimization
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Optimization/RMSProp.hpp>

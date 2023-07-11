@@ -21,7 +21,7 @@ struct Plus : public std::plus< void >
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -44,7 +44,7 @@ struct Multiplies : public std::multiplies< void >
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -90,7 +90,7 @@ struct LogicalAnd : public std::logical_and< void >
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -110,7 +110,7 @@ struct LogicalOr : public std::logical_or< void >
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -126,14 +126,14 @@ struct LogicalOr : public std::logical_or< void >
 using LogicalNot = std::logical_not< void >;
 
 /**
- * \brief Extension of \ref std::bit_and<void> for use with \ref TNL::Algorithms::reduce.
+ * \brief Extension of \ref std::bit_and<void> for use with \ref noa::TNL::Algorithms::reduce.
  */
 struct BitAnd : public std::bit_and< void >
 {
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -144,14 +144,14 @@ struct BitAnd : public std::bit_and< void >
 };
 
 /**
- * \brief Extension of \ref std::bit_or<void> for use with \ref TNL::Algorithms::reduce.
+ * \brief Extension of \ref std::bit_or<void> for use with \ref noa::TNL::Algorithms::reduce.
  */
 struct BitOr : public std::bit_or< void >
 {
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -162,14 +162,14 @@ struct BitOr : public std::bit_or< void >
 };
 
 /**
- * \brief Extension of \ref std::bit_xor<void> for use with \ref TNL::Algorithms::reduce.
+ * \brief Extension of \ref std::bit_xor<void> for use with \ref noa::TNL::Algorithms::reduce.
  */
 struct BitXor : public std::bit_xor< void >
 {
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -192,7 +192,7 @@ struct Min
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -207,8 +207,8 @@ struct Min
    constexpr auto
    operator()( const T1& lhs, const T2& rhs ) const
    {
-      // use argument-dependent lookup and make TNL::min available for unqualified calls
-      using TNL::min;
+      // use argument-dependent lookup and make noa::TNL::min available for unqualified calls
+      using noa::TNL::min;
       return min( lhs, rhs );
    }
 };
@@ -221,7 +221,7 @@ struct Max
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -236,21 +236,21 @@ struct Max
    constexpr auto
    operator()( const T1& lhs, const T2& rhs ) const
    {
-      // use argument-dependent lookup and make TNL::max available for unqualified calls
-      using TNL::max;
+      // use argument-dependent lookup and make noa::TNL::max available for unqualified calls
+      using noa::TNL::max;
       return max( lhs, rhs );
    }
 };
 
 /**
- * \brief Function object implementing `argmin(x, y, i, j)` for use with \ref TNL::Algorithms::reduceWithArgument.
+ * \brief Function object implementing `argmin(x, y, i, j)` for use with \ref noa::TNL::Algorithms::reduceWithArgument.
  */
 struct MinWithArg
 {
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T
@@ -276,14 +276,14 @@ struct MinWithArg
 };
 
 /**
- * \brief Function object implementing `argmax(x, y, i, j)` for use with \ref TNL::Algorithms::reduceWithArgument.
+ * \brief Function object implementing `argmax(x, y, i, j)` for use with \ref noa::TNL::Algorithms::reduceWithArgument.
  */
 struct MaxWithArg
 {
    /**
     * \brief Returns the [identity element](https://en.wikipedia.org/wiki/Identity_element) of the operation.
     *
-    * Suitable for \ref TNL::Algorithms::reduce.
+    * Suitable for \ref noa::TNL::Algorithms::reduce.
     */
    template< typename T >
    static constexpr T

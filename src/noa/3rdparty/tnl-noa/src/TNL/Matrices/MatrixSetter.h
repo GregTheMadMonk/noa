@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Pointers/SharedPointer.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename DifferentialOperator, typename BoundaryConditions, typename RowsCapacitiesType >
 class MatrixSetterTraverserUserData
@@ -139,7 +138,6 @@ class MatrixSetter< Meshes::Grid< Dimension, Real, Device, Index >,
 };
 */
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixSetter_impl.h>

@@ -6,9 +6,7 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 struct LinearResidueGetter
 {
@@ -17,8 +15,6 @@ struct LinearResidueGetter
    getResidue( const Matrix& matrix, const Vector1& x, const Vector2& b, typename Matrix::RealType bNorm = 0 );
 };
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
 #include "LinearResidueGetter.hpp"

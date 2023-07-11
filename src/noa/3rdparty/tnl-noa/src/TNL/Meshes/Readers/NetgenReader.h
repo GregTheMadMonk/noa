@@ -11,9 +11,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Readers/MeshReader.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Readers {
+namespace noa::TNL::Meshes::Readers {
 
 class NetgenReader : public MeshReader
 {
@@ -150,6 +148,4 @@ public:
    }
 };
 
-}  // namespace Readers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Readers

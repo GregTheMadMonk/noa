@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/traits/MeshTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace EntityTags {
+namespace noa::TNL::Meshes::EntityTags {
 
 template< typename MeshConfig,
           typename Device,
@@ -35,6 +33,4 @@ enum EntityTags : std::uint8_t
    GhostEntity = 2,
 };
 
-}  // namespace EntityTags
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::EntityTags

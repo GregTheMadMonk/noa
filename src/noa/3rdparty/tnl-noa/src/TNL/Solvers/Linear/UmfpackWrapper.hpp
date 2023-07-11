@@ -14,9 +14,7 @@
 
    #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/Utils/LinearResidueGetter.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 bool
 UmfpackWrapper< Matrices::CSR< double, Devices::Host, int > >::solve( ConstVectorViewType b, VectorViewType x )
@@ -105,8 +103,6 @@ finished:
    return status == UMFPACK_OK;
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
 #endif

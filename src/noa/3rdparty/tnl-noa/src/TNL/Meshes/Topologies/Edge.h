@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/SubentityVertexMap.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Vertex.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Topologies {
+namespace noa::TNL::Meshes::Topologies {
 
 struct Edge
 {
@@ -26,6 +24,4 @@ struct Subtopology< Edge, 0 >
    static constexpr int count = 2;
 };
 
-}  // namespace Topologies
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Topologies

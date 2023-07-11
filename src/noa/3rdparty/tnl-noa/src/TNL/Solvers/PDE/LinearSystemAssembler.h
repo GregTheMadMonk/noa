@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/FunctionAdapter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Traverser.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Real,
           typename MeshFunction,
@@ -177,6 +175,4 @@ protected:
    const RightHandSide* rightHandSide = NULL;
 };
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE

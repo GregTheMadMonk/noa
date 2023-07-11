@@ -13,9 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Pointers/SharedPointer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolverMonitor.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename DofVector, template< typename DofVector_, typename SolverMonitor > class OdeSolver >
 class ExplicitTimeStepper
@@ -84,8 +82,6 @@ protected:
    long long int allIterations = 0;
 };
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/PDE/ExplicitTimeStepper.hpp>

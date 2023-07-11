@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <unordered_map>
 #include <vector>
 
@@ -15,8 +16,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/ConfigError.h>
 
-namespace noa::TNL {
-namespace Config {
+namespace noa::TNL::Config {
 
 class ParameterContainer
 {
@@ -79,7 +79,7 @@ public:
     *
     * \param name Name of the parameter.
     */
-   bool
+   [[nodiscard]] bool
    checkParameter( const std::string& name ) const
    {
       return parameters.count( name ) > 0;
@@ -90,13 +90,15 @@ public:
     *
     * \param names List of the parameter names.
     */
-   bool
+   [[nodiscard]] bool
    checkParameters( std::initializer_list< std::string > names ) const
    {
-      for( const auto& name : names )
-         if( ! checkParameter( name ) )
-            return false;
-      return true;
+      return std::all_of( names.begin(),
+                          names.end(),
+                          [ this ]( const std::string& name )
+                          {
+                             return checkParameter( name );
+                          } );
    }
 
    /**
@@ -105,7 +107,7 @@ public:
     * \param name Name of the parameter.
     */
    template< class T >
-   bool
+   [[nodiscard]] bool
    checkParameterType( const std::string& name ) const
    {
       using CoercedType = typename ParameterTypeCoercion< T >::type;
@@ -139,10 +141,10 @@ public:
                                     + " already exists with different type. "
                                       "Current type index is "
                                     + std::to_string( search->second.index() ) + " (variant type is "
-                                    + std::string( TNL::getType< Parameter >() )
+                                    + std::string( noa::TNL::getType< Parameter >() )
                                     + "), "
                                       "tried to set value of type "
-                                    + std::string( TNL::getType< T >() ) + "." );
+                                    + std::string( noa::TNL::getType< T >() ) + "." );
          }
       }
       addParameter< T >( name, value );
@@ -154,7 +156,7 @@ public:
     * \param name Name of the parameter.
     */
    template< class T >
-   T
+   [[nodiscard]] T
    getParameter( const std::string& name ) const
    {
       using CoercedType = typename ParameterTypeCoercion< T >::type;
@@ -167,10 +169,10 @@ public:
                                            + " holds a value of different type than requested. "
                                              "Current type index is "
                                            + std::to_string( search->second.index() ) + " (variant type is "
-                                           + std::string( TNL::getType< Parameter >() )
+                                           + std::string( noa::TNL::getType< Parameter >() )
                                            + "), "
                                              "tried to get value of type "
-                                           + std::string( TNL::getType< T >() ) + "." );
+                                           + std::string( noa::TNL::getType< T >() ) + "." );
       }
       throw Exceptions::ConfigError( "The program attempts to get unknown parameter " + name + "." );
    }
@@ -181,7 +183,7 @@ public:
     * \param name Name of the parameter list.
     */
    template< class T >
-   std::vector< T >
+   [[nodiscard]] std::vector< T >
    getList( const std::string& name ) const
    {
       return getParameter< std::vector< T > >( name );
@@ -194,7 +196,7 @@ public:
     *               \e prefix-y and \e prefix-z.
     */
    template< class StaticArray >
-   StaticArray
+   [[nodiscard]] StaticArray
    getXyz( const std::string& prefix ) const
    {
       StaticArray result;
@@ -210,5 +212,4 @@ protected:
    std::unordered_map< std::string, Parameter > parameters;
 };
 
-}  // namespace Config
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Config

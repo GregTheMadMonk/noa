@@ -9,7 +9,7 @@
 #include <limits>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>  // TNL::product
+#include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>  // noa::TNL::product
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/VTIWriter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Endianness.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/base64.h>
@@ -18,9 +18,7 @@
    #include <noa/3rdparty/tnl-noa/src/TNL/zlib_compression.h>
 #endif
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 template< typename Mesh >
 VTIWriter< Mesh >::VTIWriter( std::ostream& str, VTK::FileFormat format ) : str( str.rdbuf() ), format( format )
@@ -101,8 +99,8 @@ VTIWriter< Mesh >::writeImageData( const typename Mesh::PointType& gridOrigin,
    }
 
    // sets points and cells counts
-   pointsCount = TNL::product( end - begin + 1 );
-   cellsCount = TNL::product( end - begin );
+   pointsCount = noa::TNL::product( end - begin + 1 );
+   cellsCount = noa::TNL::product( end - begin );
 }
 
 template< typename Mesh >
@@ -156,7 +154,7 @@ VTIWriter< Mesh >::writeDataArray( const Array& array, const std::string& name, 
    // use a host buffer if direct access to the array elements is not possible
    if( std::is_same< typename Array::DeviceType, Devices::Cuda >::value ) {
       using HostArray =
-         TNL::Containers::Array< std::remove_const_t< typename Array::ValueType >, Devices::Host, typename Array::IndexType >;
+         noa::TNL::Containers::Array< std::remove_const_t< typename Array::ValueType >, Devices::Host, typename Array::IndexType >;
       HostArray hostBuffer;
       hostBuffer = array;
       writeDataArray( hostBuffer, name, numberOfComponents );
@@ -300,6 +298,4 @@ VTIWriter< Mesh >::closePiece()
    }
 }
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers

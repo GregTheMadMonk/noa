@@ -9,14 +9,15 @@
 #include <iostream>
 #include <memory>
 
-#ifndef _WIN32
+#include <noa/3rdparty/tnl-noa/src/TNL/3rdparty/spy.hpp>
+
+#ifndef SPY_OS_IS_WINDOWS
    #include <execinfo.h>
 #endif
 
-#include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>  // TNL::detail::demangle
+#include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>  // noa::TNL::detail::demangle
 
-namespace noa::TNL {
-namespace Debugging {
+namespace noa::TNL::Debugging {
 
 /*
  * Print a demangled stack backtrace of the caller function to FILE* out.
@@ -29,7 +30,7 @@ namespace Debugging {
 static void
 printStackBacktrace( std::ostream& out = std::cout, unsigned int max_frames = 64 )
 {
-#ifndef _WIN32
+#ifndef SPY_OS_IS_WINDOWS
    out << "stack trace:\n";
 
    // storage array for stack trace address data
@@ -74,7 +75,7 @@ printStackBacktrace( std::ostream& out = std::cout, unsigned int max_frames = 64
 
          // mangled name is now in [begin_name, begin_offset) and caller
          // offset in [begin_offset, end_offset).
-         std::cout << "  " << i << " " << symbollist.get()[ i ] << " : " << TNL::detail::demangle( begin_name ) << "+"
+         std::cout << "  " << i << " " << symbollist.get()[ i ] << " : " << noa::TNL::detail::demangle( begin_name ) << "+"
                    << begin_offset << "\n";
       }
       else {
@@ -87,5 +88,4 @@ printStackBacktrace( std::ostream& out = std::cout, unsigned int max_frames = 64
 #endif
 }
 
-}  // namespace Debugging
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Debugging

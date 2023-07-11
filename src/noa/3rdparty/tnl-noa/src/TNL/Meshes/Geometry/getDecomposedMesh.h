@@ -17,8 +17,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/scan.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 // Polygon Mesh
 template< typename ParentConfig >
@@ -237,5 +236,4 @@ getDecomposedMesh( const Mesh< MeshConfig, Devices::Host >& inMesh )
    return outMesh;
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

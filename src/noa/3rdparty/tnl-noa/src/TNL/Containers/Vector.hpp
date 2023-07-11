@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 template< typename Real, typename Device, typename Index, typename Allocator >
 Vector< Real, Device, Index, Allocator >::Vector( const Vector& vector, const AllocatorType& allocator )
@@ -121,5 +120,4 @@ Vector< Real, Device, Index, Allocator >::operator%=( const VectorExpression& ex
    return *this;
 }
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

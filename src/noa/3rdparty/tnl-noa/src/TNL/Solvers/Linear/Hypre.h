@@ -13,9 +13,7 @@
    #include <noa/3rdparty/tnl-noa/src/TNL/Containers/HypreParVector.h>
    #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/HypreParCSRMatrix.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 //! \brief Abstract class for Hypre's solvers and preconditioners
 //! \ingroup Hypre
@@ -126,7 +124,7 @@ public:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HyprePCG solver;
+ * noa::TNL::Solvers::Linear::HyprePCG solver;
  * HYPRE_PCGSetTol(solver, 1e-7);
  * \endcode
  *
@@ -218,7 +216,7 @@ protected:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HypreBiCGSTAB solver;
+ * noa::TNL::Solvers::Linear::HypreBiCGSTAB solver;
  * HYPRE_BiCGSTABSetTol(solver, 1e-7);
  * \endcode
  *
@@ -307,7 +305,7 @@ protected:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HypreGMRES solver;
+ * noa::TNL::Solvers::Linear::HypreGMRES solver;
  * HYPRE_GMRESSetTol(solver, 1e-7);
  * \endcode
  *
@@ -397,7 +395,7 @@ protected:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HypreFlexGMRES solver;
+ * noa::TNL::Solvers::Linear::HypreFlexGMRES solver;
  * HYPRE_FlexGMRESSetTol(solver, 1e-7);
  * \endcode
  *
@@ -542,7 +540,7 @@ public:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HypreParaSails precond;
+ * noa::TNL::Solvers::Linear::HypreParaSails precond;
  * HYPRE_ParaSailsSetSym(precond, 1);
  * \endcode
  *
@@ -585,7 +583,7 @@ public:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HypreEuclid precond;
+ * noa::TNL::Solvers::Linear::HypreEuclid precond;
  * HYPRE_EuclidSetLevel(precond, 2);
  * \endcode
  *
@@ -623,7 +621,7 @@ public:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HypreILU precond;
+ * noa::TNL::Solvers::Linear::HypreILU precond;
  * HYPRE_ILUSetLevelOfFill(precond, 1);
  * \endcode
  *
@@ -677,7 +675,7 @@ public:
  * Parameters can be set using native Hypre functions, e.g.
  *
  * \code
- * TNL::Solvers::Linear::HypreBoomerAMG solver;
+ * noa::TNL::Solvers::Linear::HypreBoomerAMG solver;
  * HYPRE_BoomerAMGSetTol(solver, 1e-7);
  * HYPRE_BoomerAMGSetMaxIter(solver, 20);
  * \endcode
@@ -771,9 +769,7 @@ protected:
    postSolveHook() const override;
 };
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
    #include "Hypre.hpp"
 

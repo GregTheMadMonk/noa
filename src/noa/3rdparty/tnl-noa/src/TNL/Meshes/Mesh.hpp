@@ -10,8 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/IndexPermutationApplier.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/initializer/Initializer.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename MeshConfig, typename Device, typename MeshType >
 void
@@ -353,5 +352,4 @@ operator<<( std::ostream& str, const Mesh< MeshConfig, Device >& mesh )
    return str;
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

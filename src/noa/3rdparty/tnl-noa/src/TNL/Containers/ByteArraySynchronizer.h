@@ -9,30 +9,20 @@
 #pragma once
 
 #include <future>
-// 3rd-party async library providing a thread-pool
-#include <noa/3rdparty/tnl-noa/src/TNL/3rdparty/async/threadpool.h>
+// 3rd-party thread pool library
+#include <noa/3rdparty/tnl-noa/src/TNL/3rdparty/BS_thread_pool_light.hpp>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ArrayView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Wrappers.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Timer.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 template< typename Device, typename Index >
 class ByteArraySynchronizer
 {
 private:
-   // NOTE: async::threadpool has alignment requirements, which causes problems:
-   //  - it may become misaligned in derived classes, see e.g.
-   //    https://stackoverflow.com/a/46475498
-   //    solution: specify it as the first member of the base class
-   //  - operator new before C++17 may not support over-aligned types, see
-   //    https://stackoverflow.com/a/53485295
-   //    solution: relaxed alignment requirements to not exceed the value of
-   //    alignof(std::max_align_t), which is the strongest alignment supported
-   //    by plain new. See https://github.com/d36u9/async/pull/2
-   async::threadpool tp;
+   BS::thread_pool_light tp;
 
    int gpu_id = 0;
 
@@ -59,11 +49,11 @@ public:
    virtual void
    synchronizeByteArray( ByteArrayView array, int bytesPerValue ) = 0;
 
-   virtual RequestsVector
+   [[nodiscard]] virtual RequestsVector
    synchronizeByteArrayAsyncWorker( ByteArrayView array, int bytesPerValue ) = 0;
 
    /**
-    * \brief An asynchronous version of \ref TNL::Containers::ByteArraySynchronizer::synchronizeByteArray
+    * \brief An asynchronous version of \ref noa::TNL::Containers::ByteArraySynchronizer::synchronizeByteArray
     * "synchronizeByteArray".
     *
     * Note that this method is not thread-safe - only the thread which created
@@ -101,7 +91,7 @@ public:
          };
 
          if( policy == AsyncPolicy::threadpool )
-            async_op = tp.post( worker );
+            async_op = tp.submit( worker );
          else
             async_op = std::async( std::launch::async, worker );
       }
@@ -148,5 +138,4 @@ public:
    std::size_t async_ops_count = 0;
 };
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/Templates/BooleanOperations.h>
 #include <type_traits>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Templates {
+namespace noa::TNL::Meshes::Templates {
 
 /*
  * A pack of type and its count
@@ -302,6 +300,4 @@ public:
 template< int N, class Pack >
 using get = typename Get< N, Pack >::type;
 
-}  // namespace Templates
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Templates

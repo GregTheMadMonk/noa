@@ -8,9 +8,7 @@
 
 #include <limits>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 template< typename Real, typename Index, typename SolverMonitor >
 void
@@ -117,6 +115,4 @@ ExplicitSolver< Real, Index, SolverMonitor >::setTestingMode( bool testingMode )
    this->testingMode = testingMode;
 }
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE

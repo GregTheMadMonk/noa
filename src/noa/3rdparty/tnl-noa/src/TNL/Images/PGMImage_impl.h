@@ -10,8 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/PGMImage.h>
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 template< typename Index >
 PGMImage< Index >::PGMImage() : binary( false ), maxColors( 0 ), fileOpen( false )
@@ -215,5 +214,4 @@ PGMImage< Index >::~PGMImage()
    close();
 }
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images

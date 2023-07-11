@@ -10,8 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Mesh.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixPermutationApplier.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename Mesh, int Dimension >
 struct IndexPermutationApplier
@@ -151,5 +150,4 @@ public:
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

@@ -8,8 +8,7 @@
 
 #include <stdexcept>
 
-namespace noa::TNL {
-namespace Exceptions {
+namespace noa::TNL::Exceptions {
 
 struct MPISupportMissing : public std::runtime_error
 {
@@ -19,5 +18,4 @@ struct MPISupportMissing : public std::runtime_error
    {}
 };
 
-}  // namespace Exceptions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Exceptions

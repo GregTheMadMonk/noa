@@ -12,9 +12,7 @@
 
 #include "Merson.h"
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 template< typename Vector, typename SolverMonitor >
 void
@@ -163,7 +161,7 @@ Merson< Vector, SolverMonitor >::solve( VectorType& _u, RHSFunction&& rhsFunctio
       /////
       // Compute the new time step.
       if( adaptivity != 0.0 && error != 0.0 ) {
-         currentTau *= 0.8 * TNL::pow( adaptivity / error, 0.2 );
+         currentTau *= 0.8 * noa::TNL::pow( adaptivity / error, 0.2 );
          currentTau = min( currentTau, this->getMaxTau() );
       }
       if( time + currentTau > this->getStopTime() )
@@ -195,6 +193,4 @@ Merson< Vector, SolverMonitor >::writeGrids( const DofVectorType& u )
    getchar();
 }
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE

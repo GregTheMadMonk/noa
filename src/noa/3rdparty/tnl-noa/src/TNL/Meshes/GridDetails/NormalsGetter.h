@@ -9,16 +9,15 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/Templates/Permutations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/Templates/Functions.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename Index, Index EntityDimension, Index GridDimension >
 struct NormalsGetter
 {
 public:
-   using Coordinate = TNL::Containers::StaticVector< GridDimension, Index >;
+   using Coordinate = noa::TNL::Containers::StaticVector< GridDimension, Index >;
    using OrientationNormalsContainer =
-      TNL::Containers::StaticVector< Templates::combination( EntityDimension, GridDimension ), Coordinate >;
+      noa::TNL::Containers::StaticVector< combinationsCount( EntityDimension, GridDimension ), Coordinate >;
    using Permutations =
       Templates::make_int_permutations< GridDimension,
                                         Templates::build_ones_pack< GridDimension - EntityDimension, GridDimension > >;
@@ -26,9 +25,9 @@ public:
    template<
       int Orientation,
       std::enable_if_t<
-         Templates::isInLeftClosedRightOpenInterval( 0, Orientation, Templates::combination( EntityDimension, GridDimension ) ),
+         Templates::isInLeftClosedRightOpenInterval( 0, Orientation, combinationsCount( EntityDimension, GridDimension ) ),
          bool > = true >
-   constexpr static Coordinate
+   [[nodiscard]] constexpr static Coordinate
    getNormals()
    {
       using Value = Templates::get< Orientation, Permutations >;
@@ -41,10 +40,10 @@ private:
    struct BuildNormals;
 
    template< int... Values >
-   struct BuildNormals< TNL::Meshes::Templates::int_pack< Values... > >
+   struct BuildNormals< noa::TNL::Meshes::Templates::int_pack< Values... > >
    {
    public:
-      constexpr static Coordinate
+      [[nodiscard]] constexpr static Coordinate
       build()
       {
          return Coordinate( Values... );
@@ -52,5 +51,4 @@ private:
    };
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

@@ -9,9 +9,7 @@
 #include <ostream>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 /**
  * \brief Writer of data linked with meshes into [Gnuplot format](http://www.gnuplot.info/).
@@ -95,8 +93,6 @@ protected:
    std::ostream& str;
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/GnuplotWriter.hpp>

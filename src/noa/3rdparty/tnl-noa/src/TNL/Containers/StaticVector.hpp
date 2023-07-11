@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/detail/VectorAssignment.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 template< int Size, typename Real >
 template< typename T1, typename T2, typename Operation >
@@ -85,16 +84,4 @@ StaticVector< Size, Real >::operator%=( const VectorExpression& expression )
    return *this;
 }
 
-template< int Size, typename Real >
-template< typename OtherReal >
-// NOTE: without __cuda_callable__, nvcc 11.8 would complain that it is __host__ only, even though it is constexpr
-__cuda_callable__
-constexpr StaticVector< Size, Real >::operator StaticVector< Size, OtherReal >() const
-{
-   StaticVector< Size, OtherReal > aux;
-   aux.operator=( *this );
-   return aux;
-}
-
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

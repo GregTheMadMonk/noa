@@ -16,10 +16,9 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/3rdparty/Leksys/iniparser.hpp>
 
-namespace noa::TNL {
-namespace Config {
+namespace noa::TNL::Config {
 
-ParameterContainer
+[[nodiscard]] ParameterContainer
 parseINIConfigFile( const std::string& configPath, const ConfigDescription& description )
 {
    ParameterContainer parameters;
@@ -120,5 +119,4 @@ parseINIConfigFile( const std::string& configPath, const ConfigDescription& desc
    return parameters;
 }
 
-}  // namespace Config
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Config

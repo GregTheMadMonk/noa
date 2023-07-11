@@ -15,8 +15,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Sequential.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 
-namespace noa::TNL {
-namespace Pointers {
+namespace noa::TNL::Pointers {
 
 /**
  * Since TNL currently supports only execution on host (which does not need
@@ -29,7 +28,7 @@ class SmartPointersRegister
 {
 public:
    /**
-    * Negative deviceId means that \ref TNL::Cuda::DeviceInfo::getActiveDevice
+    * Negative deviceId means that \ref noa::TNL::Cuda::DeviceInfo::getActiveDevice
     * will be called to get the device ID.
     */
    void
@@ -41,7 +40,7 @@ public:
    }
 
    /**
-    * Negative deviceId means that \ref TNL::Cuda::DeviceInfo::getActiveDevice
+    * Negative deviceId means that \ref noa::TNL::Cuda::DeviceInfo::getActiveDevice
     * will be called to get the device ID.
     */
    void
@@ -61,7 +60,7 @@ public:
    }
 
    /**
-    * Negative deviceId means that \ref TNL::Cuda::DeviceInfo::getActiveDevice
+    * Negative deviceId means that \ref noa::TNL::Cuda::DeviceInfo::getActiveDevice
     * will be called to get the device ID.
     */
    bool
@@ -121,5 +120,4 @@ synchronizeSmartPointersOnDevice( int deviceId = -1 )
    return b;
 }
 
-}  // namespace Pointers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Pointers

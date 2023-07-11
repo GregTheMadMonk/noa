@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Math.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 
-namespace noa::TNL {
-namespace Functions {
-namespace Analytic {
+namespace noa::TNL::Functions::Analytic {
 
 template< int Dimensions_, typename Real >
 class VectorNormBase : public Domain< Dimensions_, SpaceDomain >
@@ -56,7 +54,7 @@ public:
       this->center = center;
    }
 
-   const RealType&
+   [[nodiscard]] const RealType&
    getCenter() const
    {
       return this->center;
@@ -68,7 +66,7 @@ public:
       this->anisotropy = anisotropy;
    }
 
-   const RealType&
+   [[nodiscard]] const RealType&
    getAnisotropy() const
    {
       return this->anisotropy;
@@ -80,7 +78,7 @@ public:
       this->power = power;
    }
 
-   const RealType&
+   [[nodiscard]] const RealType&
    getPower() const
    {
       return this->power;
@@ -92,7 +90,7 @@ public:
       this->radius = radius;
    }
 
-   const RealType&
+   [[nodiscard]] const RealType&
    getRadius() const
    {
       return this->radius;
@@ -104,7 +102,7 @@ public:
       this->multiplicator = multiplicator;
    }
 
-   const RealType&
+   [[nodiscard]] const RealType&
    getMultiplicator() const
    {
       return this->multiplicator;
@@ -116,7 +114,7 @@ public:
       this->maxNorm = maxNorm;
    }
 
-   const RealType&
+   [[nodiscard]] const RealType&
    getMaxNorm() const
    {
       return this->maxNorm;
@@ -143,7 +141,7 @@ public:
    using typename BaseType::RealType;
 
    template< int XDiffOrder = 0, int YDiffOrder = 0, int ZDiffOrder = 0 >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RealType
    getPartialDerivative( const PointType& v, const Real& time = 0.0 ) const
    {
@@ -151,10 +149,10 @@ public:
       if( YDiffOrder != 0 || ZDiffOrder != 0 )
          return 0.0;
       if( XDiffOrder == 0 ) {
-         return this->multiplicator * ( TNL::abs( x ) * this->anisotropy.x() - this->radius );
+         return this->multiplicator * ( noa::TNL::abs( x ) * this->anisotropy.x() - this->radius );
       }
       if( XDiffOrder == 1 ) {
-         return this->multiplicator * TNL::sign( x ) * this->anisotropy.x();
+         return this->multiplicator * noa::TNL::sign( x ) * this->anisotropy.x();
       }
       return 0.0;
    }
@@ -176,7 +174,7 @@ public:
    using typename BaseType::RealType;
 
    template< int XDiffOrder = 0, int YDiffOrder = 0, int ZDiffOrder = 0 >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    inline RealType
    getPartialDerivative( const PointType& v, const Real& time = 0.0 ) const
    {
@@ -186,16 +184,16 @@ public:
          return 0.0;
       if( XDiffOrder == 0 && YDiffOrder == 0 ) {
          if( this->maxNorm )
-            return ( TNL::max( TNL::abs( x ) * this->anisotropy.x(), TNL::abs( y ) * this->anisotropy.y() ) - this->radius )
+            return ( noa::TNL::max( noa::TNL::abs( x ) * this->anisotropy.x(), noa::TNL::abs( y ) * this->anisotropy.y() ) - this->radius )
                  * this->multiplicator;
          if( this->power == 1.0 )
-            return ( ( TNL::abs( x ) * this->anisotropy.x() + TNL::abs( y ) * this->anisotropy.y() ) - this->radius )
+            return ( ( noa::TNL::abs( x ) * this->anisotropy.x() + noa::TNL::abs( y ) * this->anisotropy.y() ) - this->radius )
                  * this->multiplicator;
          if( this->power == 2.0 )
             return ( std::sqrt( x * x * this->anisotropy.x() + y * y * this->anisotropy.y() ) - this->radius )
                  * this->multiplicator;
-         return ( std::pow( std::pow( TNL::abs( x ), this->power ) * this->anisotropy.x()
-                               + std::pow( TNL::abs( y ), this->power ) * this->anisotropy.y(),
+         return ( std::pow( std::pow( noa::TNL::abs( x ), this->power ) * this->anisotropy.x()
+                               + std::pow( noa::TNL::abs( y ), this->power ) * this->anisotropy.y(),
                             1.0 / this->power )
                   - this->radius )
               * this->multiplicator;
@@ -221,7 +219,7 @@ public:
    using typename BaseType::RealType;
 
    template< int XDiffOrder = 0, int YDiffOrder = 0, int ZDiffOrder = 0 >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RealType
    getPartialDerivative( const PointType& v, const Real& time = 0.0 ) const
    {
@@ -230,22 +228,22 @@ public:
       const RealType& z = v.z() - this->center.z();
       if( XDiffOrder == 0 && YDiffOrder == 0 && ZDiffOrder == 0 ) {
          if( this->maxNorm )
-            return ( TNL::max( TNL::max( TNL::abs( x ) * this->anisotropy.x(), TNL::abs( y ) * this->anisotropy.y() ),
-                               TNL::abs( z ) * this->anisotropy.z() )
+            return ( noa::TNL::max( noa::TNL::max( noa::TNL::abs( x ) * this->anisotropy.x(), noa::TNL::abs( y ) * this->anisotropy.y() ),
+                               noa::TNL::abs( z ) * this->anisotropy.z() )
                      - this->radius )
                  * this->multiplicator;
          if( this->power == 1.0 )
-            return ( ( TNL::abs( x ) * this->anisotropy.x() + TNL::abs( y ) * this->anisotropy.y()
-                       + TNL::abs( z ) * this->anisotropy.z() )
+            return ( ( noa::TNL::abs( x ) * this->anisotropy.x() + noa::TNL::abs( y ) * this->anisotropy.y()
+                       + noa::TNL::abs( z ) * this->anisotropy.z() )
                      - this->radius )
                  * this->multiplicator;
          if( this->power == 2.0 )
             return ( std::sqrt( x * x * this->anisotropy.x() + y * y * this->anisotropy.y() + z * z * this->anisotropy.z() )
                      - this->radius )
                  * this->multiplicator;
-         return ( std::pow( std::pow( TNL::abs( x ), this->power ) * this->anisotropy.x()
-                               + std::pow( TNL::abs( y ), this->power ) * this->anisotropy.y()
-                               + std::pow( TNL::abs( z ), this->power ) * this->anisotropy.z(),
+         return ( std::pow( std::pow( noa::TNL::abs( x ), this->power ) * this->anisotropy.x()
+                               + std::pow( noa::TNL::abs( y ), this->power ) * this->anisotropy.y()
+                               + std::pow( noa::TNL::abs( z ), this->power ) * this->anisotropy.z(),
                             1.0 / this->power )
                   - this->radius )
               * this->multiplicator;
@@ -270,6 +268,4 @@ operator<<( std::ostream& str, const VectorNorm< Dimensions, Real >& f )
    return str;
 }
 
-}  // namespace Analytic
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions::Analytic

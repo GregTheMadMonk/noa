@@ -12,20 +12,18 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 /**
  * \brief Base class for ODE solvers and explicit solvers od PDEs.
  *
  * This is a specialization for static solvers, i.e. solvers which of scalar problem
- * or small system of ODEs solution of which can be expressed by \ref TNL::Containers::StaticVector.
- * The static solvers can be created even in GPU kernels and can be combined with \ref TNL::Algorithms::parallelFor.
+ * or small system of ODEs solution of which can be expressed by \ref noa::TNL::Containers::StaticVector.
+ * The static solvers can be created even in GPU kernels and can be combined with \ref noa::TNL::Algorithms::parallelFor.
  *
- * See also: \ref TNL::Solvers::ODE::StaticEuler, \ref TNL::Solvers::ODE::StaticMerson.
+ * See also: \ref noa::TNL::Solvers::ODE::StaticEuler, \ref noa::TNL::Solvers::ODE::StaticMerson.
  *
- * \tparam Real is type of the floating-point arithmetics or static vector ( \ref TNL::Containers::StaticVector ).
+ * \tparam Real is type of the floating-point arithmetics or static vector ( \ref noa::TNL::Containers::StaticVector ).
  * \tparam Index is type for indexing.
  */
 template< typename Real = double, typename Index = int >
@@ -70,7 +68,7 @@ public:
    /**
     * \brief Getter of the current time of the evolution computed by the solver.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getTime() const;
 
@@ -84,7 +82,7 @@ public:
    /**
     * \brief Getter of the time where the evolution computation shall by stopped.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getStopTime() const;
 
@@ -100,7 +98,7 @@ public:
    /**
     * \brief Getter of the time step used for the computation.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getTau() const;
 
@@ -116,7 +114,7 @@ public:
    /**
     * \brief Getter of maximal value of the time step.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getMaxTau() const;
 
@@ -127,7 +125,7 @@ public:
     * \return \e false if the solver is \b not allowed to do the next iteration. This may
     *    happen because the divergence occurred.
     */
-   bool __cuda_callable__
+   [[nodiscard]] bool __cuda_callable__
    checkNextIteration();
 
    __cuda_callable__
@@ -157,8 +155,6 @@ protected:
    bool testingMode = false;
 };
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/StaticExplicitSolver.hpp>

@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomHeader.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/DicomSeriesInfo.h>
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 inline DicomSeriesInfo::DicomSeriesInfo( DicomHeader& dicomHeader ) : dicomHeader( dicomHeader )
 {
@@ -184,5 +183,4 @@ DicomSeriesInfo::getAcquisitionTime()
    return this->acquisitionTime;
 }
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images

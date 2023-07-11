@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/VectorView.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 /**
  * \brief \e Vector extends \ref Array with algebraic operations.
@@ -47,7 +46,7 @@ public:
    /**
     * \brief Device used to run operations on the vector.
     *
-    * See \ref TNL::Devices for the available options.
+    * See \ref noa::TNL::Devices for the available options.
     */
    using DeviceType = Device;
 
@@ -59,7 +58,7 @@ public:
    /**
     * \brief Allocator type used for allocating this vector.
     *
-    * See \ref TNL::Allocators.
+    * See \ref noa::TNL::Allocators.
     */
    using AllocatorType = Allocator;
 
@@ -75,7 +74,7 @@ public:
 
    /**
     * \brief A template which allows to quickly obtain a
-    * \ref TNL::Containers::Vector "Vector" type with changed template
+    * \ref noa::TNL::Containers::Vector "Vector" type with changed template
     * parameters.
     */
    template< typename _Real,
@@ -151,7 +150,7 @@ public:
     * \param end The end of the vector sub-interval. The default value is 0
     *            which is, however, replaced with the array size.
     */
-   ViewType
+   [[nodiscard]] ViewType
    getView( IndexType begin = 0, IndexType end = 0 );
 
    /**
@@ -166,7 +165,7 @@ public:
     * \param end The end of the vector sub-interval. The default value is 0
     *            which is, however, replaced with the array size.
     */
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView( IndexType begin = 0, IndexType end = 0 ) const;
 
    /**
@@ -200,7 +199,7 @@ public:
 
    /**
     * \brief Assigns a value or an array - same as
-    * \ref TNL::Containers::Array::operator= "Array::operator=".
+    * \ref noa::TNL::Containers::Array::operator= "Array::operator=".
     *
     * \return Reference to this vector.
     */
@@ -294,7 +293,6 @@ struct HasEnabledExpressionTemplates< Vector< Real, Device, Index, Allocator > >
 {};
 }  // namespace Expressions
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.hpp>

@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolverMonitor.h>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 /**
  * \brief Base class for iterative solvers.
@@ -245,7 +244,6 @@ protected:
    std::ofstream residualHistoryFile;
 };
 
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolver.hpp>

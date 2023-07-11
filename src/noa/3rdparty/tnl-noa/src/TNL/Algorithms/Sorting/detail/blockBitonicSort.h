@@ -8,9 +8,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/helpers.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 #ifdef __CUDACC__
 
@@ -24,8 +22,8 @@ namespace Sorting {
 template< typename Value, typename CMP >
 __device__
 void
-bitonicSort_Block( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > src,
-                   TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > dst,
+bitonicSort_Block( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > src,
+                   noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > dst,
                    Value* sharedMem,
                    const CMP& Cmp )
 {
@@ -82,7 +80,7 @@ bitonicSort_Block( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > src,
 template< typename Value, typename CMP >
 __device__
 void
-bitonicSort_Block( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > src, const CMP& Cmp )
+bitonicSort_Block( noa::TNL::Containers::ArrayView< Value, noa::TNL::Devices::Cuda > src, const CMP& Cmp )
 {
    int paddedSize = closestPow2_ptx( src.getSize() );
 
@@ -112,6 +110,5 @@ bitonicSort_Block( TNL::Containers::ArrayView< Value, TNL::Devices::Cuda > src, 
 }
 
 #endif
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+
+}  // namespace noa::TNL::Algorithms::Sorting

@@ -10,8 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/String.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 /**
  * \brief Helper class for importing of matrices from different input formats.
@@ -68,13 +67,13 @@ public:
    readMtx( std::istream& str, Matrix& matrix, bool verbose = false );
 
 protected:
-   using HostMatrix = typename Matrix::template Self< RealType, TNL::Devices::Host >;
+   using HostMatrix = typename Matrix::template Self< RealType, noa::TNL::Devices::Host >;
 };
 
 // This is to prevent from appearing in Doxygen documentation.
 /// \cond
 template< typename Matrix >
-class MatrixReader< Matrix, TNL::Devices::Host >
+class MatrixReader< Matrix, noa::TNL::Devices::Host >
 {
 public:
    /**
@@ -148,7 +147,6 @@ protected:
 };
 /// \endcond
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixReader.hpp>

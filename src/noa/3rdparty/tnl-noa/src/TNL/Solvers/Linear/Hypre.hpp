@@ -12,9 +12,7 @@
 
    #include "Hypre.h"
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 HypreSolver::HypreSolver( const Matrices::HypreParCSRMatrix& A )
 {
@@ -507,8 +505,6 @@ HypreBoomerAMG::postSolveHook() const
    }
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
 #endif  // HAVE_HYPRE

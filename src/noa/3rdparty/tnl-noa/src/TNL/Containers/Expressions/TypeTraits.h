@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeTraits.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace Expressions {
+namespace noa::TNL::Containers::Expressions {
 
 // trait classes used for the enabling of expression templates
 template< typename T >
@@ -154,6 +152,4 @@ struct OperandMemberType< R, typename enable_if_type< typename R::VectorOperandT
    using type = std::add_const_t< std::remove_reference_t< R > >;
 };
 
-}  // namespace Expressions
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::Expressions

@@ -13,9 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/AtomicOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/details/SparseMatrix.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace Sandbox {
+namespace noa::TNL::Matrices::Sandbox {
 
 template< typename Real, typename Device, typename Index, typename MatrixType >
 __cuda_callable__
@@ -60,8 +58,8 @@ template< typename Real, typename Device, typename Index, typename MatrixType >
 std::string
 SparseSandboxMatrixView< Real, Device, Index, MatrixType >::getSerializationType()
 {
-   return "Matrices::Sandbox::SparseMatrix< " + TNL::getSerializationType< RealType >() + ", "
-        + TNL::getSerializationType< IndexType >() + ", " + MatrixType::getSerializationType()
+   return "Matrices::Sandbox::SparseMatrix< " + noa::TNL::getSerializationType< RealType >() + ", "
+        + noa::TNL::getSerializationType< IndexType >() + ", " + MatrixType::getSerializationType()
         + ", [any_allocator], [any_allocator] >";
 }
 
@@ -153,7 +151,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::getNonzeroElementsCo
          }
          row_sums_view[ rowIdx ] = sum;
       };
-      TNL::Algorithms::parallelFor< DeviceType >( 0, this->getRows(), f );
+      noa::TNL::Algorithms::parallelFor< DeviceType >( 0, this->getRows(), f );
       return sum( row_sums );
    }
    return 0;
@@ -343,7 +341,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::vectorProduct( const
 #define HAVE_SANDBOX_SIMPLE_SPMV
    // SANDBOX_TODO: The following is simple direct implementation of SpMV operation with CSR format. We recommend to start by
    //               replacing this part with SpMV based on your sparse format.
-   if( std::is_same< DeviceType, TNL::Devices::Host >::value )  // this way you may easily specialize for different device types
+   if( std::is_same< DeviceType, noa::TNL::Devices::Host >::value )  // this way you may easily specialize for different device types
    {
       // SANDBOX_TODO: This simple and naive implementation for CPU.
       for( IndexType rowIdx = firstRow; rowIdx < lastRow; rowIdx++ ) {
@@ -372,7 +370,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::vectorProduct( const
             sum += valuesView[ globalIdx ] * inVectorView[ columnIndexesView[ globalIdx ] ];
          outVectorView[ rowIdx ] = outVectorView[ rowIdx ] * outVectorMultiplicator + matrixMultiplicator * sum;
       };
-      TNL::Algorithms::parallelFor< DeviceType >( firstRow, lastRow, f );
+      noa::TNL::Algorithms::parallelFor< DeviceType >( firstRow, lastRow, f );
    }
 #ifdef HAVE_SANDBOX_SIMPLE_SPMV
 #else
@@ -485,7 +483,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::reduceRows( IndexTyp
       }
       keep( rowIdx, sum );
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, typename MatrixType >
@@ -520,7 +518,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::reduceRows( IndexTyp
       }
       keep( rowIdx, sum );
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, typename MatrixType >
@@ -569,7 +567,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::forElements( IndexTy
          localIdx++;
       }
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, typename MatrixType >
@@ -595,7 +593,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::forElements( IndexTy
          localIdx++;
       }
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, typename MatrixType >
@@ -633,7 +631,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::forRows( IndexType b
                               columns_view );
       function( rowView );
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, typename MatrixType >
@@ -655,7 +653,7 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::forRows( IndexType b
                                    columns_view );
       function( rowView );
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Real, typename Device, typename Index, typename MatrixType >
@@ -858,6 +856,4 @@ SparseSandboxMatrixView< Real, Device, Index, MatrixType >::getColumnIndexes() -
    return this->columnIndexes;
 }
 
-}  // namespace Sandbox
-}  // namespace Matrices
-}  // namespace  TNL
+}  // namespace noa::TNL::Matrices::Sandbox

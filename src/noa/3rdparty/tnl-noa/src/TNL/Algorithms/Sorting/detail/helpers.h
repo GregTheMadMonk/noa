@@ -10,9 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Math.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 #ifdef __CUDACC__
 
@@ -54,9 +52,7 @@ void
 cmpSwap( Value& a, Value& b, bool ascending, const CMP& Cmp )
 {
    if( ascending == Cmp( b, a ) )
-      TNL::swap( a, b );
+      noa::TNL::swap( a, b );
 }
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

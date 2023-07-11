@@ -11,14 +11,13 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/KernelLaunch.h>
 
-namespace noa::TNL {
-namespace Devices {
+namespace noa::TNL::Devices {
 
 class Cuda
 {
 public:
    //! \brief Alias to the CUDA kernel launch configuration structure.
-   using LaunchConfiguration = TNL::Cuda::LaunchConfiguration;
+   using LaunchConfiguration = noa::TNL::Cuda::LaunchConfiguration;
 
    static inline void
    configSetup( Config::ConfigDescription& config, const String& prefix = "" )
@@ -45,5 +44,4 @@ public:
    }
 };
 
-}  // namespace Devices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Devices

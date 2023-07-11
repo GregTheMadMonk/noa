@@ -14,10 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/Utils/Traits.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
-namespace Preconditioners {
+namespace noa::TNL::Solvers::Linear::Preconditioners {
 
 /**
  * \brief Base class for preconditioners of of iterative solvers of linear systems.
@@ -123,7 +120,4 @@ public:
    virtual ~Preconditioner() {}
 };
 
-}  // namespace Preconditioners
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear::Preconditioners

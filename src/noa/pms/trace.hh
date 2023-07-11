@@ -238,7 +238,7 @@ namespace noa::pms::trace {
             Array<std::optional<Index>, DeviceType> device_array(mesh_size);
             auto view = device_array.getView();
 
-            Algorithms::ParallelFor<DeviceType>::exec(Index(), mesh_size, [=] __cuda_callable__ (Index i) mutable {
+            Algorithms::parallelFor<DeviceType>(Index(), mesh_size, [=] __cuda_callable__ (Index i) mutable {
                 std::optional<Index> result{};
                 if (check_point_in_tetrahedron(mesh_pointer, i, point)) {
                     result = i;

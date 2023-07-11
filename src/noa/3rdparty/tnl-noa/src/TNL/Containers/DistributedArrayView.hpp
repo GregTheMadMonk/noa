@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Wrappers.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 template< typename Value, typename Device, typename Index >
 DistributedArrayView< Value, Device, Index >::~DistributedArrayView()
@@ -407,5 +406,4 @@ DistributedArrayView< Value, Device, Index >::loadFromGlobalFile( File& file, bo
       IO::loadSubrange( file, elementsInFile, localRange.getBegin(), localData.getData(), localData.getSize() );
 }
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

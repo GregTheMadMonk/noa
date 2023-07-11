@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/PDE/SemiImplicitTimeStepper.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/LinearSolverTypeResolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Problem >
 void
@@ -196,6 +194,4 @@ SemiImplicitTimeStepper< Problem >::writeEpilog( Logger& logger ) const
    return true;
 }
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE

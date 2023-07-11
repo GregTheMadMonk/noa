@@ -24,9 +24,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/DistributedMesh.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Problem >
 class TimeIndependentPDESolver : public PDESolver< typename Problem::RealType, typename Problem::IndexType >
@@ -76,8 +74,6 @@ protected:
    ProblemType* problem;
 };
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/PDE/TimeIndependentPDESolver.hpp>

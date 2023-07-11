@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ConfigDescription.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 /**
  * \brief Base class for iterative solvers.
@@ -232,7 +231,6 @@ protected:
    Index refreshRate = 1;
 };
 
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/StaticIterativeSolver.hpp>

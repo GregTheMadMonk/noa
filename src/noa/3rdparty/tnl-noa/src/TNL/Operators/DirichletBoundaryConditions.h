@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/FunctionAdapter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/MeshFunction.h>
 
-namespace noa::TNL {
-namespace Operators {
+namespace noa::TNL::Operators {
 
 template< typename Mesh,
           typename Function = Functions::Analytic::Constant< Mesh::getMeshDimension(), typename Mesh::RealType >,
@@ -117,5 +116,4 @@ operator<<( std::ostream& str, const DirichletBoundaryConditions< Mesh, Function
    return str;
 }
 
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators

@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/detail/Contains.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 /**
  * \brief Checks if an array/vector/view contains an element with given value.
@@ -67,5 +66,4 @@ containsOnlyValue( const Array& array,
    return detail::ContainsOnlyValue< typename Array::DeviceType >()( array.getData() + begin, end - begin, value );
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

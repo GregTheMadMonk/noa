@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Mesh.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 // general implementation covering grids
 template< typename Mesh, typename Ordering >
@@ -22,9 +21,9 @@ struct MeshOrdering
 
 // reordering makes sense only for unstructured meshes
 template< typename MeshConfig, typename Device, typename Ordering >
-struct MeshOrdering< TNL::Meshes::Mesh< MeshConfig, Device >, Ordering >
+struct MeshOrdering< noa::TNL::Meshes::Mesh< MeshConfig, Device >, Ordering >
 {
-   using Mesh = TNL::Meshes::Mesh< MeshConfig, Device >;
+   using Mesh = noa::TNL::Meshes::Mesh< MeshConfig, Device >;
 
    void
    reorder( Mesh& mesh )
@@ -44,5 +43,4 @@ struct MeshOrdering< TNL::Meshes::Mesh< MeshConfig, Device >, Ordering >
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

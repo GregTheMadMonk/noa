@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/MeshTypeResolver.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/VTKTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename ConfigTag, typename Device >
 template< typename Reader, typename Functor >
@@ -195,5 +194,4 @@ MeshTypeResolver< ConfigTag, Device >::detail< Reader, Functor >::resolveTermina
    }
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

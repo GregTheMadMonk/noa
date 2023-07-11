@@ -10,9 +10,7 @@
 
 #include "BICGStab.h"
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 template< typename Matrix >
 void
@@ -161,6 +159,4 @@ BICGStab< Matrix >::setSize( const VectorViewType& x )
    M_tmp.setLike( x );
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear

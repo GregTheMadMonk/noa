@@ -16,8 +16,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Pointers/DevicePointer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Vector, typename Matrix >
 __global__
@@ -142,7 +141,7 @@ copySparseMatrix_impl( Matrix1& A, const Matrix2& B )
       Cuda::launchKernelSync( kernelRowLenghts,
                               launch_config,
                               rowLengths.getData(),
-                              &Bpointer.template getData< TNL::Devices::Cuda >(),
+                              &Bpointer.template getData< noa::TNL::Devices::Cuda >(),
                               rows,
                               cols );
       Apointer->setRowCapacities( rowLengths );
@@ -152,8 +151,8 @@ copySparseMatrix_impl( Matrix1& A, const Matrix2& B )
       constexpr auto kernelCopy = SparseMatrixCopyKernel< Matrix1, Matrix2 >;
       Cuda::launchKernelSync( kernelCopy,
                               launch_config,
-                              &Apointer.template modifyData< TNL::Devices::Cuda >(),
-                              &Bpointer.template getData< TNL::Devices::Cuda >(),
+                              &Apointer.template modifyData< noa::TNL::Devices::Cuda >(),
+                              &Bpointer.template getData< noa::TNL::Devices::Cuda >(),
                               rowLengths.getData(),
                               rows );
    }
@@ -339,5 +338,4 @@ reorderArray( const Array1& src, Array2& dest, const PermutationArray& perm )
    Algorithms::parallelFor< DeviceType >( 0, src.getSize(), kernel, src.getData(), dest.getData(), perm.getData() );
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

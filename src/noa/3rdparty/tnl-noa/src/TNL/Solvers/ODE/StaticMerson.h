@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ConfigDescription.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/StaticExplicitSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 /**
  * \brief Solver of ODEs with the first order of accuracy.
@@ -28,10 +26,10 @@ namespace ODE {
  * It is supposed to be used when the unknown \f$ x \in R \f$ is expressed by a scalar, i.e.
  * by a numeric type like `double` or `float`.
  *
- * For problems where \f$ \vec x\f$ is represented by \ref TNL::Containers::StaticVector,
- * see \ref TNL::Solvers::ODE::StaticMerson<Containers::StaticVector<Size_,Real>>.
- * For problems where \f$ \vec x\f$ is represented by \ref TNL::Containers::Vector,
- * or \ref TNL::Containers::VectorView, see \ref TNL::Solvers::ODE::Merson.
+ * For problems where \f$ \vec x\f$ is represented by \ref noa::TNL::Containers::StaticVector,
+ * see \ref noa::TNL::Solvers::ODE::StaticMerson<Containers::StaticVector<Size_,Real>>.
+ * For problems where \f$ \vec x\f$ is represented by \ref noa::TNL::Containers::Vector,
+ * or \ref noa::TNL::Containers::VectorView, see \ref noa::TNL::Solvers::ODE::Merson.
  *
  * The following example demonstrates the use the solvers:
  *
@@ -42,7 +40,7 @@ namespace ODE {
  * \include StaticODESolver-SineExample.out
  *
  * Since this variant of the Euler solver is static, it can be used even inside of GPU kernels and so combined with \ref
- * TNL::Algorithms::parallelFor as demonstrated by the following example:
+ * noa::TNL::Algorithms::parallelFor as demonstrated by the following example:
  *
  * \includelineno Solvers/ODE/StaticODESolver-SineParallelExample.h
  *
@@ -116,7 +114,7 @@ public:
     * \returns the current value of the parameter controlling the adaptive choice of
     *    integration time step.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getAdaptivity() const;
 
@@ -163,16 +161,16 @@ protected:
  * \f$ u( 0 )  = u_{ini} \f$.
  * It is supposed to be used when the unknown \f$ \vec x \in R^n \f$ is expressed by a \ref Containers::StaticVector.
  *
- * For problems where \f$ x\f$ is represented by floating-point number, see \ref TNL::Solvers::ODE::StaticMerson.
- * For problems where \f$ \vec x\f$ is represented by \ref TNL::Containers::Vector or \ref TNL::Containers::VectorView,
- * see \ref TNL::Solvers::ODE::Merson.
+ * For problems where \f$ x\f$ is represented by floating-point number, see \ref noa::TNL::Solvers::ODE::StaticMerson.
+ * For problems where \f$ \vec x\f$ is represented by \ref noa::TNL::Containers::Vector or \ref noa::TNL::Containers::VectorView,
+ * see \ref noa::TNL::Solvers::ODE::Merson.
  *
  * The following example demonstrates the use the solvers:
  *
  * \includelineno Solvers/ODE/StaticODESolver-LorenzExample.h
  *
  * Since this variant of the Euler solver is static, it can be used even inside of GPU kernels and so combined with \ref
- * TNL::Algorithms::parallelFor as demonstrated by the following example:
+ * noa::TNL::Algorithms::parallelFor as demonstrated by the following example:
  *
  * \includelineno Solvers/ODE/StaticODESolver-LorenzParallelExample.h
  *
@@ -252,7 +250,7 @@ public:
     * \returns the current value of the parameter controlling the adaptive choice of
     *    integration time step.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const RealType&
    getAdaptivity() const;
 
@@ -286,8 +284,6 @@ protected:
    RealType adaptivity = 0.00001;
 };
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/StaticMerson.hpp>

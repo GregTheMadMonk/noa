@@ -6,9 +6,6 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Solvers {
-
 /**
  * \brief Namespace for solvers of ordinary differential equations.
  *
@@ -22,15 +19,13 @@ namespace Solvers {
  * The following solvers are available:
  *
  * 1. First order of accuracy
- *      a. \ref TNL::Solvers::ODE::StaticEuler, \ref TNL::Solvers::ODE::Euler - the Euler method
+ *      a. \ref noa::TNL::Solvers::ODE::StaticEuler, \ref noa::TNL::Solvers::ODE::Euler - the Euler method
  * 2. Fourth order of accuracy
- *      a. \ref TNL::Solvers::ODE::StaticMerson, \ref TNL::Solvers::ODE::Merson - the Runge-Kutta-Merson
+ *      a. \ref noa::TNL::Solvers::ODE::StaticMerson, \ref noa::TNL::Solvers::ODE::Merson - the Runge-Kutta-Merson
  *          method with adaptive choice of the time step.
  *
  * The static variants of the solvers are supposed to be used when the unknown \f$ x \in R^n \f$
  * is expressed by a \ref Containers::StaticVector or it is a scalar, i.e.
  * \f$ x \in R \f$ expressed by a numeric type like `double` or `float`.
  */
-namespace ODE {}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+namespace noa::TNL::Solvers::ODE {}

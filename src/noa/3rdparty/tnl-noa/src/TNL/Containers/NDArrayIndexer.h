@@ -12,13 +12,12 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ndarray/SizesHolderHelpers.h>  // StorageSizeGetter
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/ndarray/Subarrays.h>           // DummyStrideBase
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 // HACK for https://stackoverflow.com/q/74240374
 #ifdef _MSC_VER
 template< typename T >
-constexpr std::size_t
+[[nodiscard]] constexpr std::size_t
 getDimension()
 {
    return T::getDimension();
@@ -95,7 +94,7 @@ public:
    NDArrayIndexer( SizesHolderType sizes, StridesHolderType strides ) : StridesHolder( strides ), sizes( sizes ) {}
 
    //! \brief Returns the dimension of the \e N-dimensional array, i.e. \e N.
-   static constexpr std::size_t
+   [[nodiscard]] static constexpr std::size_t
    getDimension()
    {
 // HACK for https://stackoverflow.com/q/74240374
@@ -107,7 +106,7 @@ public:
    }
 
    //! \brief Returns the N-dimensional array sizes held by the indexer.
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    const SizesHolderType&
    getSizes() const
    {
@@ -120,7 +119,7 @@ public:
     * \tparam level Integer specifying the component of the sizes to be returned.
     */
    template< std::size_t level >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSize() const
    {
@@ -137,7 +136,7 @@ public:
     * \tparam level Integer specifying the axis of the array.
     */
    template< std::size_t level >
-   static constexpr std::size_t
+   [[nodiscard]] static constexpr std::size_t
    getOverlap()
    {
       return detail::get< level >( Overlaps{} );
@@ -148,7 +147,7 @@ public:
     *
     * \returns The product of the aligned sizes.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getStorageSize() const
    {
@@ -167,7 +166,7 @@ public:
     *          one-dimensional array.
     */
    template< typename... IndexTypes >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getStorageIndex( IndexTypes&&... indices ) const
    {
@@ -184,7 +183,7 @@ public:
    }
 
    template< typename BeginsHolder, typename EndsHolder >
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    bool
    isContiguousBlock( const BeginsHolder& begins, const EndsHolder& ends )
    {
@@ -197,7 +196,7 @@ public:
       Algorithms::staticFor< std::size_t, 0, getDimension() >(
          [ & ]( auto i )
          {
-            constexpr int dim = TNL::Containers::detail::get< i >( Permutation{} );
+            constexpr int dim = noa::TNL::Containers::detail::get< i >( Permutation{} );
             const auto size = getSize< dim >();
             const auto blockSize = ends.template getSize< dim >() - begins.template getSize< dim >();
             // blockSize can be different from size only in the first dimension,
@@ -218,7 +217,7 @@ protected:
     * The function is not public -- only subclasses like \ref NDArrayStorage
     * may modify the sizes.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    SizesHolderType&
    getSizes()
    {
@@ -229,5 +228,4 @@ protected:
    SizesHolderType sizes;
 };
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

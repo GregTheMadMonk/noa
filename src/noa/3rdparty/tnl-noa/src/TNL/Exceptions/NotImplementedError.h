@@ -10,13 +10,11 @@
 
 #include <stdexcept>
 
-namespace noa::TNL {
-namespace Exceptions {
+namespace noa::TNL::Exceptions {
 
 struct NotImplementedError : public std::runtime_error
 {
    NotImplementedError( const std::string& msg = "Something is not implemented." ) : std::runtime_error( msg ) {}
 };
 
-}  // namespace Exceptions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Exceptions

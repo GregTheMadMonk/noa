@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/Image.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/RegionOfInterest.h>
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 template< typename Index = int >
 class PGMImage : public Image< Index >
@@ -67,7 +66,6 @@ protected:
    bool fileOpen;
 };
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/PGMImage_impl.h>

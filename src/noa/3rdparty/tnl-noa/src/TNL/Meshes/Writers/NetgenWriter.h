@@ -9,9 +9,7 @@
 #include <ostream>
 #include <iomanip>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
+namespace noa::TNL::Meshes::Writers {
 
 template< typename Mesh >
 class NetgenWriter
@@ -51,6 +49,4 @@ public:
    }
 };
 
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers

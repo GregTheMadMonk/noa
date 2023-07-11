@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/Merson.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/Euler.h>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 class DefaultBuildConfigTag
 {};
@@ -100,5 +99,4 @@ struct ConfigTagExplicitSolver
    static constexpr bool enabled = true;
 };
 
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers

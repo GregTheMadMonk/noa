@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/GridEntityMeasureGetter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/GridDetails/NeighbourGridEntityGetter.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< class Grid, int EntityDimension >
 constexpr int
@@ -241,5 +240,4 @@ operator<<( std::ostream& str, const GridEntity< Grid, EntityDimension >& entity
    return str;
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

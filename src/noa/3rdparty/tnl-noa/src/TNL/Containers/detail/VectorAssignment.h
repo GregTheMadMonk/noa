@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Expressions/TypeTraits.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace detail {
+namespace noa::TNL::Containers::detail {
 
 /**
  * \brief Vector assignment
@@ -396,6 +394,4 @@ struct VectorAssignmentWithOperation< Vector, T, false, false >
    }
 };
 
-}  // namespace detail
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::detail

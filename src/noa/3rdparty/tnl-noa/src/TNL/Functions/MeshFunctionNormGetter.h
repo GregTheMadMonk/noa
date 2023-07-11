@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 template< typename Mesh >
 class MeshFunctionNormGetter
@@ -114,5 +113,4 @@ public:
    }
 };
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

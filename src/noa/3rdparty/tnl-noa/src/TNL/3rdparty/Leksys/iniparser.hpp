@@ -58,7 +58,7 @@
 #include <string.h>   // for strlen()
 #include <iomanip>    // for std::setprecision
 
-#include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>   // for TNL::getType
+#include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>   // for noa::TNL::getType
 /*---------------------------------------------------------------------------------------------------------------/
 / Defines & Settings
 /---------------------------------------------------------------------------------------------------------------*/
@@ -158,7 +158,7 @@ namespace INI
         ss << v;
         ss >> out;
         if (ss.fail())
-            throw std::runtime_error("Value '" + v + "' could not be converted to type " + TNL::getType<T>() + ".");
+            throw std::runtime_error("Value '" + v + "' could not be converted to type " + noa::TNL::getType<T>() + ".");
         return out;
     }
     /// Special case for string

@@ -17,9 +17,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/CudaReductionBuffer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaSupportMissing.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace detail {
+namespace noa::TNL::Algorithms::detail {
 
 #ifdef __CUDACC__
 template< int blockSizeX, typename Result, typename DataFetcher, typename Reduction, typename Index >
@@ -147,7 +145,7 @@ CudaMultireductionKernelLauncher( const Result identity,
    Cuda::LaunchConfiguration launch_config;
 
    // version A: max 16 rows of threads
-   launch_config.blockSize.y = TNL::min( n, 16 );
+   launch_config.blockSize.y = noa::TNL::min( n, 16 );
 
    // version B: up to 16 rows of threads, then "minimize" number of inactive rows
    //   if( n <= 16 )
@@ -169,7 +167,7 @@ CudaMultireductionKernelLauncher( const Result identity,
    while( launch_config.blockSize.x * launch_config.blockSize.y > maxThreadsPerBlock )
       launch_config.blockSize.x /= 2;
 
-   launch_config.gridSize.x = TNL::min( Cuda::getNumberOfBlocks( size, launch_config.blockSize.x ), desGridSizeX );
+   launch_config.gridSize.x = noa::TNL::min( Cuda::getNumberOfBlocks( size, launch_config.blockSize.x ), desGridSizeX );
    launch_config.gridSize.y = Cuda::getNumberOfBlocks( n, launch_config.blockSize.y );
 
    if( launch_config.gridSize.y > (unsigned) Cuda::getMaxGridYSize() ) {
@@ -313,6 +311,4 @@ CudaMultireductionKernelLauncher( const Result identity,
 #endif
 }
 
-}  // namespace detail
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::detail

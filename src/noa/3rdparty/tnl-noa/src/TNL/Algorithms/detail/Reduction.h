@@ -14,9 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace detail {
+namespace noa::TNL::Algorithms::detail {
 
 template< typename Device >
 struct Reduction;
@@ -57,8 +55,6 @@ struct Reduction< Devices::Cuda >
    reduceWithArgument( Index begin, Index end, Fetch&& fetch, Reduce&& reduce, const Result& identity );
 };
 
-}  // namespace detail
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::detail
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/detail/Reduction.hpp>

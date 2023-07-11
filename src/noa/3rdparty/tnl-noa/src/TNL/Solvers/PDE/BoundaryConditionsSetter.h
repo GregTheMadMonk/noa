@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Pointers/SharedPointer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Traverser.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Real, typename DofVector, typename BoundaryConditions >
 class BoundaryConditionsSetterTraverserUserData
@@ -66,6 +64,4 @@ public:
    };
 };
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE

@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/MeshFunction.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 // BoundaryMeshFunction is supposed to store values of a mesh functions only
 // at boundary mesh entities. It is just a small memory optimization.
@@ -29,5 +28,4 @@ public:
    using typename BaseType::VectorType;
 };
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

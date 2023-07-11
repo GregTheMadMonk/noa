@@ -14,9 +14,7 @@
 
 #include "Traits.h"
 
-namespace noa::TNL {
-namespace Meshes {
-namespace EntityTags {
+namespace noa::TNL::Meshes::EntityTags {
 
 template< typename Mesh >
 constexpr bool
@@ -91,6 +89,4 @@ initializeEntityTags( Mesh& mesh )
    }
 }
 
-}  // namespace EntityTags
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::EntityTags

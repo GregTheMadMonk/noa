@@ -13,14 +13,12 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/SegmentView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/ElementsOrganization.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 /**
  * \brief Data structure for CSR segments format.
  *
- * See \ref TNL::Algorithms::Segments for more details about segments.
+ * See \ref noa::TNL::Algorithms::Segments for more details about segments.
  *
  * \tparam Device is type of device where the segments will be operating.
  * \tparam Index is type for indexing of the elements managed by the segments.
@@ -85,7 +83,7 @@ public:
     * \brief This functions says that CSR format is always organised in
     * row-major order.
     */
-   static constexpr ElementsOrganization
+   [[nodiscard]] static constexpr ElementsOrganization
    getOrganization()
    {
       return RowMajorOrder;
@@ -94,7 +92,7 @@ public:
    /**
     * \brief This function says that CSR format does not use padding elements.
     */
-   static constexpr bool
+   [[nodiscard]] static constexpr bool
    havePadding()
    {
       return false;
@@ -113,7 +111,7 @@ public:
     * segments.
     *
     * \tparam SizesContainer is a type of container for segments sizes.  It can
-    *    be \ref TNL::Containers::Array or \ref TNL::Containers::Vector for
+    *    be \ref noa::TNL::Containers::Array or \ref noa::TNL::Containers::Vector for
     *    example.
     * \param segmentsSizes is an instance of the container with the segments sizes.
     *
@@ -176,7 +174,7 @@ public:
     * \par Output
     * \include SegmentsExample_CSR_getSerializationType.out
     */
-   static std::string
+   [[nodiscard]] static std::string
    getSerializationType();
 
    /**
@@ -191,14 +189,14 @@ public:
     * \par Output
     * \include SegmentsExample_CSR_getSegmentsType.out
     */
-   static String
+   [[nodiscard]] static String
    getSegmentsType();
 
    /**
     * \brief Set sizes of particular segments.
     *
     * \tparam SizesContainer is a container with segments sizes. It can be
-    * \ref TNL::Containers::Array or \ref TNL::Containers::Vector for example.
+    * \ref noa::TNL::Containers::Array or \ref noa::TNL::Containers::Vector for example.
     *
     * \param segmentsSizes is an instance of the container with segments sizes.
     */
@@ -220,7 +218,7 @@ public:
     * \return View for this instance of CSR segments which can by used for
     * example in lambda functions running in GPU kernels.
     */
-   ViewType
+   [[nodiscard]] ViewType
    getView();
 
    /**
@@ -229,7 +227,7 @@ public:
     * \return View for this instance of CSR segments which can by used for
     * example in lambda functions running in GPU kernels.
     */
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const;
 
    /**
@@ -237,7 +235,7 @@ public:
     *
     * \return number of segments within this object.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSegmentsCount() const;
 
@@ -246,7 +244,7 @@ public:
     *
     * \return size of the segment number \e segmentIdx.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSegmentSize( IndexType segmentIdx ) const;
 
@@ -255,7 +253,7 @@ public:
     *
     * \return number of elements managed by all segments.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getSize() const;
 
@@ -265,7 +263,7 @@ public:
     *
     * \return size of container connected to this segments.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getStorageSize() const;
 
@@ -278,7 +276,7 @@ public:
     * \param localIdx is tha local index of the element within the segment.
     * \return global index of the element.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getGlobalIndex( Index segmentIdx, Index localIdx ) const;
 
@@ -294,7 +292,7 @@ public:
     * \par Output
     * \include SegmentsExample_CSR_getSegmentView.out
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    SegmentViewType
    getSegmentView( IndexType segmentIdx ) const;
 
@@ -303,7 +301,7 @@ public:
     *
     * \return reference on constant vector with row offsets used in the CSR format.
     */
-   const OffsetsContainer&
+   [[nodiscard]] const OffsetsContainer&
    getOffsets() const;
 
    /**
@@ -311,7 +309,7 @@ public:
     *
     * \return reference on vector with row offsets used in the CSR format.
     */
-   OffsetsContainer&
+   [[nodiscard]] OffsetsContainer&
    getOffsets();
 
    /**
@@ -344,10 +342,10 @@ public:
    forElements( IndexType begin, IndexType end, Function&& function ) const;
 
    /**
-    * \brief Call \ref TNL::Algorithms::Segments::CSR::forElements for all
+    * \brief Call \ref noa::TNL::Algorithms::Segments::CSR::forElements for all
     * elements of the segments.
     *
-    * See \ref TNL::Algorithms::Segments::CSR::forElements for more details.
+    * See \ref noa::TNL::Algorithms::Segments::CSR::forElements for more details.
     */
    template< typename Function >
    void
@@ -368,7 +366,7 @@ public:
     * ```
     * auto f = [=] __cuda_callable__ ( const SegmentView& segment ) {...}
     * ```
-    * where \e segment represents given segment (see \ref TNL::Algorithms::Segments::SegmentView).
+    * where \e segment represents given segment (see \ref noa::TNL::Algorithms::Segments::SegmentView).
     * Its type is given by \ref SegmentViewType.
     *
     * \par Example
@@ -381,16 +379,16 @@ public:
    forSegments( IndexType begin, IndexType end, Function&& function ) const;
 
    /**
-    * \brief Call \ref TNL::Algorithms::Segments::CSR::forSegments for all segments.
+    * \brief Call \ref noa::TNL::Algorithms::Segments::CSR::forSegments for all segments.
     *
-    * See \ref TNL::Algorithms::Segments::CSR::forSegments for more details.
+    * See \ref noa::TNL::Algorithms::Segments::CSR::forSegments for more details.
     */
    template< typename Function >
    void
    forAllSegments( Function&& function ) const;
 
    /**
-    * \brief Call \ref TNL::Algorithms::Segments::CSR::forSegments sequentially
+    * \brief Call \ref noa::TNL::Algorithms::Segments::CSR::forSegments sequentially
     * for particular segments.
     *
     * With this method, the given segments are processed sequentially
@@ -403,7 +401,7 @@ public:
     *    elements of which we want to apply the lambda function.
     * \param function is the lambda function to be applied on the elements of the segments.
     *
-    * See \ref TNL::Algorithms::Segments::CSR::forSegments for more details.
+    * See \ref noa::TNL::Algorithms::Segments::CSR::forSegments for more details.
     *
     * \par Example
     * \include Algorithms/Segments/SegmentsExample_CSR_sequentialForSegments.cpp
@@ -415,9 +413,9 @@ public:
    sequentialForSegments( IndexType begin, IndexType end, Function&& function ) const;
 
    /**
-    * \brief Call \ref TNL::Algorithms::Segments::CSR::sequentialForSegments for all segments.
+    * \brief Call \ref noa::TNL::Algorithms::Segments::CSR::sequentialForSegments for all segments.
     *
-    * See \ref TNL::Algorithms::Segments::CSR::sequentialForSegments for more details.
+    * See \ref noa::TNL::Algorithms::Segments::CSR::sequentialForSegments for more details.
     */
    template< typename Function >
    void
@@ -481,9 +479,9 @@ public:
    reduceSegments( IndexType begin, IndexType end, Fetch& fetch, const Reduce& reduce, Keep& keep, const Value& zero ) const;
 
    /**
-    * \brief Call \ref TNL::Algorithms::Segments::CSR::reduceSegments for all segments.
+    * \brief Call \ref noa::TNL::Algorithms::Segments::CSR::reduceSegments for all segments.
     *
-    * See \ref TNL::Algorithms::Segments::CSR::reduceSegments for more details.
+    * See \ref noa::TNL::Algorithms::Segments::CSR::reduceSegments for more details.
     */
    template< typename Fetch, typename Reduce, typename Keep, typename Value >
    void
@@ -556,13 +554,13 @@ public:
    SegmentsPrinter< CSR, Fetch >
    print( Fetch&& fetch ) const;
 
-   KernelType&
+   [[nodiscard]] KernelType&
    getKernel()
    {
       return kernel;
    }
 
-   const KernelType&
+   [[nodiscard]] const KernelType&
    getKernel() const
    {
       return kernel;
@@ -622,8 +620,6 @@ template< typename Device,
           typename IndexAllocator = typename Allocators::Default< Device >::template Allocator< Index > >
 using CSRDefault = CSRScalar< Device, Index, IndexAllocator >;
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/CSR.hpp>

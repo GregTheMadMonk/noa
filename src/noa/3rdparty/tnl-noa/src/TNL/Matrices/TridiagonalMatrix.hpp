@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/TridiagonalMatrix.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 template< typename Real, typename Device, typename Index, ElementsOrganization Organization, typename RealAllocator >
 TridiagonalMatrix< Real, Device, Index, Organization, RealAllocator >::TridiagonalMatrix() = default;
@@ -51,8 +50,8 @@ template< typename Real, typename Device, typename Index, ElementsOrganization O
 std::string
 TridiagonalMatrix< Real, Device, Index, Organization, RealAllocator >::getSerializationType()
 {
-   return "Matrices::TridiagonalMatrix< " + TNL::getSerializationType< RealType >() + ", [any_device], "
-        + TNL::getSerializationType< IndexType >() + ", " + TNL::getSerializationType( Organization ) + ", [any_allocator] >";
+   return "Matrices::TridiagonalMatrix< " + noa::TNL::getSerializationType< RealType >() + ", [any_device], "
+        + noa::TNL::getSerializationType< IndexType >() + ", " + noa::TNL::getSerializationType( Organization ) + ", [any_allocator] >";
 }
 
 template< typename Real, typename Device, typename Index, ElementsOrganization Organization, typename RealAllocator >
@@ -591,5 +590,4 @@ TridiagonalMatrix< Real, Device, Index, Organization, RealAllocator >::getPaddin
    return this->view.getPaddingIndex();
 }
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices

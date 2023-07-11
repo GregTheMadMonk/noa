@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/SOR.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/Utils/LinearResidueGetter.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 template< typename Matrix >
 void
@@ -113,9 +111,7 @@ SOR< Matrix >::performIteration( const ConstVectorViewType& b,
    {
       Algorithms::AtomicOperations< DeviceType >::add( x[ rowIdx ], omega_ / diagonalView[ rowIdx ] * ( b[ rowIdx ] - value ) );
    };
-   this->matrix->reduceAllRows( fetch, TNL::Plus{}, keep, 0.0 );
+   this->matrix->reduceAllRows( fetch, noa::TNL::Plus{}, keep, 0.0 );
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear

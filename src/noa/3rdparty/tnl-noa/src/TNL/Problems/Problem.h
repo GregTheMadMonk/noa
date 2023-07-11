@@ -6,8 +6,7 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Problems {
+namespace noa::TNL::Problems {
 
 template< typename Real, typename Device, typename Index >
 class Problem
@@ -18,5 +17,4 @@ public:
    using IndexType = Index;
 };
 
-}  // namespace Problems
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Problems

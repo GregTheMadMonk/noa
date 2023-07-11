@@ -6,8 +6,7 @@
 
 #pragma once
 
-namespace noa::TNL {
-namespace Arithmetics {
+namespace noa::TNL::Arithmetics {
 
 template< typename Value >
 __cuda_callable__
@@ -730,7 +729,7 @@ __cuda_callable__
 Value
 abs( const Complex< Value >& c )
 {
-   return TNL::sqrt( norm( c ) );
+   return noa::TNL::sqrt( norm( c ) );
 }
 
 template< typename Value >
@@ -738,7 +737,7 @@ __cuda_callable__
 Value
 arg( const Complex< Value >& c )
 {
-   return TNL::atan2( c.imag(), c.real() );
+   return noa::TNL::atan2( c.imag(), c.real() );
 }
 
 template< typename Value >
@@ -757,5 +756,4 @@ operator<<( std::ostream& str, const Complex< Value >& c )
    return str;
 }
 
-}  // namespace Arithmetics
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Arithmetics

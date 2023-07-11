@@ -14,8 +14,7 @@
    // - https://doc.cgal.org/latest/Spatial_sorting/index.html
    #include <CGAL/hilbert_sort.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 struct HilbertOrdering
 {
@@ -23,8 +22,8 @@ struct HilbertOrdering
    static void
    getPermutations( const Mesh& mesh, PermutationArray& perm, PermutationArray& iperm )
    {
-      static_assert( std::is_same< typename Mesh::DeviceType, TNL::Devices::Host >::value, "" );
-      static_assert( std::is_same< typename PermutationArray::DeviceType, TNL::Devices::Host >::value, "" );
+      static_assert( std::is_same< typename Mesh::DeviceType, noa::TNL::Devices::Host >::value, "" );
+      static_assert( std::is_same< typename PermutationArray::DeviceType, noa::TNL::Devices::Host >::value, "" );
       using GlobalIndexType = typename Mesh::GlobalIndexType;
       using PointType = typename Mesh::PointType;
       using RealType = typename Mesh::RealType;
@@ -65,17 +64,17 @@ struct HilbertOrdering
          = Less_d;
          using Point_dimension_d [[maybe_unused]]  // FIXME: workaround for https://github.com/llvm/llvm-project/issues/59706
          = Point_dim_d;
-         Compute_coordinate_d
+         [[nodiscard]] Compute_coordinate_d
          compute_coordinate_d_object() const
          {
             return {};
          }
-         Less_coordinate_d
+         [[nodiscard]] Less_coordinate_d
          less_coordinate_d_object() const
          {
             return {};
          }
-         Point_dimension_d
+         [[nodiscard]] Point_dimension_d
          point_dimension_d_object() const
          {
             return {};
@@ -104,7 +103,6 @@ struct HilbertOrdering
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes
 
 #endif  // HAVE_CGAL

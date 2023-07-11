@@ -17,9 +17,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Readers/PVTIReader.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Readers/FPMAReader.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Readers {
+namespace noa::TNL::Meshes::Readers {
 
 inline std::shared_ptr< MeshReader >
 getMeshReader( const std::string& fileName, const std::string& fileFormat )
@@ -57,6 +55,4 @@ getMeshReader( const std::string& fileName, const std::string& fileFormat )
    return nullptr;
 }
 
-}  // namespace Readers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Readers

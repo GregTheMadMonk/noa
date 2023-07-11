@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/task.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 template< typename Value, typename Device >
 class Quicksorter;
@@ -33,7 +31,6 @@ public:
    void
    sort( Array& arr );
 
-protected:
    void
    init( Containers::ArrayView< Value, Devices::Cuda > arr,
          int gridDim,
@@ -48,13 +45,13 @@ protected:
    /**
     * returns how many blocks are needed to start sort phase 1 if @param elemPerBlock were to be used
     * */
-   int
+   [[nodiscard]] int
    getSetsNeeded( int elemPerBlock ) const;
 
    /**
     * returns the optimal amount of elements per thread needed for phase
     * */
-   int
+   [[nodiscard]] int
    getElemPerBlock() const;
 
    /**
@@ -85,6 +82,7 @@ protected:
    void
    secondPhase( const CMP& Cmp );
 
+protected:
    // kernel config
    int maxBlocks, threadsPerBlock, desiredElemPerBlock;
    std::size_t maxSharable;
@@ -111,8 +109,6 @@ protected:
    getSetsNeededFunction( int elemPerBlock, const Quicksorter< T, Devices::Cuda >& quicksort );
 };
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/Quicksorter.hpp>

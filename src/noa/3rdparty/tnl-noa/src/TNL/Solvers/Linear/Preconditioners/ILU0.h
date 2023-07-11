@@ -15,10 +15,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Pointers/UniquePointer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
-namespace Preconditioners {
+namespace noa::TNL::Solvers::Linear::Preconditioners {
 
 // implementation template
 template< typename Matrix, typename Real, typename Device, typename Index >
@@ -40,7 +37,7 @@ class ILU0 : public ILU0_impl< Matrix, typename Matrix::RealType, typename Matri
  *
  * See [detailed description](https://en.wikipedia.org/wiki/Incomplete_LU_factorization).
  *
- * See \ref TNL::Solvers::Linear::Preconditioners::Preconditioner for example of setup with a linear solver.
+ * See \ref noa::TNL::Solvers::Linear::Preconditioners::Preconditioner for example of setup with a linear solver.
  *
  * \tparam Matrix is type of the matrix describing the linear system.
  */
@@ -151,9 +148,6 @@ public:
    }
 };
 
-}  // namespace Preconditioners
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear::Preconditioners
 
 #include "ILU0.hpp"

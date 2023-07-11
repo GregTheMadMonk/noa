@@ -9,40 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 #include <type_traits>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Templates {
-
-constexpr size_t
-pow( size_t Value, size_t Power )
-{
-   size_t result = 1;
-
-   for( size_t i = 0; i < Power; i++ )
-      result *= Value;
-
-   return result;
-}
-
-template< typename Index >
-constexpr Index
-product( Index from, Index to )
-{
-   Index result = 1;
-
-   if( from <= to )
-      for( Index i = from; i <= to; i++ )
-         result *= i;
-
-   return result;
-}
-
-template< typename Index >
-constexpr Index
-combination( Index k, Index n )
-{
-   return product< Index >( k + 1, n ) / product< Index >( 1, n - k );
-}
+namespace noa::TNL::Meshes::Templates {
 
 /**
  * @brief A help method to calculate collapsed index the next way:
@@ -55,7 +22,7 @@ combination( Index k, Index n )
  */
 template< typename Index, int Size >
 constexpr Index
-makeCollapsedIndex( const Index base, const TNL::Containers::StaticVector< Size, Index > powers )
+makeCollapsedIndex( const Index base, const noa::TNL::Containers::StaticVector< Size, Index > powers )
 {
    Index index = 0;
    Index currentBase = 1;
@@ -85,25 +52,6 @@ makeCollapsedIndex( const int base )
    return index;
 }
 
-template< typename Index >
-constexpr Index
-firstKCombinationSum( Index k, Index n )
-{
-   if( k == 0 )
-      return 0;
-
-   if( k == n )
-      return ( 1 << n ) - 1;
-
-   Index result = 0;
-
-   // Fraction simplification of k-combination
-   for( Index i = 0; i < k; i++ )
-      result += combination( i, n );
-
-   return result;
-}
-
 constexpr bool
 isInClosedInterval( int lower, int value, int upper )
 {
@@ -116,6 +64,4 @@ isInLeftClosedRightOpenInterval( int lower, int value, int upper )
    return lower <= value && value < upper;
 }
 
-}  // namespace Templates
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Templates

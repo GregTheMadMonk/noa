@@ -11,11 +11,10 @@
 #ifdef HAVE_HYPRE
 
    #include <noa/3rdparty/tnl-noa/src/TNL/Hypre.h>
-
+   #include <noa/3rdparty/tnl-noa/src/TNL/Containers/HypreVector.h>
    #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/SparseMatrix.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 /**
  * \brief Wrapper for Hypre's sequential CSR matrix.
@@ -120,7 +119,7 @@ public:
       reset();
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getRows() const
    {
       if( m == nullptr )
@@ -128,7 +127,7 @@ public:
       return hypre_CSRMatrixNumRows( m );
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getColumns() const
    {
       if( m == nullptr )
@@ -136,7 +135,7 @@ public:
       return hypre_CSRMatrixNumCols( m );
    }
 
-   IndexType
+   [[nodiscard]] IndexType
    getNonzeroElementsCount() const
    {
       if( m == nullptr )
@@ -144,7 +143,7 @@ public:
       return hypre_CSRMatrixNumNonzeros( m );
    }
 
-   ConstValuesViewType
+   [[nodiscard]] ConstValuesViewType
    getValues() const
    {
       if( m == nullptr )
@@ -152,7 +151,7 @@ public:
       return { hypre_CSRMatrixData( m ), hypre_CSRMatrixNumNonzeros( m ) };
    }
 
-   ValuesViewType
+   [[nodiscard]] ValuesViewType
    getValues()
    {
       if( m == nullptr )
@@ -160,7 +159,7 @@ public:
       return { hypre_CSRMatrixData( m ), hypre_CSRMatrixNumNonzeros( m ) };
    }
 
-   ConstColumnIndexesViewType
+   [[nodiscard]] ConstColumnIndexesViewType
    getColumnIndexes() const
    {
       if( m == nullptr )
@@ -172,7 +171,7 @@ public:
       return { hypre_CSRMatrixJ( m ), hypre_CSRMatrixNumNonzeros( m ) };
    }
 
-   ColumnIndexesViewType
+   [[nodiscard]] ColumnIndexesViewType
    getColumnIndexes()
    {
       if( m == nullptr )
@@ -184,7 +183,7 @@ public:
       return { hypre_CSRMatrixJ( m ), hypre_CSRMatrixNumNonzeros( m ) };
    }
 
-   ConstColumnIndexesViewType
+   [[nodiscard]] ConstColumnIndexesViewType
    getRowOffsets() const
    {
       if( m == nullptr )
@@ -194,7 +193,7 @@ public:
       return { hypre_CSRMatrixI( m ), hypre_CSRMatrixNumRows( m ) + 1 };
    }
 
-   ColumnIndexesViewType
+   [[nodiscard]] ColumnIndexesViewType
    getRowOffsets()
    {
       if( m == nullptr )
@@ -204,7 +203,7 @@ public:
       return { hypre_CSRMatrixI( m ), hypre_CSRMatrixNumRows( m ) + 1 };
    }
 
-   ConstSegmentsViewType
+   [[nodiscard]] ConstSegmentsViewType
    getSegments() const
    {
       if( m == nullptr )
@@ -212,7 +211,7 @@ public:
       return { getRowOffsets(), typename ConstSegmentsViewType::KernelType{} };
    }
 
-   SegmentsViewType
+   [[nodiscard]] SegmentsViewType
    getSegments()
    {
       if( m == nullptr )
@@ -220,13 +219,13 @@ public:
       return { getRowOffsets(), typename SegmentsViewType::KernelType{} };
    }
 
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const
    {
       return { getRows(), getColumns(), getValues(), getColumnIndexes(), getSegments() };
    }
 
-   ViewType
+   [[nodiscard]] ViewType
    getView()
    {
       return { getRows(), getColumns(), getValues(), getColumnIndexes(), getSegments() };
@@ -340,7 +339,7 @@ public:
       TNL_ASSERT_EQ(
          rowCapacities.getSize(), this->getRows(), "Number of matrix rows does match the rowCapacities vector size." );
 
-      const IndexType nonzeros = TNL::sum( rowCapacities );
+      const IndexType nonzeros = noa::TNL::sum( rowCapacities );
       hypre_CSRMatrixResize( m, getRows(), getColumns(), nonzeros );
 
       // initialize row pointers
@@ -401,12 +400,42 @@ public:
          } );
    }
 
+   template< typename InVector, typename OutVector >
+   void
+   vectorProduct( const InVector& inVector,
+                  OutVector& outVector,
+                  RealType matrixMultiplicator = 1.0,
+                  RealType outVectorMultiplicator = 0.0,
+                  IndexType begin = 0,
+                  IndexType end = 0 ) const
+   {
+      static_assert( std::is_same< typename InVector::RealType, RealType >::value, "Wrong value type." );
+      static_assert( std::is_same< typename InVector::IndexType, IndexType >::value, "Wrong index type." );
+      static_assert( std::is_same< typename OutVector::RealType, RealType >::value, "Wrong value type." );
+      static_assert( std::is_same< typename OutVector::IndexType, IndexType >::value, "Wrong index type." );
+
+      TNL_ASSERT_EQ( begin, 0, "Hypre does not allow multiplication of a part of matrix and vector." );
+      TNL_ASSERT_EQ( end, 0, "Hypre does not allow multiplication of a part of matrix and vector." );
+
+      noa::TNL::Containers::HypreVector x( const_cast< RealType* >( inVector.getData() ), inVector.getSize() );
+      noa::TNL::Containers::HypreVector y( outVector.getData(), outVector.getSize() );
+      // y = alpha*A + beta*y
+      auto err = hypre_CSRMatrixMatvec( matrixMultiplicator,     // HYPRE_Complex alpha,
+                                        this->m,                 // hypre_CSRMatrix *A,
+                                        (hypre_Vector*) x,       // hypre_Vector *x,
+                                        outVectorMultiplicator,  // HYPRE_Complex beta,
+                                        (hypre_Vector*) y        // hypre_Vector *y
+      );
+
+      if( err != 0 )
+         throw std::runtime_error( "hypre_CSRMatrixMatvec returned code " + std::to_string( err ) );
+   }
+
 protected:
    hypre_CSRMatrix* m = nullptr;
    bool owns_handle = true;
 };
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices
 
 #endif  // HAVE_HYPRE

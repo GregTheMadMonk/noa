@@ -8,22 +8,21 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/BuildConfigTags.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename ConfigTag, typename Device >
 class GridTypeResolver
 {
 public:
    template< typename Reader, typename Functor >
-   static bool
+   [[nodiscard]] static bool
    run( Reader& reader, Functor&& functor );
 
 protected:
    template< typename Reader, typename Functor >
    struct detail
    {
-      static bool
+      [[nodiscard]] static bool
       resolveGridDimension( Reader& reader, Functor&& functor );
 
       // NOTE: We could disable the grids only by the GridTag, but doing the
@@ -31,24 +30,23 @@ protected:
       //       good optimization of compilation times.
 
       template< int MeshDimension >
-      static bool
+      [[nodiscard]] static bool
       resolveReal( Reader& reader, Functor&& functor );
 
       template< int MeshDimension, typename Real >
-      static bool
+      [[nodiscard]] static bool
       resolveIndex( Reader& reader, Functor&& functor );
 
       template< int MeshDimension, typename Real, typename Index >
-      static bool
+      [[nodiscard]] static bool
       resolveGridType( Reader& reader, Functor&& functor );
 
       template< typename GridType >
-      static bool
+      [[nodiscard]] static bool
       resolveTerminate( Reader& reader, Functor&& functor );
    };
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/GridTypeResolver.hpp>

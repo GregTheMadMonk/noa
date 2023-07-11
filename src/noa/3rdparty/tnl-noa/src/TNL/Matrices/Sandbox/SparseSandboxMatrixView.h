@@ -13,9 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/Sandbox/SparseSandboxMatrixRowView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeTraits.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace Sandbox {
+namespace noa::TNL::Matrices::Sandbox {
 
 /**
  * \brief Implementation of sparse sandbox matrix view.
@@ -60,7 +58,7 @@ public:
    using ValuesViewType = typename BaseType::ValuesView;
    using ConstValuesViewType = typename ValuesViewType::ConstViewType;
    using ColumnsIndexesViewType =
-      Containers::VectorView< typename TNL::copy_const< Index >::template from< Real >::type, Device, Index >;
+      Containers::VectorView< typename noa::TNL::copy_const< Index >::template from< Real >::type, Device, Index >;
    using ConstColumnsIndexesViewType = typename ColumnsIndexesViewType::ConstViewType;
    using RowsCapacitiesView = Containers::VectorView< Index, Device, Index >;
    using ConstRowsCapacitiesView = typename RowsCapacitiesView::ConstViewType;
@@ -147,7 +145,7 @@ public:
     * SANDBOX_TODO: You may replace it with containers views for metadata of your format.
     */
    using RowPointersView =
-      TNL::Containers::VectorView< std::conditional_t< std::is_const< Real >::value, std::add_const_t< IndexType >, IndexType >,
+      noa::TNL::Containers::VectorView< std::conditional_t< std::is_const< Real >::value, std::add_const_t< IndexType >, IndexType >,
                                    DeviceType,
                                    IndexType >;
 
@@ -196,7 +194,7 @@ public:
     *
     * \return sparse matrix view.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ViewType
    getView();
 
@@ -205,7 +203,7 @@ public:
     *
     * \return sparse matrix view.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstViewType
    getConstView() const;
 
@@ -222,7 +220,7 @@ public:
     * \par Output
     * \include SparseMatrixViewExample_getSerializationType.out
     */
-   static std::string
+   [[nodiscard]] static std::string
    getSerializationType();
 
    /**
@@ -237,7 +235,7 @@ public:
     * \par Output
     * \include SparseMatrixExample_getSerializationType.out
     */
-   std::string
+   [[nodiscard]] std::string
    getSerializationTypeVirtual() const override;
 
    /**
@@ -272,7 +270,7 @@ public:
     * \param row index of matrix row.
     * \return number of matrix elements allocated for the row.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getRowCapacity( IndexType row ) const;
 
@@ -284,7 +282,7 @@ public:
     *
     * \return number of non-zero matrix elements.
     */
-   IndexType
+   [[nodiscard]] IndexType
    getNonzeroElementsCount() const override;
 
    /**
@@ -301,7 +299,7 @@ public:
     *
     * See \ref SparseSandboxMatrixRowView.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstRowView
    getRow( const IndexType& rowIdx ) const;
 
@@ -319,7 +317,7 @@ public:
     *
     * See \ref SparseSandboxMatrixRowView.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RowView
    getRow( const IndexType& rowIdx );
 
@@ -394,7 +392,7 @@ public:
     * \include SparseMatrixViewExample_getElement.out
     *
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RealType
    getElement( IndexType row, IndexType column ) const;
 
@@ -751,12 +749,12 @@ public:
     * `outVector = matrixMultiplicator * ( * this ) * inVector + outVectorMultiplicator * outVector`
     *
     * \tparam InVector is type of input vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     * \tparam OutVector is type of output vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     *
     * \param inVector is input vector.
@@ -794,7 +792,7 @@ public:
     * \return \e true if the RHS matrix is equal, \e false otherwise.
     */
    template< typename Matrix >
-   bool
+   [[nodiscard]] bool
    operator==( const Matrix& matrix ) const;
 
    /**
@@ -804,7 +802,7 @@ public:
     * \return \e true if the RHS matrix is equal, \e false otherwise.
     */
    template< typename Matrix >
-   bool
+   [[nodiscard]] bool
    operator!=( const Matrix& matrix ) const;
 
    /**
@@ -856,7 +854,7 @@ public:
     *
     * \return Constant reference to a vector with matrix elements column indexes.
     */
-   const ColumnsIndexesViewType&
+   [[nodiscard]] const ColumnsIndexesViewType&
    getColumnIndexes() const;
 
    /**
@@ -864,7 +862,7 @@ public:
     *
     * \return Reference to a vector with matrix elements column indexes.
     */
-   ColumnsIndexesViewType&
+   [[nodiscard]] ColumnsIndexesViewType&
    getColumnIndexes();
 
    /**
@@ -875,7 +873,7 @@ public:
     *
     * \return value of the padding index.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getPaddingIndex() const;
 
@@ -902,8 +900,6 @@ private:
    }
 };
 
-}  // namespace Sandbox
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::Sandbox
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/Sandbox/SparseSandboxMatrixView.hpp>

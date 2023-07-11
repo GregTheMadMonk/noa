@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshEntity.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< typename MeshConfig, typename Device, typename EntityTopology >
 __cuda_callable__
@@ -121,5 +120,4 @@ operator<<( std::ostream& str, const MeshEntity< MeshConfig, Device, EntityTopol
    return str << getType< decltype( entity ) >() << "( <meshPointer>, " << entity.getIndex() << " )";
 }
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

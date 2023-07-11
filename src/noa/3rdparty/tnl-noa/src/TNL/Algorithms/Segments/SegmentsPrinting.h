@@ -9,9 +9,7 @@
 #include <iostream>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 /**
  * \brief Print segments sizes, i.e. the segments setup.
@@ -58,7 +56,7 @@ struct SegmentsPrinter
       using DeviceType = typename Segments::DeviceType;
       using ValueType = decltype( fetch( IndexType() ) );
 
-      TNL::Containers::Array< ValueType, DeviceType, IndexType > aux( 1 );
+      noa::TNL::Containers::Array< ValueType, DeviceType, IndexType > aux( 1 );
       auto view = segments.getConstView();
       for( IndexType segmentIdx = 0; segmentIdx < segments.getSegmentsCount(); segmentIdx++ ) {
          str << "Seg. " << segmentIdx << ": [ ";
@@ -102,7 +100,7 @@ printSegments( const Segments& segments, Fetch&& fetch, std::ostream& str )
    using DeviceType = typename Segments::DeviceType;
    using ValueType = decltype( fetch( IndexType() ) );
 
-   TNL::Containers::Array< ValueType, DeviceType, IndexType > aux( 1 );
+   noa::TNL::Containers::Array< ValueType, DeviceType, IndexType > aux( 1 );
    auto view = segments.getConstView();
    for( IndexType segmentIdx = 0; segmentIdx < segments.getSegmentsCount(); segmentIdx++ ) {
       str << "Seg. " << segmentIdx << ": [ ";
@@ -127,6 +125,4 @@ printSegments( const Segments& segments, Fetch&& fetch, std::ostream& str )
 }
 /// \endcond
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

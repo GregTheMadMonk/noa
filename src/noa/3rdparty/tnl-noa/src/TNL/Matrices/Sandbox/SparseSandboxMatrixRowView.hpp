@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/Sandbox/SparseSandboxMatrixRowView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace Sandbox {
+namespace noa::TNL::Matrices::Sandbox {
 
 // SANDBOX_TODO: Modify the follwing constructor by your needs
 template< typename ValuesView, typename ColumnsIndexesView, bool isBinary_ >
@@ -200,6 +198,4 @@ operator<<( std::ostream& str, const SparseSandboxMatrixRowView< ValuesView, Col
    return str;
 }
 
-}  // namespace Sandbox
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::Sandbox

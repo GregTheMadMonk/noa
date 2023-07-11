@@ -14,8 +14,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Problems/HeatEquationProblem.h>
 
-namespace noa::TNL {
-namespace Problems {
+namespace noa::TNL::Problems {
 
 template< typename Mesh,
           typename BoundaryCondition,
@@ -32,7 +31,6 @@ public:
    setup( const Config::ParameterContainer& parameters, const String& prefix );
 };
 
-}  // namespace Problems
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Problems
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Problems/HeatEquationEocProblem_impl.h>

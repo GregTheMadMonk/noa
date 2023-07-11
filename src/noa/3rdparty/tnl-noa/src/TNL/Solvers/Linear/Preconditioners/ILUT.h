@@ -14,10 +14,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/SparseMatrix.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/NotImplementedError.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
-namespace Preconditioners {
+namespace noa::TNL::Solvers::Linear::Preconditioners {
 
 // implementation template
 template< typename Matrix, typename Real, typename Device, typename Index >
@@ -28,7 +25,7 @@ class ILUT_impl;
  *
  * See [detailed description](https://www-users.cse.umn.edu/~saad/PDF/umsi-92-38.pdf)
  *
- * See \ref TNL::Solvers::Linear::Preconditioners::Preconditioner for example of setup with a linear solver.
+ * See \ref noa::TNL::Solvers::Linear::Preconditioners::Preconditioner for example of setup with a linear solver.
  *
  * \tparam Matrix is type of the matrix describing the linear system.
  */
@@ -176,9 +173,6 @@ public:
    }
 };
 
-}  // namespace Preconditioners
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear::Preconditioners
 
 #include "ILUT.hpp"

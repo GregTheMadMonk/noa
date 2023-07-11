@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Grid.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace DistributedMeshes {
+namespace noa::TNL::Meshes::DistributedMeshes {
 
 template< typename Mesh >
 class DistributedMesh;
@@ -106,8 +104,6 @@ public:
                 const SubdomainOverlapsType& upperPeriodicBoundariesOverlapSize = 0 );
 };
 
-}  // namespace DistributedMeshes
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::DistributedMeshes
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DistributedMeshes/SubdomainOverlapsGetter.hpp>

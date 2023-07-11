@@ -20,9 +20,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/resolveDistributedMeshType.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Comm.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace PDE {
+namespace noa::TNL::Solvers::PDE {
 
 template< typename Problem >
 TimeIndependentPDESolver< Problem >::TimeIndependentPDESolver() : problem( 0 )
@@ -145,6 +143,4 @@ TimeIndependentPDESolver< Problem >::writeEpilog( Logger& logger ) const
    return this->problem->writeEpilog( logger );
 }
 
-}  // namespace PDE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::PDE

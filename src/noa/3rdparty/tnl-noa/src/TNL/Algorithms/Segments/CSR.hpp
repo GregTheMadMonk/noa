@@ -10,9 +10,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/CSR.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/CSR.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Device, typename Index, typename Kernel, typename IndexAllocator >
 template< typename SizesContainer >
@@ -32,9 +30,9 @@ template< typename Device, typename Index, typename Kernel, typename IndexAlloca
 std::string
 CSR< Device, Index, Kernel, IndexAllocator >::getSerializationType()
 {
-   return "CSR< [any_device], " + TNL::getSerializationType< IndexType >() + ", " +
+   return "CSR< [any_device], " + noa::TNL::getSerializationType< IndexType >() + ", " +
           // FIXME: the serialized data do not depend on the the kernel type so it should not be in the serialization type
-          TNL::getSerializationType< KernelType >() + " >";
+          noa::TNL::getSerializationType< KernelType >() + " >";
 }
 
 template< typename Device, typename Index, typename Kernel, typename IndexAllocator >
@@ -250,6 +248,4 @@ CSR< Device, Index, Kernel, IndexAllocator >::print( Fetch&& fetch ) const -> Se
    return SegmentsPrinter< CSR, Fetch >( *this, fetch );
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

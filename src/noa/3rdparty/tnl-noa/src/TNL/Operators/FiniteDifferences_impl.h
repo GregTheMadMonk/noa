@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Operators/FiniteDifferences.h>
 
-namespace noa::TNL {
-namespace Operators {
+namespace noa::TNL::Operators {
 
 template< typename Real, typename Device, typename Index >
 template< typename GridFunction,
@@ -213,7 +212,6 @@ FiniteDifferences< Meshes::Grid< 3, Real, Device, Index > >::getDifference( cons
    }
 }
 
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Operators/FiniteDifferences_impl.h>

@@ -16,8 +16,7 @@
 #include "Comm.h"
 #include "Utils.h"
 
-namespace noa::TNL {
-namespace MPI {
+namespace noa::TNL::MPI {
 
 /**
  * \brief Returns a matrix of communication costs between each pair of ranks as
@@ -29,8 +28,8 @@ auto
 measureAlltoallCommunicationCost( const MPI::Comm& communicator, int messageSize = 1e7, int iterations = 10 )
 {
    using ValueType = int;
-   using Vector = TNL::Containers::Vector< ValueType, Device, int >;
-   using Matrix = TNL::Matrices::DenseMatrix< double, TNL::Devices::Sequential, int >;
+   using Vector = noa::TNL::Containers::Vector< ValueType, Device, int >;
+   using Matrix = noa::TNL::Matrices::DenseMatrix< double, noa::TNL::Devices::Sequential, int >;
 
    // initialize communication buffers
    Vector send_buf( messageSize );
@@ -74,7 +73,7 @@ measureAlltoallCommunicationCost( const MPI::Comm& communicator, int messageSize
          cost( src, dest ) = cost( dest, src ) = time;
 
          // keep the minimal time for normalization
-         min_time = TNL::min( min_time, time );
+         min_time = noa::TNL::min( min_time, time );
       }
    }
 
@@ -91,10 +90,10 @@ measureAlltoallCommunicationCost( const MPI::Comm& communicator, int messageSize
  * matrix, communication pattern and permutation of the ranks.
  */
 template< typename CostMatrix, typename CommPattern, typename Permutation >
-TNL::Containers::Vector< double, TNL::Devices::Sequential, int >
+TNL::Containers::Vector< double, noa::TNL::Devices::Sequential, int >
 getCommunicationCosts( const CostMatrix& cost, const CommPattern& pattern, const Permutation& perm )
 {
-   using Vector = TNL::Containers::Vector< double, TNL::Devices::Sequential, int >;
+   using Vector = noa::TNL::Containers::Vector< double, noa::TNL::Devices::Sequential, int >;
 
    const int size = perm.getSize();
    if( cost.getRows() != size || cost.getColumns() != size || pattern.getRows() != size || pattern.getColumns() != size )
@@ -136,28 +135,28 @@ getCommunicationCosts( const CostMatrix& cost, const CommPattern& pattern, const
  * - Reference: https://en.wikipedia.org/wiki/Transposition_(mathematics)
  */
 template< typename CostMatrix, typename CommPattern >
-Containers::Vector< int, TNL::Devices::Sequential, int >
+Containers::Vector< int, noa::TNL::Devices::Sequential, int >
 solveQuadraticAssignmentProblem( int nproc, const CostMatrix& costMatrix, const CommPattern& pattern )
 {
-   using Vector = Containers::Vector< int, TNL::Devices::Sequential, int >;
+   using Vector = Containers::Vector< int, noa::TNL::Devices::Sequential, int >;
 
    // start with identity permutation
    Vector perm( nproc );
    for( int i = 0; i < nproc; i++ )
       perm[ i ] = i;
 
-   double current_cost = TNL::sum( getCommunicationCosts( costMatrix, pattern, perm ) );
+   double current_cost = noa::TNL::sum( getCommunicationCosts( costMatrix, pattern, perm ) );
 
    // generate transpositions
    for( int i = 0; i < nproc; i++ ) {
       for( int j = i + 1; j < nproc; j++ ) {
          // check if the transposition is better
          std::swap( perm[ i ], perm[ j ] );
-         const double cost = TNL::sum( getCommunicationCosts( costMatrix, pattern, perm ) );
+         const double cost = noa::TNL::sum( getCommunicationCosts( costMatrix, pattern, perm ) );
          if( cost < current_cost ) {
             // keep the permutation
             current_cost = cost;
-            if( TNL::MPI::GetRank( MPI_COMM_WORLD ) == 0 ) {
+            if( noa::TNL::MPI::GetRank( MPI_COMM_WORLD ) == 0 ) {
                std::cout << "permutation " << perm << " cost " << cost << std::endl;
             }
          }
@@ -194,14 +193,14 @@ optimizeRanks( const MPI::Comm& communicator, const CommPattern& communicationPa
    const auto costMatrix = measureAlltoallCommunicationCost< Device >( communicator );
 
    if( rank == 0 ) {
-      using Vector = TNL::Containers::Vector< double, TNL::Devices::Sequential, int >;
+      using Vector = noa::TNL::Containers::Vector< double, noa::TNL::Devices::Sequential, int >;
       Vector identity( nproc );
       for( int i = 0; i < nproc; i++ )
          identity[ i ] = i;
 
       std::cout << "cost matrix:\n" << costMatrix << std::endl;
       const auto cost = getCommunicationCosts( costMatrix, communicationPattern, identity );
-      std::cout << "initial cost vector: " << cost << " sum " << TNL::sum( cost ) << std::endl;
+      std::cout << "initial cost vector: " << cost << " sum " << noa::TNL::sum( cost ) << std::endl;
    }
 
    // get permutation by solving the quadratic assignment problem
@@ -210,12 +209,11 @@ optimizeRanks( const MPI::Comm& communicator, const CommPattern& communicationPa
    if( rank == 0 ) {
       const auto rank_costs = getCommunicationCosts( costMatrix, communicationPattern, perm );
       std::cout << "restored best permutation " << perm << " with cost vector " << rank_costs << " sum "
-                << TNL::sum( rank_costs ) << std::endl;
+                << noa::TNL::sum( rank_costs ) << std::endl;
    }
 
    // create a communicator comprising all processes, but with permuted ranks
    return communicator.split( 0, perm[ rank ] );
 }
 
-}  // namespace MPI
-}  // namespace noa::TNL
+}  // namespace noa::TNL::MPI

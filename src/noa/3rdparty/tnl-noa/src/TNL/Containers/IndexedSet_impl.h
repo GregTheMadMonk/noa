@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/IndexedSet.h>
 
-namespace noa::TNL {
-namespace Containers {
+namespace noa::TNL::Containers {
 
 template< class Key, class Index, class Compare, class Allocator >
 void
@@ -79,5 +78,4 @@ operator<<( std::ostream& str, IndexedSet< Key, Index, Compare, Allocator >& set
    return str;
 }
 
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers

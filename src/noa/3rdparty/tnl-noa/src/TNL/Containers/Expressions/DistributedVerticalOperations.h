@@ -12,9 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Wrappers.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/reduce.h>
 
-namespace noa::TNL {
-namespace Containers {
-namespace Expressions {
+namespace noa::TNL::Containers::Expressions {
 
 template< typename Expression >
 auto
@@ -26,7 +24,7 @@ DistributedExpressionMin( const Expression& expression ) -> std::decay_t< declty
                   "std::numeric_limits is not specialized for the reduction's result type" );
    ResultType result = std::numeric_limits< ResultType >::max();
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::Min{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::Min{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_MIN, expression.getCommunicator() );
    }
    return result;
@@ -47,7 +45,7 @@ DistributedExpressionArgMin( const Expression& expression )
    const MPI::Comm& communicator = expression.getCommunicator();
    if( communicator != MPI_COMM_NULL ) {
       // compute local argMin
-      ResultType localResult = Algorithms::reduceWithArgument( expression.getConstLocalView(), TNL::MinWithArg{} );
+      ResultType localResult = Algorithms::reduceWithArgument( expression.getConstLocalView(), noa::TNL::MinWithArg{} );
       // transform local index to global index
       localResult.second += expression.getLocalRange().getBegin();
 
@@ -69,7 +67,7 @@ DistributedExpressionArgMin( const Expression& expression )
       {
          return gatheredResults[ i ].first;
       };
-      result = Algorithms::reduceWithArgument< Devices::Host >( (IndexType) 0, (IndexType) nproc, fetch, TNL::MinWithArg{} );
+      result = Algorithms::reduceWithArgument< Devices::Host >( (IndexType) 0, (IndexType) nproc, fetch, noa::TNL::MinWithArg{} );
       result.second = gatheredResults[ result.second ].second;
    }
    return result;
@@ -85,7 +83,7 @@ DistributedExpressionMax( const Expression& expression ) -> std::decay_t< declty
                   "std::numeric_limits is not specialized for the reduction's result type" );
    ResultType result = std::numeric_limits< ResultType >::lowest();
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::Max{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::Max{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_MAX, expression.getCommunicator() );
    }
    return result;
@@ -106,7 +104,7 @@ DistributedExpressionArgMax( const Expression& expression )
    const MPI::Comm& communicator = expression.getCommunicator();
    if( communicator != MPI_COMM_NULL ) {
       // compute local argMax
-      ResultType localResult = Algorithms::reduceWithArgument( expression.getConstLocalView(), TNL::MaxWithArg{} );
+      ResultType localResult = Algorithms::reduceWithArgument( expression.getConstLocalView(), noa::TNL::MaxWithArg{} );
       // transform local index to global index
       localResult.second += expression.getLocalRange().getBegin();
 
@@ -128,7 +126,7 @@ DistributedExpressionArgMax( const Expression& expression )
       {
          return gatheredResults[ i ].first;
       };
-      result = Algorithms::reduceWithArgument< Devices::Host >( (IndexType) 0, (IndexType) nproc, fetch, TNL::MaxWithArg{} );
+      result = Algorithms::reduceWithArgument< Devices::Host >( (IndexType) 0, (IndexType) nproc, fetch, noa::TNL::MaxWithArg{} );
       result.second = gatheredResults[ result.second ].second;
    }
    return result;
@@ -142,7 +140,7 @@ DistributedExpressionSum( const Expression& expression ) -> std::decay_t< declty
 
    ResultType result = 0;
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::Plus{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::Plus{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_SUM, expression.getCommunicator() );
    }
    return result;
@@ -156,7 +154,7 @@ DistributedExpressionProduct( const Expression& expression ) -> std::decay_t< de
 
    ResultType result = 1;
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::Multiplies{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::Multiplies{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_PROD, expression.getCommunicator() );
    }
    return result;
@@ -173,7 +171,7 @@ DistributedExpressionLogicalAnd( const Expression& expression )
                   "std::numeric_limits is not specialized for the reduction's result type" );
    ResultType result = std::numeric_limits< ResultType >::max();
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::LogicalAnd{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::LogicalAnd{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_LAND, expression.getCommunicator() );
    }
    return result;
@@ -187,7 +185,7 @@ DistributedExpressionLogicalOr( const Expression& expression ) -> std::decay_t< 
 
    ResultType result = 0;
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::LogicalOr{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::LogicalOr{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_LOR, expression.getCommunicator() );
    }
    return result;
@@ -203,7 +201,7 @@ DistributedExpressionBinaryAnd( const Expression& expression ) -> std::decay_t< 
                   "std::numeric_limits is not specialized for the reduction's result type" );
    ResultType result = std::numeric_limits< ResultType >::max();
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::BitAnd{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::BitAnd{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_BAND, expression.getCommunicator() );
    }
    return result;
@@ -217,7 +215,7 @@ DistributedExpressionBinaryOr( const Expression& expression ) -> std::decay_t< d
 
    ResultType result = 0;
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::BitOr{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::BitOr{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_BOR, expression.getCommunicator() );
    }
    return result;
@@ -231,12 +229,10 @@ DistributedExpressionBinaryXor( const Expression& expression ) -> std::decay_t< 
 
    ResultType result = 0;
    if( expression.getCommunicator() != MPI_COMM_NULL ) {
-      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), TNL::BitXor{} );
+      const ResultType localResult = Algorithms::reduce( expression.getConstLocalView(), noa::TNL::BitXor{} );
       MPI::Allreduce( &localResult, &result, 1, MPI_BXOR, expression.getCommunicator() );
    }
    return result;
 }
 
-}  // namespace Expressions
-}  // namespace Containers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Containers::Expressions

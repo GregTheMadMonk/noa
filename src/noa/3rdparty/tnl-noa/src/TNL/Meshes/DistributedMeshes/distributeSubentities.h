@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/scan.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/contains.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace DistributedMeshes {
+namespace noa::TNL::Meshes::DistributedMeshes {
 
 template< typename GlobalIndexType >
 auto
@@ -184,9 +182,9 @@ distributeSubentities( DistributedMesh& mesh, bool preferHighRanks = true )
          for( LocalIndexType k = 0; k < entity.template getSuperentitiesCount< DistributedMesh::getMeshDimension() >(); k++ ) {
             const GlobalIndexType gk = entity.template getSuperentityIndex< DistributedMesh::getMeshDimension() >( k );
             if( preferHighRanks )
-               owner = TNL::max( owner, getCellOwner( gk ) );
+               owner = noa::TNL::max( owner, getCellOwner( gk ) );
             else
-               owner = TNL::min( owner, getCellOwner( gk ) );
+               owner = noa::TNL::min( owner, getCellOwner( gk ) );
          }
          return owner;
       }
@@ -418,6 +416,4 @@ distributeSubentities( DistributedMesh& mesh, bool preferHighRanks = true )
    }
 }
 
-}  // namespace DistributedMeshes
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::DistributedMeshes

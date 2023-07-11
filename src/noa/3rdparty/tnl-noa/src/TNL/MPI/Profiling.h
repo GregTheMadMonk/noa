@@ -8,15 +8,13 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Timer.h>
 
-namespace noa::TNL {
-namespace MPI {
+namespace noa::TNL::MPI {
 
-inline Timer&
+[[nodiscard]] inline Timer&
 getTimerAllreduce()
 {
    static Timer t;
    return t;
 }
 
-}  // namespace MPI
-}  // namespace noa::TNL
+}  // namespace noa::TNL::MPI

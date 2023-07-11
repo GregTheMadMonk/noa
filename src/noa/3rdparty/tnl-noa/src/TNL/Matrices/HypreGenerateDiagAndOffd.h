@@ -17,9 +17,7 @@
    #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
    #include <noa/3rdparty/tnl-noa/src/TNL/Hypre.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace detail {
+namespace noa::TNL::Matrices::detail {
 
 /**
  * \brief Splits matrix A into the diagonal and off-diagonal blocks
@@ -137,7 +135,7 @@ GenerateDiagAndOffd( hypre_CSRMatrix* A, hypre_ParCSRMatrix* matrix, HYPRE_BigIn
             return offd_j[ perm_view[ a ] ] < offd_j[ perm_view[ b ] ];
          },
          [ = ] __cuda_callable__( HYPRE_Int a, HYPRE_Int b ) mutable {  // swapper lambda function
-            TNL::swap( perm_view[ a ], perm_view[ b ] );
+            noa::TNL::swap( perm_view[ a ], perm_view[ b ] );
          } );
 
       // count offd columns
@@ -152,7 +150,7 @@ GenerateDiagAndOffd( hypre_CSRMatrix* A, hypre_ParCSRMatrix* matrix, HYPRE_BigIn
             else
                return 0;
          },
-         TNL::Plus{}  // reduction operation
+         noa::TNL::Plus{}  // reduction operation
       );
       hypre_CSRMatrixNumCols( offd ) = num_cols_offd;
 
@@ -205,8 +203,6 @@ GenerateDiagAndOffd( hypre_CSRMatrix* A, hypre_ParCSRMatrix* matrix, HYPRE_BigIn
    return hypre_error_flag;
 }
 
-}  // namespace detail
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::detail
 
 #endif  // HAVE_HYPRE

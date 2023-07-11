@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/Analytic/Paraboloid.h>
 
-namespace noa::TNL {
-namespace Functions {
-namespace Analytic {
+namespace noa::TNL::Functions::Analytic {
 
 template< int dimensions, typename Real >
 ParaboloidBase< dimensions, Real >::ParaboloidBase() : xCenter( 0 ), yCenter( 0 ), zCenter( 0 ), coefficient( 1 ), radius( 0 )
@@ -169,6 +167,4 @@ Paraboloid< 3, Real >::getPartialDerivative( const PointType& v, const Real& tim
    return 0.0;
 }
 
-}  // namespace Analytic
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions::Analytic

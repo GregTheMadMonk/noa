@@ -10,9 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/ODE/StaticExplicitSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace ODE {
+namespace noa::TNL::Solvers::ODE {
 
 template< typename Real, typename Index >
 void
@@ -117,6 +115,4 @@ StaticExplicitSolver< Real, Index >::setTestingMode( bool testingMode )
    this->testingMode = testingMode;
 }
 
-}  // namespace ODE
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::ODE

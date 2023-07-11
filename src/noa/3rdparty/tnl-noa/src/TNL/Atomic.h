@@ -75,7 +75,7 @@ public:
    using std::atomic< T >::atomic;
 
    // NOTE: std::atomic is not copyable (see https://stackoverflow.com/a/15250851 for
-   // an explanation), but we need copyability for TNL::Containers::Array. Note that
+   // an explanation), but we need copyability for noa::TNL::Containers::Array. Note that
    // this copy-constructor and copy-assignment operator are not atomic as they
    // synchronize only with respect to one or the other object.
    Atomic( const Atomic& desired ) noexcept : std::atomic< T >()
@@ -147,7 +147,7 @@ public:
    }
 
    // NOTE: std::atomic is not copyable (see https://stackoverflow.com/a/15250851 for
-   // an explanation), but we need copyability for TNL::Containers::Array. Note that
+   // an explanation), but we need copyability for noa::TNL::Containers::Array. Note that
    // this copy-constructor and copy-assignment operator are not atomic as they
    // synchronize only with respect to one or the other object.
    __cuda_callable__
@@ -167,13 +167,13 @@ public:
       return *this;
    }
 
-   bool
+   [[nodiscard]] bool
    is_lock_free() const noexcept
    {
       return true;
    }
 
-   constexpr bool
+   [[nodiscard]] constexpr bool
    is_always_lock_free() const noexcept
    {
       return true;

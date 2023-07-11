@@ -15,9 +15,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Kernels/details/CSRAdaptiveKernelBlockDescriptor.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Kernels/details/CSRAdaptiveKernelParameters.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename BlocksView,
           typename Offsets,
@@ -52,7 +50,7 @@ reduceSegmentsCSRAdaptiveKernel( BlocksView blocks,
    __shared__ Real multivectorShared[ CudaBlockSize / WarpSize ];
    //__shared__ BlockType sharedBlocks[ WarpsCount ];
 
-   const Index index = ( ( gridIdx * TNL::Cuda::getMaxGridXSize() + blockIdx.x ) * blockDim.x ) + threadIdx.x;
+   const Index index = ( ( gridIdx * noa::TNL::Cuda::getMaxGridXSize() + blockIdx.x ) * blockDim.x ) + threadIdx.x;
    const Index blockIdx = index / WarpSize;
    if( blockIdx >= blocks.getSize() - 1 )
       return;
@@ -115,8 +113,8 @@ reduceSegmentsCSRAdaptiveKernel( BlocksView blocks,
 
       TNL_ASSERT_GT( block.getWarpsCount(), 0, "" );
       result = zero;
-      for( Index globalIdx = begin + laneIdx + TNL::Cuda::getWarpSize() * block.getWarpIdx(); globalIdx < end;
-           globalIdx += TNL::Cuda::getWarpSize() * block.getWarpsCount() )
+      for( Index globalIdx = begin + laneIdx + noa::TNL::Cuda::getWarpSize() * block.getWarpIdx(); globalIdx < end;
+           globalIdx += noa::TNL::Cuda::getWarpSize() * block.getWarpsCount() )
       {
          result = reduce( result, fetch( globalIdx, compute ) );
       }
@@ -209,7 +207,7 @@ CSRAdaptiveKernelView< Index, Device >::reduceSegments( const OffsetsView& offse
    int valueSizeLog = getSizeValueLog( sizeof( Real ) );
 
    if( detail::CheckFetchLambda< Index, Fetch >::hasAllParameters() || valueSizeLog >= MaxValueSizeLog ) {
-      TNL::Algorithms::Segments::CSRScalarKernel< Index, Device >::reduceSegments(
+      noa::TNL::Algorithms::Segments::CSRScalarKernel< Index, Device >::reduceSegments(
          offsets, first, last, fetch, reduction, keeper, zero, args... );
       return;
    }
@@ -217,17 +215,17 @@ CSRAdaptiveKernelView< Index, Device >::reduceSegments( const OffsetsView& offse
    constexpr bool DispatchScalarCSR =
       detail::CheckFetchLambda< Index, Fetch >::hasAllParameters() || std::is_same< Device, Devices::Host >::value;
    if constexpr( DispatchScalarCSR ) {
-      TNL::Algorithms::Segments::CSRScalarKernel< Index, Device >::reduceSegments(
+      noa::TNL::Algorithms::Segments::CSRScalarKernel< Index, Device >::reduceSegments(
          offsets, first, last, fetch, reduction, keeper, zero, args... );
    }
    else {
       Devices::Cuda::LaunchConfiguration launch_config;
       launch_config.blockSize.x = detail::CSRAdaptiveKernelParameters< sizeof( Real ) >::CudaBlockSize();
-      constexpr std::size_t maxGridSize = TNL::Cuda::getMaxGridXSize();
+      constexpr std::size_t maxGridSize = noa::TNL::Cuda::getMaxGridXSize();
 
       // Fill blocks
       const auto& blocks = this->blocksArray[ valueSizeLog ];
-      std::size_t neededThreads = blocks.getSize() * TNL::Cuda::getWarpSize();  // one warp per block
+      std::size_t neededThreads = blocks.getSize() * noa::TNL::Cuda::getWarpSize();  // one warp per block
 
       // Execute kernels on device
       for( Index gridIdx = 0; neededThreads != 0; gridIdx++ ) {
@@ -270,6 +268,4 @@ CSRAdaptiveKernelView< Index, Device >::printBlocks( int idx ) const
    }
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

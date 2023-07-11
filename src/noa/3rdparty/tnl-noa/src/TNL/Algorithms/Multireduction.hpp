@@ -22,8 +22,7 @@
    #include <iostream>
 #endif
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 template< typename Result, typename DataFetcher, typename Reduction, typename Index >
 void constexpr Multireduction< Devices::Sequential >::reduce( Result identity,
@@ -114,7 +113,7 @@ Multireduction< Devices::Host >::reduce( Result identity,
    const int blocks = size / block_size;
 
    if( Devices::Host::isOMPEnabled() && blocks >= 2 ) {
-      const int threads = TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
+      const int threads = noa::TNL::min( blocks, Devices::Host::getMaxThreadsCount() );
       #pragma omp parallel num_threads(threads)
       {
          // first thread initializes the result array
@@ -229,5 +228,4 @@ Multireduction< Devices::Cuda >::reduce( Result identity,
 #endif
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

@@ -137,11 +137,10 @@
 
    #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 
-namespace noa::TNL {
 /**
  * \brief Internal namespace for helper classes used in the TNL_ASSERT_* macros.
  */
-namespace Assert {
+namespace noa::TNL::Assert {
 
    #ifdef TNL_THROW_ASSERTION_ERROR
 // This will be used by the code for Python bindings to translate assertion
@@ -394,8 +393,7 @@ TNL_IMPL_CMP_HELPER_( GT, > )
 
    #undef TNL_IMPL_CMP_HELPER_
 
-}  // namespace Assert
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Assert
 
    // Internal macro wrapping the __PRETTY_FUNCTION__ "magic".
    #if defined( __NVCC__ ) && ( __CUDACC_VER_MAJOR__ < 8 )

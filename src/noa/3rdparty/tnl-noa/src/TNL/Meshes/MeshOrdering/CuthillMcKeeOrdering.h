@@ -10,8 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< bool reverse = true >
 struct CuthillMcKeeOrdering
@@ -20,8 +19,8 @@ struct CuthillMcKeeOrdering
    static void
    getPermutations( const Mesh& mesh, PermutationArray& perm, PermutationArray& iperm )
    {
-      static_assert( std::is_same< typename Mesh::DeviceType, TNL::Devices::Host >::value, "" );
-      static_assert( std::is_same< typename PermutationArray::DeviceType, TNL::Devices::Host >::value, "" );
+      static_assert( std::is_same< typename Mesh::DeviceType, noa::TNL::Devices::Host >::value, "" );
+      static_assert( std::is_same< typename PermutationArray::DeviceType, noa::TNL::Devices::Host >::value, "" );
 
       // The reverse Cuthill-McKee ordering is implemented only for cells,
       // other entities are ordered from the current order of cells exactly
@@ -67,7 +66,7 @@ private:
       const auto neighborCounts = mesh.getNeighborCounts().getConstView();
 
       // worker array - marker for inserted elements
-      TNL::Containers::Array< bool, TNL::Devices::Host, IndexType > marker( numberOfCells );
+      noa::TNL::Containers::Array< bool, noa::TNL::Devices::Host, IndexType > marker( numberOfCells );
       marker.setValue( false );
       // worker vector for collecting neighbors
       std::vector< IndexType > neighbors;
@@ -137,14 +136,15 @@ private:
       iperm.setSize( numberOfEntities );
 
       // worker array - marker for numbered entities
-      TNL::Containers::Array< bool, TNL::Devices::Host, IndexType > marker( numberOfEntities );
+      noa::TNL::Containers::Array< bool, noa::TNL::Devices::Host, IndexType > marker( numberOfEntities );
       marker.setValue( false );
 
       IndexType permIndex = 0;
       for( IndexType K = 0; K < numberOfCells; K++ ) {
          const auto& cell = mesh.template getEntity< Mesh::getMeshDimension() >( K );
          for( typename Mesh::LocalIndexType e = 0; e < cell.template getSubentitiesCount< MeshEntity::getEntityDimension() >();
-              e++ ) {
+              e++ )
+         {
             const auto E = cell.template getSubentityIndex< MeshEntity::getEntityDimension() >( e );
             if( ! marker[ E ] ) {
                marker[ E ] = true;
@@ -157,5 +157,4 @@ private:
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

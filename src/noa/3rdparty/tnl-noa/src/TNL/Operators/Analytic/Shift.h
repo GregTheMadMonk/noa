@@ -11,9 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/StaticVector.h>
 
-namespace noa::TNL {
-namespace Operators {
-namespace Analytic {
+namespace noa::TNL::Operators::Analytic {
 
 template< int Dimensions, typename Real >
 class Shift : public Functions::Domain< Dimensions, Functions::SpaceDomain >
@@ -74,6 +72,4 @@ protected:
    PointType shift;
 };
 
-}  // namespace Analytic
-}  // namespace Operators
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Operators::Analytic

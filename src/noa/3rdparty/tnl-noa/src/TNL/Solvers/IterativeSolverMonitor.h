@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/SolverMonitor.h>
 
-namespace noa::TNL {
-namespace Solvers {
+namespace noa::TNL::Solvers {
 
 /**
  * \brief Object for monitoring convergence of iterative solvers.
@@ -26,7 +25,7 @@ namespace Solvers {
  *
  * \include IterativeLinearSolverWithMonitorExample.out
  *
- * The following example shows how to employ timer (\ref TNL::Timer) to the monitor
+ * The following example shows how to employ timer (\ref noa::TNL::Timer) to the monitor
  * of iterative solvers:
  *
  * \includelineno Solvers/Linear/IterativeLinearSolverWithTimerExample.cpp
@@ -149,7 +148,6 @@ protected:
    IndexType nodesPerIteration = 0;
 };
 
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/IterativeSolverMonitor.hpp>

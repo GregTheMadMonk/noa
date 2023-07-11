@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Optimization/RMSProp.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Optimization {
+namespace noa::TNL::Solvers::Optimization {
 
 template< typename Vector, typename SolverMonitor >
 void
@@ -72,7 +70,7 @@ RMSProp< Vector, SolverMonitor >::solve( VectorView& w, GradientGetter&& getGrad
       a = this->beta * a + ( 1.0 - this->beta ) * gradient_view * gradient_view;
       this->setResidue(
          addAndReduceAbs(
-            w_view, -this->relaxation / sqrt( this->a + this->epsilon ) * gradient_view, TNL::Plus(), (RealType) 0.0 )
+            w_view, -this->relaxation / sqrt( this->a + this->epsilon ) * gradient_view, noa::TNL::Plus(), (RealType) 0.0 )
          / ( this->relaxation * (RealType) w.getSize() ) );
 
       if( ! this->nextIteration() )
@@ -86,6 +84,4 @@ RMSProp< Vector, SolverMonitor >::solve( VectorView& w, GradientGetter&& getGrad
    return false;  // just to avoid warnings
 }
 
-}  // namespace Optimization
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Optimization

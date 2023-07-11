@@ -12,10 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Traits.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polyhedron.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace Writers {
-namespace detail {
+namespace noa::TNL::Meshes::Writers::detail {
 
 // specialization for meshes
 template< typename Mesh >
@@ -70,7 +67,4 @@ struct VTUPolyhedralFacesWriter
    }
 };
 
-}  // namespace detail
-}  // namespace Writers
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::Writers::detail

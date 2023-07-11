@@ -11,8 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Functions/MeshFunction.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/PDE/BoundaryConditionsSetter.h>
 
-namespace noa::TNL {
-namespace Functions {
+namespace noa::TNL::Functions {
 
 /***
  * This class evaluates given operator on given preimageFunction. If the flag
@@ -481,5 +480,4 @@ protected:
    Operator operator_;
 };
 
-}  // namespace Functions
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Functions

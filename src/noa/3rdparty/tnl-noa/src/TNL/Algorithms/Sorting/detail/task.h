@@ -8,13 +8,11 @@
 
 #pragma once
 
-#include <iostream>
+#include <ostream>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Sorting {
+namespace noa::TNL::Algorithms::Sorting {
 
 struct TASK
 {
@@ -45,7 +43,7 @@ struct TASK
       this->pivotIdx = pivotIdx;
    }
 
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    int
    getSize() const
    {
@@ -67,6 +65,4 @@ operator<<( std::ostream& out, const TASK& task )
    return out << " ] ";
 }
 
-}  // namespace Sorting
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Sorting

@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeTraits.h>
 
-namespace noa::TNL {
-namespace Matrices {
-namespace details {
+namespace noa::TNL::Matrices::details {
 
 template< typename VectorOrView, std::enable_if_t< HasSetSizeMethod< VectorOrView >::value, bool > = true >
 static void
@@ -26,6 +24,4 @@ set_size_if_resizable( VectorOrView& v, typename VectorOrView::IndexType size )
    TNL_ASSERT_EQ( v.getSize(), size, "view has wrong size" );
 }
 
-}  // namespace details
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices::details

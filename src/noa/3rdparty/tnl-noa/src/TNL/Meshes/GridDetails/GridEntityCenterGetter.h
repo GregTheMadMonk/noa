@@ -8,8 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 
-namespace noa::TNL {
-namespace Meshes {
+namespace noa::TNL::Meshes {
 
 template< int Dimension, typename Real, typename Device, typename Index >
 class Grid;
@@ -31,8 +30,8 @@ public:
    using Entity = GridEntity< Grid, 1 >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -48,8 +47,8 @@ public:
    using Entity = GridEntity< Grid, 0 >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -68,8 +67,8 @@ public:
    using Entity = GridEntity< Grid, 2 >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -86,8 +85,8 @@ public:
    using Entity = GridEntity< Grid, 1 >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -105,8 +104,8 @@ public:
    using Entity = GridEntity< Grid, 0 >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -126,8 +125,8 @@ public:
    using Entity = GridEntity< Grid, EntityDimension >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -146,8 +145,8 @@ public:
    using Entity = GridEntity< Grid, 3 >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -165,8 +164,8 @@ public:
    using Entity = GridEntity< Grid, 0 >;
    using Point = typename Grid::PointType;
 
-   __cuda_callable__
-   inline static Point
+   [[nodiscard]] __cuda_callable__
+   static Point
    getEntityCenter( const Entity& entity )
    {
       const Grid& grid = entity.getMesh();
@@ -176,5 +175,4 @@ public:
    }
 };
 
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes

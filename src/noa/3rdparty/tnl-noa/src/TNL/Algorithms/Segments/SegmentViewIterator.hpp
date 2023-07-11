@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/SegmentView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename SegmentView >
 __cuda_callable__
@@ -58,12 +56,9 @@ SegmentViewIterator< SegmentView >::operator--()
 template< typename SegmentView >
 __cuda_callable__
 auto
-SegmentViewIterator< SegmentView >::operator*() const -> const SegmentElementType
+SegmentViewIterator< SegmentView >::operator*() const -> SegmentElementType
 {
-   return SegmentElementType(
-      this->segmentView.getSegmentIndex(), this->localIdx, this->segmentView.getGlobalIndex( this->localIdx ) );
+   return { this->segmentView.getSegmentIndex(), this->localIdx, this->segmentView.getGlobalIndex( this->localIdx ) };
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

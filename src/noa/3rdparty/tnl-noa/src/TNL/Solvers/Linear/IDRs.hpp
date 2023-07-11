@@ -16,9 +16,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/Factorization/LUsequential.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 template< typename Matrix >
 void
@@ -65,7 +63,7 @@ IDRs< Matrix >::solve( ConstVectorViewType b, VectorViewType x )
    VectorViewType P_i( x ), U_k( x ), U_i( x ), G_k( x ), G_i( x );
 
    // initialize the norm of the right-hand-side
-   RealType b_norm = TNL::l2Norm( b );
+   RealType b_norm = noa::TNL::l2Norm( b );
 
    // check for zero rhs - solution is the null vector
    if( b_norm == 0 ) {
@@ -76,7 +74,7 @@ IDRs< Matrix >::solve( ConstVectorViewType b, VectorViewType x )
    // r = b - A * x
    this->matrix->vectorProduct( x, r );
    r = b - r;
-   RealType r_norm = TNL::l2Norm( r );
+   RealType r_norm = noa::TNL::l2Norm( r );
    if( std::isnan( r_norm ) )
       throw std::runtime_error( "IDR(s): initial residue is NAN" );
 
@@ -168,7 +166,7 @@ IDRs< Matrix >::solve( ConstVectorViewType b, VectorViewType x )
             U_i.bind( &U.getData()[ i * sizeWithGhosts ], sizeWithGhosts );
             G_i.bind( &G.getData()[ i * sizeWithGhosts ], sizeWithGhosts );
 
-            const RealType alpha = TNL::dot( P_i, G_k ) / M( i, i );
+            const RealType alpha = noa::TNL::dot( P_i, G_k ) / M( i, i );
             U_k = U_k - alpha * U_i;
             G_k = G_k - alpha * G_i;
          }
@@ -201,15 +199,15 @@ IDRs< Matrix >::solve( ConstVectorViewType b, VectorViewType x )
          const RealType beta = f[ k ] / M( k, k );
          x = x + beta * U_k;
          r = r - beta * G_k;
-         r_norm = TNL::l2Norm( r );
+         r_norm = noa::TNL::l2Norm( r );
 
          // residual smoothing
          if( smoothing ) {
             t = r_s - r;
-            const RealType gamma = TNL::dot( t, r_s ) / TNL::dot( t, t );
+            const RealType gamma = noa::TNL::dot( t, r_s ) / noa::TNL::dot( t, t );
             r_s = r_s - gamma * t;
             x_s = x_s - gamma * ( x_s - x );
-            r_norm = TNL::l2Norm( r_s );
+            r_norm = noa::TNL::l2Norm( r_s );
          }
 
          this->setResidue( r_norm / b_norm );
@@ -236,9 +234,9 @@ IDRs< Matrix >::solve( ConstVectorViewType b, VectorViewType x )
       matvec( v, t );
 
       // Computation of a new omega
-      const RealType t_norm = TNL::l2Norm( t );
-      const RealType tr = TNL::dot( t, r );
-      const RealType rho = TNL::abs( tr / ( t_norm * r_norm ) );
+      const RealType t_norm = noa::TNL::l2Norm( t );
+      const RealType tr = noa::TNL::dot( t, r );
+      const RealType rho = noa::TNL::abs( tr / ( t_norm * r_norm ) );
       omega = tr / ( t_norm * t_norm );
       if( rho < angle )
          omega = omega * angle / rho;
@@ -250,15 +248,15 @@ IDRs< Matrix >::solve( ConstVectorViewType b, VectorViewType x )
       // new vector in G_j+1
       x = x + omega * v;
       r = r - omega * t;
-      r_norm = TNL::l2Norm( r );
+      r_norm = noa::TNL::l2Norm( r );
 
       // residual smoothing
       if( smoothing ) {
          t = r_s - r;
-         const RealType gamma = TNL::dot( t, r_s ) / TNL::dot( t, t );
+         const RealType gamma = noa::TNL::dot( t, r_s ) / noa::TNL::dot( t, t );
          r_s = r_s - gamma * t;
          x_s = x_s - gamma * ( x_s - x );
-         r_norm = TNL::l2Norm( r_s );
+         r_norm = noa::TNL::l2Norm( r_s );
       }
 
       this->setResidue( r_norm / b_norm );
@@ -332,14 +330,12 @@ IDRs< Matrix >::setSize( const VectorViewType& x )
 
       for( int j = 0; j < i; j++ ) {
          P_j.bind( &P.getData()[ j * sizeWithGhosts ], sizeWithGhosts );
-         P_i = P_i - TNL::dot( P_i, P_j );
+         P_i = P_i - noa::TNL::dot( P_i, P_j );
       }
 
       // normalize the column
-      P_i /= TNL::l2Norm( P_i );
+      P_i /= noa::TNL::l2Norm( P_i );
    }
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear

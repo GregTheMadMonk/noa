@@ -10,8 +10,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Images/JPEGImage.h>
 
-namespace noa::TNL {
-namespace Images {
+namespace noa::TNL::Images {
 
 #ifdef HAVE_JPEG_H
 inline void
@@ -282,5 +281,4 @@ JPEGImage< Index >::~JPEGImage()
    close();
 }
 
-}  // namespace Images
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Images

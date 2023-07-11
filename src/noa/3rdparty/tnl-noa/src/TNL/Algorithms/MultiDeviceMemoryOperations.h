@@ -9,8 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/LaunchHelpers.h>  // getTransferBufferSize
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 template< typename DestinationDevice, typename SourceDevice = DestinationDevice >
 struct MultiDeviceMemoryOperations
@@ -99,13 +98,13 @@ MultiDeviceMemoryOperations< DeviceType, Devices::Cuda >::copy( DestinationEleme
    }
    else {
       using BaseType = std::remove_cv_t< SourceElement >;
-      const int buffer_size = TNL::min( Cuda::getTransferBufferSize() / sizeof( BaseType ), size );
+      const int buffer_size = noa::TNL::min( Cuda::getTransferBufferSize() / sizeof( BaseType ), size );
       std::unique_ptr< BaseType[] > buffer{ new BaseType[ buffer_size ] };
       Index i = 0;
       while( i < size ) {
          if( cudaMemcpy( (void*) buffer.get(),
                          (void*) &source[ i ],
-                         TNL::min( size - i, buffer_size ) * sizeof( SourceElement ),
+                         noa::TNL::min( size - i, buffer_size ) * sizeof( SourceElement ),
                          cudaMemcpyDeviceToHost )
              != cudaSuccess )
             std::cerr << "Transfer of data from CUDA device to host failed." << std::endl;
@@ -139,11 +138,11 @@ MultiDeviceMemoryOperations< DeviceType, Devices::Cuda >::compare( const Element
    TNL_ASSERT_TRUE( source, "Attempted to compare data through a nullptr." );
    TNL_ASSERT_GE( size, (Index) 0, "Array size must be non-negative." );
 #ifdef __CUDACC__
-   const int buffer_size = TNL::min( Cuda::getTransferBufferSize() / sizeof( Element2 ), size );
+   const int buffer_size = noa::TNL::min( Cuda::getTransferBufferSize() / sizeof( Element2 ), size );
    std::unique_ptr< Element2[] > host_buffer{ new Element2[ buffer_size ] };
    Index compared = 0;
    while( compared < size ) {
-      const int transfer = TNL::min( size - compared, buffer_size );
+      const int transfer = noa::TNL::min( size - compared, buffer_size );
       if( cudaMemcpy(
              (void*) host_buffer.get(), (void*) &source[ compared ], transfer * sizeof( Element2 ), cudaMemcpyDeviceToHost )
           != cudaSuccess )
@@ -181,7 +180,7 @@ MultiDeviceMemoryOperations< Devices::Cuda, DeviceType >::copy( DestinationEleme
       TNL_CHECK_CUDA_DEVICE;
    }
    else {
-      const int buffer_size = TNL::min( Cuda::getTransferBufferSize() / sizeof( DestinationElement ), size );
+      const int buffer_size = noa::TNL::min( Cuda::getTransferBufferSize() / sizeof( DestinationElement ), size );
       std::unique_ptr< DestinationElement[] > buffer{ new DestinationElement[ buffer_size ] };
       Index i = 0;
       while( i < size ) {
@@ -218,5 +217,4 @@ MultiDeviceMemoryOperations< Devices::Cuda, DeviceType >::compare( const Element
    return MultiDeviceMemoryOperations< DeviceType, Devices::Cuda >::compare( source, destination, size );
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms

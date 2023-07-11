@@ -15,9 +15,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Wrappers.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace detail {
+namespace noa::TNL::Algorithms::detail {
 
 template< ScanType Type, ScanPhaseType PhaseType >
 struct DistributedScan
@@ -69,6 +67,4 @@ struct DistributedScan
    }
 };
 
-}  // namespace detail
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::detail

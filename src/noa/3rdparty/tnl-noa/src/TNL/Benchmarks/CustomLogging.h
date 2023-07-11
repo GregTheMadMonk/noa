@@ -12,8 +12,7 @@
 #include "Logging.h"
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 
-namespace noa::TNL {
-namespace Benchmarks {
+namespace noa::TNL::Benchmarks {
 
 class CustomLogging : public Logging
 {
@@ -136,5 +135,4 @@ protected:
    }
 };
 
-}  // namespace Benchmarks
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Benchmarks

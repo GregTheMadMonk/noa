@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/details/MultidiagonalMatrixIndexer.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MultidiagonalMatrixView.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 /**
  * \brief Implementation of sparse multidiagonal matrix.
@@ -43,8 +42,8 @@ namespace Matrices {
  * are \f$\{-3,-1,0,1,3\}\f$. Advantage is that we do not store the column indexes
  * explicitly as it is in \ref SparseMatrix. This can reduce significantly the
  * memory requirements which also means better performance. See the following table
- * for the storage requirements comparison between \ref TNL::Matrices::MultidiagonalMatrix
- * and \ref TNL::Matrices::SparseMatrix.
+ * for the storage requirements comparison between \ref noa::TNL::Matrices::MultidiagonalMatrix
+ * and \ref noa::TNL::Matrices::SparseMatrix.
  *
  *  Real   | Index     |      SparseMatrix    | MultidiagonalMatrix | Ratio
  * --------|-----------|----------------------|---------------------|-------
@@ -100,7 +99,7 @@ public:
     *
     * \return \e  \e false.
     */
-   static constexpr bool
+   [[nodiscard]] static constexpr bool
    isSymmetric()
    {
       return false;
@@ -154,7 +153,7 @@ public:
    /**
     * \brief Elements organization getter.
     */
-   static constexpr ElementsOrganization
+   [[nodiscard]] static constexpr ElementsOrganization
    getOrganization()
    {
       return Organization;
@@ -249,7 +248,7 @@ public:
     *
     * \return multidiagonal matrix view.
     */
-   ViewType
+   [[nodiscard]] ViewType
    getView();
 
    /**
@@ -259,7 +258,7 @@ public:
     *
     * \return multidiagonal matrix view.
     */
-   ConstViewType
+   [[nodiscard]] ConstViewType
    getConstView() const;
 
    /**
@@ -275,7 +274,7 @@ public:
     * \par Output
     * \include MultidiagonalMatrixExample_getSerializationType.out
     */
-   static std::string
+   [[nodiscard]] static std::string
    getSerializationType();
 
    /**
@@ -290,7 +289,7 @@ public:
     * \par Output
     * \include MultidiagonalMatrixExample_getSerializationType.out
     */
-   std::string
+   [[nodiscard]] std::string
    getSerializationTypeVirtual() const override;
 
    /**
@@ -351,7 +350,7 @@ public:
     *
     * \return Number of diagonals.
     */
-   IndexType
+   [[nodiscard]] IndexType
    getDiagonalsCount() const;
 
    /**
@@ -359,7 +358,7 @@ public:
     *
     * \return vector with diagonals offsets.
     */
-   const DiagonalsOffsetsType&
+   [[nodiscard]] const DiagonalsOffsetsType&
    getDiagonalsOffsets() const;
 
    /**
@@ -407,7 +406,7 @@ public:
    void
    getCompressedRowLengths( Vector& rowLengths ) const;
 
-   [[deprecated]] IndexType
+   [[deprecated]] [[nodiscard]] IndexType
    getRowLength( IndexType row ) const;
 
    /**
@@ -439,7 +438,7 @@ public:
     *
     * \return number of non-zero matrix elements.
     */
-   IndexType
+   [[nodiscard]] IndexType
    getNonzeroElementsCount() const override;
 
    /**
@@ -466,7 +465,7 @@ public:
              ElementsOrganization Organization_,
              typename RealAllocator_,
              typename IndexAllocator_ >
-   bool
+   [[nodiscard]] bool
    operator==(
       const MultidiagonalMatrix< Real_, Device_, Index_, Organization_, RealAllocator_, IndexAllocator_ >& matrix ) const;
 
@@ -490,7 +489,7 @@ public:
              ElementsOrganization Organization_,
              typename RealAllocator_,
              typename IndexAllocator_ >
-   bool
+   [[nodiscard]] bool
    operator!=(
       const MultidiagonalMatrix< Real_, Device_, Index_, Organization_, RealAllocator_, IndexAllocator_ >& matrix ) const;
 
@@ -508,7 +507,7 @@ public:
     *
     * See \ref MultidiagonalMatrixRowView.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RowView
    getRow( IndexType rowIdx );
 
@@ -526,7 +525,7 @@ public:
     *
     * See \ref MultidiagonalMatrixRowView.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    ConstRowView
    getRow( IndexType rowIdx ) const;
 
@@ -610,7 +609,7 @@ public:
     * \include MultidiagonalMatrixExample_getElement.out
     *
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    RealType
    getElement( IndexType row, IndexType column ) const;
 
@@ -900,7 +899,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) mutable { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::MultidiagonalMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::MultidiagonalMatrix::RowView.
     *
     * \par Example
     * \include Matrices/MultidiagonalMatrix/MultidiagonalMatrixExample_forRows.cpp
@@ -927,7 +926,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::MultidiagonalMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::MultidiagonalMatrix::RowView.
     *
     * \par Example
     * \include Matrices/MultidiagonalMatrix/MultidiagonalMatrixExample_forRows.cpp
@@ -952,7 +951,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) mutable { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::MultidiagonalMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::MultidiagonalMatrix::RowView.
     *
     * \par Example
     * \include Matrices/MultidiagonalMatrix/MultidiagonalMatrixExample_forRows.cpp
@@ -977,7 +976,7 @@ public:
     * auto function = [] __cuda_callable__ ( RowView& row ) { ... };
     * ```
     *
-    * \e RowView represents matrix row - see \ref TNL::Matrices::MultidiagonalMatrix::RowView.
+    * \e RowView represents matrix row - see \ref noa::TNL::Matrices::MultidiagonalMatrix::RowView.
     *
     * \par Example
     * \include Matrices/MultidiagonalMatrix/MultidiagonalMatrixExample_forRows.cpp
@@ -1061,12 +1060,12 @@ public:
     * ```
     *
     * \tparam InVector is type of input vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     * \tparam OutVector is type of output vector. It can be
-    *         \ref TNL::Containers::Vector, \ref TNL::Containers::VectorView,
-    *         \ref TNL::Containers::Array, \ref TNL::Containers::ArrayView,
+    *         \ref noa::TNL::Containers::Vector, \ref noa::TNL::Containers::VectorView,
+    *         \ref noa::TNL::Containers::Array, \ref noa::TNL::Containers::ArrayView,
     *         or similar container.
     *
     * \param inVector is input vector.
@@ -1167,7 +1166,7 @@ public:
     *
     * \return constant reference to the indexer.
     */
-   const IndexerType&
+   [[nodiscard]] const IndexerType&
    getIndexer() const;
 
    /**
@@ -1175,7 +1174,7 @@ public:
     *
     * \return non-constant reference to the indexer.
     */
-   IndexerType&
+   [[nodiscard]] IndexerType&
    getIndexer();
 
    /**
@@ -1185,7 +1184,7 @@ public:
     *
     * \return value of the padding index.
     */
-   __cuda_callable__
+   [[nodiscard]] __cuda_callable__
    IndexType
    getPaddingIndex() const;
 
@@ -1199,7 +1198,6 @@ protected:
    ViewType view;
 };
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MultidiagonalMatrix.hpp>

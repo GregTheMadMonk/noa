@@ -24,7 +24,7 @@ struct FinDiff : public combine::MakeDynamic<FinDiff<scalarF, BaseMethod, Domain
     ///
     /// This is awful and should not be a public member but eh
     /// I'm in a hurry here TODO
-    RealType da = 0.01;
+    RealType da = 1e-3;
 
 private:
     /// \brief Finite difference calculator runs several other computation of method

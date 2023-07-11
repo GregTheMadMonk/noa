@@ -8,10 +8,7 @@
 
 #include "CheckLambdas.h"
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
-namespace detail {
+namespace noa::TNL::Algorithms::Segments::detail {
 
 template< typename Index, typename Lambda, bool AllParameters = CheckFetchLambda< Index, Lambda >::hasAllParameters() >
 struct FetchLambdaAdapter
@@ -43,7 +40,4 @@ struct FetchLambdaAdapter< Index, Lambda, false >
    }
 };
 
-}  // namespace detail
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments::detail

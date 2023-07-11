@@ -12,8 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/String.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 
-namespace noa::TNL {
-namespace Matrices {
+namespace noa::TNL::Matrices {
 
 /**
  * \brief Helper class for exporting of matrices to different output formats.
@@ -62,7 +61,7 @@ public:
     * \param verbose controls verbosity of the matrix export.
     */
    static void
-   writeGnuplot( const TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeGnuplot( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for exporting matrix to STL output stream using Gnuplot format.
@@ -82,7 +81,7 @@ public:
     * \param verbose controls verbosity of the matrix export.
     */
    static void
-   writeEps( const TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeEps( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for exporting matrix to STL output stream using EPS format.
@@ -102,7 +101,7 @@ public:
     * \param verbose controls verbosity of the matrix export.
     */
    static void
-   writeMtx( const TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeMtx( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for exporting matrix to STL output stream using MTX format.
@@ -115,32 +114,32 @@ public:
    writeMtx( std::ostream& str, const Matrix& matrix, bool verbose = false );
 
 protected:
-   using HostMatrix = typename Matrix::template Self< RealType, TNL::Devices::Host >;
+   using HostMatrix = typename Matrix::template Self< RealType, noa::TNL::Devices::Host >;
 };
 
 // This is to prevent from appearing in Doxygen documentation.
 /// \cond
 template< typename Matrix >
-class MatrixWriter< Matrix, TNL::Devices::Host >
+class MatrixWriter< Matrix, noa::TNL::Devices::Host >
 {
 public:
    using IndexType = typename Matrix::IndexType;
    using RealType = typename Matrix::RealType;
 
    static void
-   writeGnuplot( const TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeGnuplot( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
 
    static void
    writeGnuplot( std::ostream& str, const Matrix& matrix, bool verbose = false );
 
    static void
-   writeEps( const TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeEps( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
 
    static void
    writeEps( std::ostream& str, const Matrix& matrix, bool verbose = false );
 
    static void
-   writeMtx( const TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeMtx( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
 
    static void
    writeMtx( std::ostream& str, const Matrix& matrix, bool verbose = false );
@@ -154,7 +153,6 @@ protected:
 };
 /// \endcond
 
-}  // namespace Matrices
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Matrices
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixWriter.hpp>

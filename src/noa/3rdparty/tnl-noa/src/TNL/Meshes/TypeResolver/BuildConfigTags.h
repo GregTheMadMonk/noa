@@ -19,14 +19,12 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Pyramid.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Polyhedron.h>
 
-namespace noa::TNL {
-namespace Meshes {
 /**
  * \brief Namespace for the configuration of the \ref GridTypeResolver and
  * \ref MeshTypeResolver using so-called build config tags and partial class
  * template specializations.
  */
-namespace BuildConfigTags {
+namespace noa::TNL::Meshes::BuildConfigTags {
 
 // Configuration for structured grids
 
@@ -247,6 +245,4 @@ struct MeshTag
    // clang-format on
 };
 
-}  // namespace BuildConfigTags
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::BuildConfigTags

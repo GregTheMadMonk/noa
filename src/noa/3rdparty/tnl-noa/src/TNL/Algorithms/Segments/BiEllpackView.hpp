@@ -13,9 +13,7 @@
 //#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/detail/BiEllpack.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/SharedMemory.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Device, typename Index, ElementsOrganization Organization, int WarpSize >
 __cuda_callable__
@@ -45,7 +43,7 @@ BiEllpackView< Device, Index, Organization, WarpSize >::getSerializationType()
 {
    // FIXME: the serialized data DEPEND on the Organization and WarpSize parameters, so it should be reflected in the
    // serialization type
-   return "BiEllpack< [any_device], " + TNL::getSerializationType< IndexType >() + " >";
+   return "BiEllpack< [any_device], " + noa::TNL::getSerializationType< IndexType >() + " >";
 }
 
 template< typename Device, typename Index, ElementsOrganization Organization, int WarpSize >
@@ -216,7 +214,7 @@ BiEllpackView< Device, Index, Organization, WarpSize >::forSegments( IndexType b
       auto segment = view.getSegmentView( segmentIdx );
       function( segment );
    };
-   TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
+   noa::TNL::Algorithms::parallelFor< DeviceType >( begin, end, f );
 }
 
 template< typename Device, typename Index, ElementsOrganization Organization, int WarpSize >
@@ -569,6 +567,4 @@ BiEllpackView< Device, Index, Organization, WarpSize >::reduceSegmentsKernel( In
 }
 #endif
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

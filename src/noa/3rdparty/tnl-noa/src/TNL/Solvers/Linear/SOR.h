@@ -8,16 +8,14 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/LinearSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 /**
  * \brief Iterative solver of linear systems based on the Successive-overrelaxation (SOR) or Gauss-Seidel method.
  *
  * See (Wikipedia)[https://en.wikipedia.org/wiki/Successive_over-relaxation] for more details.
  *
- * See \ref TNL::Solvers::Linear::LinearSolver for example of showing how to use the linear solvers.
+ * See \ref noa::TNL::Solvers::Linear::LinearSolver for example of showing how to use the linear solvers.
  *
  * \tparam Matrix is type of matrix describing the linear system.
  */
@@ -133,8 +131,6 @@ public:  // because nvcc does not accept lambda functions within private or prot
    performIteration( const ConstVectorViewType& b, const ConstVectorViewType& diagonalView, VectorViewType& x ) const;
 };
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/SOR.hpp>

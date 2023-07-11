@@ -16,8 +16,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Cuda.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/detail/ScanType.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 /**
  * \brief Computes segmented scan (or prefix sum) on a vector.
@@ -192,7 +191,6 @@ struct SegmentedScan< Devices::Cuda, Type >
             typename Vector::ValueType identity );
 };
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/SegmentedScan.hpp>

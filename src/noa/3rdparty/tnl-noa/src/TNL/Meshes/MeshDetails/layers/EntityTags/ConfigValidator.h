@@ -9,9 +9,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/SubentityVertexMap.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/MeshDetails/traits/MeshTraits.h>
 
-namespace noa::TNL {
-namespace Meshes {
-namespace EntityTags {
+namespace noa::TNL::Meshes::EntityTags {
 
 template< typename MeshConfig, int EntityDimension, bool entityTagsStorage = MeshConfig::entityTagsStorage( EntityDimension ) >
 class ConfigValidatorEntityTagsLayer
@@ -40,6 +38,4 @@ template< typename MeshConfig >
 class ConfigValidator : public ConfigValidatorLayer< MeshConfig >
 {};
 
-}  // namespace EntityTags
-}  // namespace Meshes
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Meshes::EntityTags

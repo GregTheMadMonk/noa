@@ -17,9 +17,7 @@
 
 #include "GMRES.h"
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 template< typename Matrix >
 void
@@ -800,6 +798,4 @@ GMRES< Matrix >::setSize( const VectorViewType& x )
    }
 }
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear

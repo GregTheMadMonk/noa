@@ -12,9 +12,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/BiEllpack.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Segments/Ellpack.h>
 
-namespace noa::TNL {
-namespace Algorithms {
-namespace Segments {
+namespace noa::TNL::Algorithms::Segments {
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int WarpSize >
 template< typename SizesContainer >
@@ -37,7 +35,7 @@ BiEllpack< Device, Index, IndexAllocator, Organization, WarpSize >::getSerializa
 {
    // FIXME: the serialized data DEPEND on the Organization and WarpSize parameters, so it should be reflected in the
    // serialization type
-   return "BiEllpack< [any_device], " + TNL::getSerializationType< IndexType >() + " >";
+   return "BiEllpack< [any_device], " + noa::TNL::getSerializationType< IndexType >() + " >";
 }
 
 template< typename Device, typename Index, typename IndexAllocator, ElementsOrganization Organization, int WarpSize >
@@ -151,7 +149,7 @@ BiEllpack< Device, Index, IndexAllocator, Organization, WarpSize >::computeColum
       // The last strip can be shorter
       if( strip == numberOfStrips - 1 ) {
          IndexType segmentsCount = size - firstSegment;
-         while( segmentsCount <= TNL::pow( 2, getLogWarpSize() - 1 - emptyGroups ) - 1 )
+         while( segmentsCount <= noa::TNL::pow( 2, getLogWarpSize() - 1 - emptyGroups ) - 1 )
             emptyGroups++;
          for( IndexType group = groupBegin; group < groupBegin + emptyGroups; group++ )
             groupPointersView[ group ] = 0;
@@ -159,12 +157,12 @@ BiEllpack< Device, Index, IndexAllocator, Organization, WarpSize >::computeColum
 
       IndexType allocatedColumns = 0;
       for( IndexType groupIdx = emptyGroups; groupIdx < getLogWarpSize(); groupIdx++ ) {
-         IndexType segmentIdx = TNL::pow( 2, getLogWarpSize() - 1 - groupIdx ) - 1;
+         IndexType segmentIdx = noa::TNL::pow( 2, getLogWarpSize() - 1 - groupIdx ) - 1;
          IndexType permSegm = 0;
          while( segmentsPermutationView[ permSegm + firstSegment ] != segmentIdx + firstSegment )
             permSegm++;
          const IndexType groupWidth = segmentsSizesView[ permSegm + firstSegment ] - allocatedColumns;
-         const IndexType groupHeight = TNL::pow( 2, getLogWarpSize() - groupIdx );
+         const IndexType groupHeight = noa::TNL::pow( 2, getLogWarpSize() - groupIdx );
          const IndexType groupSize = groupWidth * groupHeight;
          allocatedColumns = segmentsSizesView[ permSegm + firstSegment ];
          groupPointersView[ groupIdx + groupBegin ] = groupSize;
@@ -464,6 +462,4 @@ BiEllpack< Device, Index, IndexAllocator, Organization, WarpSize >::getGroupLeng
         - this->groupPointers.getElement( strip * ( getLogWarpSize() + 1 ) + group );
 }
 
-}  // namespace Segments
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms::Segments

@@ -8,9 +8,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/LinearSolver.h>
 
-namespace noa::TNL {
-namespace Solvers {
-namespace Linear {
+namespace noa::TNL::Solvers::Linear {
 
 /**
  * \brief Iterative solver of linear systems based on the conjugate gradient method.
@@ -21,7 +19,7 @@ namespace Linear {
  *
  * \tparam Matrix is type of matrix describing the linear system.
  *
- * See \ref TNL::Solvers::Linear::LinearSolver for example of showing how to use the linear solvers.
+ * See \ref noa::TNL::Solvers::Linear::LinearSolver for example of showing how to use the linear solvers.
  */
 template< typename Matrix >
 class CG : public LinearSolver< Matrix >
@@ -77,8 +75,6 @@ protected:
    VectorType r, p, Ap, z;
 };
 
-}  // namespace Linear
-}  // namespace Solvers
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Solvers::Linear
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/Linear/CG.hpp>

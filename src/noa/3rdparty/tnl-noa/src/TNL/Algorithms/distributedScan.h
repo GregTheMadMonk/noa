@@ -13,8 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/detail/DistributedScan.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Functional.h>
 
-namespace noa::TNL {
-namespace Algorithms {
+namespace noa::TNL::Algorithms {
 
 /**
  * \brief Computes an inclusive scan (or prefix sum) of a distributed array in-place.
@@ -71,19 +70,19 @@ distributedInclusiveScan( const InputDistributedArray& input,
 
 /**
  * \brief Overload of \ref distributedInclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The identity element is taken as `reduction.template getIdentity< typename OutputDistributedArray::ValueType >()`.
  * See \ref distributedInclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `input.getSize()`.
  */
-template< typename InputDistributedArray, typename OutputDistributedArray, typename Reduction = TNL::Plus >
+template< typename InputDistributedArray, typename OutputDistributedArray, typename Reduction = noa::TNL::Plus >
 void
 distributedInclusiveScan( const InputDistributedArray& input,
                           OutputDistributedArray& output,
                           typename InputDistributedArray::IndexType begin = 0,
                           typename InputDistributedArray::IndexType end = 0,
-                          Reduction&& reduction = TNL::Plus{} )
+                          Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = input.getSize();
@@ -147,19 +146,19 @@ distributedExclusiveScan( const InputDistributedArray& input,
 
 /**
  * \brief Overload of \ref distributedExclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The identity element is taken as `reduction.template getIdentity< typename OutputDistributedArray::ValueType >()`.
  * See \ref distributedExclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `input.getSize()`.
  */
-template< typename InputDistributedArray, typename OutputDistributedArray, typename Reduction = TNL::Plus >
+template< typename InputDistributedArray, typename OutputDistributedArray, typename Reduction = noa::TNL::Plus >
 void
 distributedExclusiveScan( const InputDistributedArray& input,
                           OutputDistributedArray& output,
                           typename InputDistributedArray::IndexType begin = 0,
                           typename InputDistributedArray::IndexType end = 0,
-                          Reduction&& reduction = TNL::Plus{} )
+                          Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = input.getSize();
@@ -211,18 +210,18 @@ distributedInplaceInclusiveScan( DistributedArray& array,
 
 /**
  * \brief Overload of \ref distributedInplaceInclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The identity element is taken as `reduction.template getIdentity< typename DistributedArray::ValueType >()`.
  * See \ref distributedInplaceInclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `array.getSize()`.
  */
-template< typename DistributedArray, typename Reduction = TNL::Plus >
+template< typename DistributedArray, typename Reduction = noa::TNL::Plus >
 void
 distributedInplaceInclusiveScan( DistributedArray& array,
                                  typename DistributedArray::IndexType begin = 0,
                                  typename DistributedArray::IndexType end = 0,
-                                 Reduction&& reduction = TNL::Plus{} )
+                                 Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = array.getSize();
@@ -274,18 +273,18 @@ distributedInplaceExclusiveScan( DistributedArray& array,
 
 /**
  * \brief Overload of \ref distributedInplaceExclusiveScan which uses a TNL functional
- *        object for reduction. \ref TNL::Plus is used by default.
+ *        object for reduction. \ref noa::TNL::Plus is used by default.
  *
  * The identity element is taken as `reduction.template getIdentity< typename DistributedArray::ValueType >()`.
  * See \ref distributedInplaceExclusiveScan for the explanation of other parameters.
  * Note that when `end` equals 0 (the default), it is set to `array.getSize()`.
  */
-template< typename DistributedArray, typename Reduction = TNL::Plus >
+template< typename DistributedArray, typename Reduction = noa::TNL::Plus >
 void
 distributedInplaceExclusiveScan( DistributedArray& array,
                                  typename DistributedArray::IndexType begin = 0,
                                  typename DistributedArray::IndexType end = 0,
-                                 Reduction&& reduction = TNL::Plus{} )
+                                 Reduction&& reduction = noa::TNL::Plus{} )
 {
    if( end == 0 )
       end = array.getSize();
@@ -294,5 +293,4 @@ distributedInplaceExclusiveScan( DistributedArray& array,
    distributedInplaceExclusiveScan( array, begin, end, std::forward< Reduction >( reduction ), identity );
 }
 
-}  // namespace Algorithms
-}  // namespace noa::TNL
+}  // namespace noa::TNL::Algorithms
