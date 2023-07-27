@@ -206,7 +206,7 @@ struct LayerManager {
         /// \brief Layer type corresponding to this layer manager type
         using LayerType = Layer<Device, Index>;
         /// \brief Layer vector type
-        template <typename DataType> using Vector = typename LayerType::template Vector<DataType>;
+        template <typename DataType> using Vector = LayerType::template Vector<DataType>;
 
         /// \brief Device type
         using DeviceType = Device;
@@ -238,10 +238,13 @@ struct LayerManager {
         /// Layer map end iterator (const override)
         const auto end() const { return this->layers.end(); }
 
-        /// Remove all layers
-        void clear() {
+        /// \brief Remove all layers
+        void reset() {
             while (!layers.empty()) layers.erase(layers.begin());
         }
+
+        /// \brief Remove all layers (deprecated usage). Use \ref reset()
+        [[deprecated]] void clear() { this->reset(); }
 
         /// Add a layer storing a certain data type and returns its index
         template <typename DataType>
