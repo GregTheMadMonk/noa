@@ -17,7 +17,7 @@
 #include <noa/kernels.hh>
 
 // NOA headers
-#include <noa/utils/common.hh>
+#include <noa/utils/common/common.hh>
 // Test NOA headers
 #include <mhfe/mhfe.hh>
 

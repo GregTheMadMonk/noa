@@ -15,7 +15,7 @@
 #include <iostream>
 
 // NOA headers
-#include <noa/utils/common.hh>
+#include <noa/utils/common/common.hh>
 
 // Local headers
 #include "utils/common.hh"

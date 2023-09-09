@@ -24,7 +24,7 @@
 #pragma once
 
 #include <noa/utils/numerics.hh>
-#include <noa/utils/common.hh>
+#include <noa/utils/common/common.hh>
 
 #include <jni.h>
 #include <torch/torch.h>

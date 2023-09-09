@@ -30,3 +30,6 @@ tmp*
 docs/cfd/stash/*
 !docs/cfd/stash/*.gif
 !docs/cfd/stash/*.png
+
+# Clangd cache
+.cache/

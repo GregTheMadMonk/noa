@@ -18,7 +18,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/LinearSolverTypeResolver.h>
 
 // NOA headers
-#include <noa/utils/common.hh>
+#include <noa/utils/common/common.hh>
 #include <noa/utils/domain/domain.hh>
 
 // Local headers

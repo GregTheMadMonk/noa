@@ -25,7 +25,7 @@
 
 #include "noa/pms/dcs.hh"
 #include "noa/pms/physics.hh"
-#include "noa/utils/common.cuh"
+#include "noa/utils/common/common.cuh"
 
 void noa::pms::dcs::cuda::vmap_bremsstrahlung(
         const Calculation &result,

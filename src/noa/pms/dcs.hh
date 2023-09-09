@@ -24,7 +24,7 @@
 #pragma once
 
 #include "noa/pms/physics.hh"
-#include "noa/utils/common.hh"
+#include "noa/utils/common/common.hh"
 #include "noa/utils/numerics.hh"
 
 #include <torch/types.h>

@@ -15,12 +15,13 @@ find_package(ZLIB)
 # Source files
 set(NOA_TEST_SRC
         noa-test-suite.cc
-        test-ghmc-sampler.cc
+        test-combine.cc
         test-dcs-calc.cc
+        test-domain.cc
+        test-ghmc-sampler.cc
+        test-mhfem.cc
         test-tnl.cc
         test-trace.cc
-        test-domain.cc
-        test-mhfem.cc
         ${NOA_ROOT_DIR}/test/kernels.cc)
 
 if (BUILD_NOA_CUDA)
