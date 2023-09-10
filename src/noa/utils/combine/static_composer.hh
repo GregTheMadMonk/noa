@@ -87,9 +87,10 @@ public:
     template <detail::ValidInitializer<TaskSeq>... Initializers>
     constexpr StaticComposer(Initializers&&... initializers) {
         std::apply(
-            [this, &initializers...] (auto&... taskOpts) {
+            [this, &initializers...] <Task... Ts>
+            (std::optional<Ts>&... taskOpts) {
                 (
-                    task_manip::constructTask(
+                    task_manip::constructTask<Ts>(
                         taskOpts, *this, initializers...
                     ), ...
                 );
@@ -115,9 +116,9 @@ public:
     constexpr StaticComposer& operator=(const StaticComposer& other)
     requires ( allCopyable(TaskSeq{}) ) {
         std::apply(
-            [this, &other] (auto&... taskOpts) {
+            [this, &other] <Task... Ts> (std::optional<Ts>&... taskOpts) {
                 (
-                    task_manip::copyConstructTask(
+                    task_manip::copyConstructTask<Ts>(
                         taskOpts, *this, other
                     ), ...
                 );
@@ -135,9 +136,9 @@ public:
     constexpr StaticComposer& operator=(StaticComposer&& other)
     requires ( allMovable(TaskSeq{}) ) {
         std::apply(
-            [this, &other] (auto&... taskOpts) mutable {
+            [this, &other] <Task... Ts> (std::optional<Ts>&... taskOpts) {
                 (
-                    task_manip::moveConstructTask(
+                    task_manip::moveConstructTask<Ts>(
                         taskOpts, *this, other
                     ), ...
                 );

@@ -6,8 +6,8 @@
 
 #include <optional>
 #include <memory>
+#include <vector>
 
-#include "any_task.hh"
 #include "task_traits.hh"
 
 namespace noa::utils::combine::task_manip {
@@ -23,18 +23,23 @@ concept Composer = requires (C c) {
     c.template get<detail::Dummy>();
 };
 
-/// \brief Construct the task from the composer into std::optional
-template <
-    Task TaskType, Composer ComposerType, typename... Initializers
-> constexpr inline void constructTask(
-    std::optional<TaskType>& task,
-    ComposerType& composer,
-    Initializers&&... initializers
+/// \brief Emplace a task in std::optional
+template <Task TaskType, typename... Args>
+void emplace(std::optional<TaskType>& opt, Args&&... args) {
+    opt.emplace(std::forward<Args>(args)...);
+} // <-- void emplace(std::optional<TaskType>, args...)
+
+/// \brief Construct the task from the composer
+template <Task TaskType>
+constexpr inline void constructTask(
+    auto& task,
+    auto& composer,
+    auto&&... initializers
 ) {
     using ArgList = combine::detail::ConstructorDeps<TaskType>;
     std::apply(
         [&task] (auto&... deps) {
-            task.emplace(deps...);
+            emplace<TaskType>(task, deps...);
         }, composer.getList(ArgList{})
     );
 
@@ -48,59 +53,18 @@ template <
     );
 } // <-- void constructTask(task, comp, initializers...)
 
-/// \brief Construct the task from the composer into \ref AnyTask
-template <
-    Task TaskType, Composer ComposerType, typename... Initializers
-> constexpr inline void constructTask(
-    AnyTask& task,
-    ComposerType& composer,
-    Initializers&&... initializers
-) {
-    using ArgList = combine::detail::ConstructorDeps<TaskType>;
-    std::apply(
-        [&task] (auto&... deps) {
-            task.emplace<TaskType>(deps...);
-        }, composer.getList(ArgList{})
-    );
-
-    // Apply initializers
-    (
-        [&f=initializers, &task] {
-            if constexpr (std::invocable<decltype(f), TaskType&>) {
-                f(task.get<TaskType>());
-            }
-        } (), ...
-    );
-} // <-- void constructTask(task, comp, initializers...)
-
 /// \brief Copy-construct the task from the composer
 template <Task TaskType, Composer ComposerType>
 constexpr inline void copyConstructTask(
-    std::optional<TaskType>& task,
+    auto& task,
     ComposerType& composer,
     const ComposerType& other
 ) {
     using ArgList = combine::detail::CopyDeps<TaskType>;
     std::apply(
         [&task, &other] (auto&... deps) {
-            task.emplace(
-                TaskCopy{}, other.template get<TaskType>(), deps...
-            );
-        }, composer.getList(ArgList{})
-    );
-} // <-- void copyConstructTask(task, composer, other)
-
-/// \brief Copy-construct the task from the composer into \ref AnyTask
-template <Task TaskType, Composer ComposerType>
-constexpr inline void copyConstructTask(
-    AnyTask& task,
-    ComposerType& composer,
-    const ComposerType& other
-) {
-    using ArgList = combine::detail::CopyDeps<TaskType>;
-    std::apply(
-        [&task, &other] (auto&... deps) {
-            task.emplace<TaskType>(
+            emplace<TaskType>(
+                task,
                 TaskCopy{}, other.template get<TaskType>(), deps...
             );
         }, composer.getList(ArgList{})
@@ -110,36 +74,17 @@ constexpr inline void copyConstructTask(
 /// \brief Move-construct the task for the composer
 template <Task TaskType, Composer ComposerType>
 constexpr inline void moveConstructTask(
-    std::optional<TaskType>& task,
+    auto& task,
     ComposerType& composer,
     ComposerType& other
 ) {
     using ArgList = combine::detail::MoveDeps<TaskType>;
     std::apply(
         [&task, &other] (auto&... deps) {
-            task.emplace(
+            emplace<TaskType>(
+                task,
                 TaskMove{},
-                std::move(other.template get<TaskType>()),
-                deps...
-            );
-        }, composer.getList(ArgList{})
-    );
-} // <-- void moveConstructTask(task, composer, other)
-
-/// \brief Move-construct the task for the composer into std::any
-template <Task TaskType, Composer ComposerType>
-constexpr inline void moveConstructTask(
-    AnyTask& task,
-    ComposerType& composer,
-    ComposerType& other
-) {
-    using ArgList = combine::detail::MoveDeps<TaskType>;
-    std::apply(
-        [&task, &other] (auto&... deps) {
-            task.emplace<TaskType>(
-                TaskMove{},
-                std::move(other.template get<TaskType>()),
-                deps...
+                std::move(other.template get<TaskType>()), deps...
             );
         }, composer.getList(ArgList{})
     );

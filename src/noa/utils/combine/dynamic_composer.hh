@@ -4,7 +4,6 @@
  */
 #pragma once
 
-#include <iostream>
 #include <algorithm>
 #include <functional>
 #include <typeinfo>
@@ -50,12 +49,151 @@ class DynamicComposer {
         } {}
     }; // <-- struct NoTaskError<TaskType>
 
+    /// \brief Task type index vector
+    using TaskIdxVec = std::vector<std::type_index>;
+
+    template <Task> class AsDynamic;
+    /// \brief Base abstract class for dynamic task container
+    struct DynamicTask {
+        /// \brief Convert to specific child type reference
+        template <Task TaskType>
+        AsDynamic<TaskType>& as()
+        { return *reinterpret_cast<AsDynamic<TaskType>*>(this); }
+        /// \brief Convert to specific child type const reference
+        template <Task TaskType>
+        const AsDynamic<TaskType>& as() const
+        { return *reinterpret_cast<const AsDynamic<TaskType>*>(this); }
+
+        /// \brief Stored task type index
+        virtual std::type_index type() const = 0;
+        /// \brief Run the stored task
+        virtual void run(DynamicComposer&) = 0;
+        /// \brief Check if the task was updated
+        virtual bool updated() const = 0;
+        /**
+         * \brief Call the `onUpdated()` function on th stored task with
+         *        another task if available
+         */
+        virtual void onUpdated(DynamicTask&) = 0;
+        /// \brief Get task dependencies
+        virtual const TaskIdxVec& dependencies() const = 0;
+
+        virtual ~DynamicTask() {}
+
+        template <Task TaskType, typename... Args>
+        friend
+        void emplace(std::unique_ptr<DynamicTask>& ptr, Args&&... args) {
+            ptr = std::move(
+                std::unique_ptr<DynamicTask>(
+                    new AsDynamic<TaskType>(std::forward<Args>(args)...)
+                )
+            );
+        } // <-- void emplace(ptr, args...)
+    }; // <-- class DynamicTask
+
+    /// \brief Dynamic wrapper for a task type
+    template <Task TaskType>
+    struct AsDynamic : public DynamicTask {
+        TaskType task;
+
+        template <typename... Args>
+        AsDynamic(Args&&... args) : task(std::forward<Args>(args)...) {}
+
+        std::type_index type() const override { return typeid(TaskType); }
+
+        void run(DynamicComposer& comp) override {
+            task_manip::runTask(this->task, comp);
+        } // <-- void run(comp)
+
+        bool updated() const {
+            if constexpr (UpdatableTask<TaskType>) {
+                return this->task.updated();
+            } else return false;
+        } // <-- bool updated()
+
+        void onUpdated(DynamicTask& other) override {
+            // Can't update by itself
+            if (typeid(TaskType) == other.type()) return;
+
+            const auto updater =
+                [&t=this->task, &other] <Task O> (meta::TypeTag<O>) {
+                    if constexpr (requires (O& o) { t.onUpdated(o); }) {
+                        if (typeid(O) != other.type()) return;
+
+                        t.onUpdated(other.template as<O>().task);
+                    }
+                };
+
+            [&updater] <Task... AllTasks> (meta::List<AllTasks...>) {
+                ( updater(meta::TypeTag<AllTasks>{}), ... );
+            } (Tasks{});
+        } // <-- void onUpdated(other)
+
+        static inline const TaskIdxVec deps =
+            [] <Task... Deps> (meta::List<Deps...>) {
+                TaskIdxVec ret{};
+                
+                ( ret.push_back(typeid(Deps)), ... );
+                return ret;
+            } (GetDeps<TaskType>{});
+
+        const TaskIdxVec& dependencies() const override {
+            return deps;
+        } // <-- TaskIdxVec dependencies() const
+    }; // <-- class AsDynamic
+
     /**
      * \brief Task storage
      *
      * Tasks are stored in the order of execution in a vector
      */
-    std::vector<AnyTask> tasks;
+    std::vector<std::unique_ptr<DynamicTask>> tasks;
+
+    /**
+     * \brief Convert runtime task type info to compile-time type
+     *
+     * Calls `f` with `meta::TypeTag<T>` argument (like std::visit), where
+     * `typeid(T) == idx`
+     */
+    template <typename Func>
+    static inline void visit(Func&& f, std::type_index idx) {
+        [idx, &f] <Task... AllTasks> (meta::List<AllTasks...>) {
+            (
+                [idx, &f] <Task Task> (meta::TypeTag<Task>) {
+                    using Arg = meta::TypeTag<Task>;
+                    if constexpr (std::invocable<Func, Arg>) {
+                        if (typeid(Task) == idx) f(Arg{});
+                    }
+                } (meta::TypeTag<AllTasks>{}), ...
+            );
+        } (Tasks{});
+    } // <-- static auto visit(idx, f)
+    /**
+     * \brief Converts runtime task type info to compile-time to call the
+     *        functor with a proper type
+     */
+    template <typename Func>
+    static inline void visit(Func&& f, DynamicTask& task) {
+        visit(
+            [&task, &f] <Task TaskType> (meta::TypeTag<TaskType>) {
+                f(task.template as<TaskType>().task);
+            }, task.type()
+        );
+    } // <-- static void visit(task, f)
+    /**
+     * \brief Converts runtime task type info to compile-time to call the
+     *        functor with a proper type if possible
+     */
+    template <typename Func>
+    static inline void tryVisit(Func&& f, DynamicTask& task) {
+        visit(
+            [&task, &f] <Task TaskType> (meta::TypeTag<TaskType>) {
+                if constexpr (std::invocable<Func, TaskType&>) {
+                    f(task.template as<TaskType>().task);
+                }
+            }, task.type()
+        );
+    } // <-- static void visit(task, f)
 
 public:
     /** \brief Dynamic task initializer
@@ -64,31 +202,21 @@ public:
      * We can't use this approach here, so a wrapper is required!
      */
     class Initializer {
-        std::function<void(AnyTask&)> callback = nullptr;
+        std::function<void(DynamicTask&)> callback = nullptr;
 
     public:
+        /// \brief Construct from an arbitrary functor
         template <typename Func>
         Initializer(Func&& f) {
-            this->callback = [f] (AnyTask& anyT) {
-                const auto invokeWith =
-                    [f, &anyT] <typename T> (meta::TypeTag<T>) {
-                        if constexpr (std::invocable<Func, T&>) {
-                            if (typeid(T) == anyT.type()) {
-                                f(anyT.get<T>());
-                            }
-                        }
-                    };
-
-                [&invokeWith] <typename... Ts> (meta::List<Ts...>) {
-                    ( invokeWith(meta::TypeTag<Ts>{}), ... );
-                } (Tasks{});
-            };
+            this->callback =
+                [f] (DynamicTask& task) { tryVisit(f, task); };
         } // <-- Initializer(f)
 
-        template <std::invocable<AnyTask&> Func>
+        /// \brief Construct from a functor invokable with `DynamicTask&`
+        template <std::invocable<DynamicTask&> Func>
         Initializer(Func&& f) : callback(f) {}
 
-        void operator()(AnyTask& anyT) const { this->callback(anyT); }
+        void operator()(DynamicTask& task) const { this->callback(task); }
     }; // <-- class Initializer
 
     /// \brief Task name to `std::type_index` mapping
@@ -107,183 +235,6 @@ public:
         } (Tasks{})
     };
 
-private:
-    /// \brief A vector of tasks' type indices
-    using TaskIdVec = std::vector<std::type_index>;
-    /// \brief Task dependencies
-    static inline
-    const std::unordered_map<std::type_index, TaskIdVec> dependencies {
-        [] <typename... Ts> (meta::List<Ts...>) {
-            std::unordered_map<std::type_index, TaskIdVec> ret{};
-
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
-                const std::type_index idx{ typeid(T) };
-                ret[idx] = [] <Task... Deps> (meta::List<Deps...>) {
-                    TaskIdVec vec{};
-
-                    ( vec.emplace_back(typeid(Deps)), ... );
-                    return vec;
-                } (GetDeps<T>{});
-            };
-
-            ( push(meta::TypeTag<Ts>{}), ... );
-            return ret;
-        } (Tasks{})
-    };
-
-    /// \brief Dynamic task constructor
-    using Constructor = std::function<void(AnyTask&, DynamicComposer&)>;
-    /// \brief Task default constructors
-    static inline
-    const std::unordered_map<std::type_index, Constructor> constructTask {
-        [] <Task... Ts> (meta::List<Ts...>) {
-            std::unordered_map<std::type_index, Constructor> ret{};
-
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
-                const std::type_index idx{ typeid(T) };
-                ret[idx] = [] (AnyTask& taskAny, DynamicComposer& self) {
-                    task_manip::constructTask<T>(taskAny, self);
-                };
-            };
-
-            ( push(meta::TypeTag<Ts>{}), ... );
-            return ret;
-        } (Tasks{})
-    };
-
-    /// \brief Dynamic task copier
-    using Copier = std::function<
-        void(AnyTask&, DynamicComposer&, const DynamicComposer&)
-    >;
-    /// \brief Task copiers
-    static inline
-    const std::unordered_map<std::type_index, Copier> copiers {
-        [] <Task... Ts> (meta::List<Ts...>) {
-            std::unordered_map<std::type_index, Copier> ret{};
-
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
-                const std::type_index idx{ typeid(T) };
-                ret[idx] = [] (
-                    AnyTask& task,
-                    DynamicComposer& comp,
-                    const DynamicComposer& other
-                ) {
-                    task_manip::copyConstructTask<T>(task, comp, other);
-                };
-            };
-
-            ( push(meta::TypeTag<Ts>{}), ... );
-            return ret;
-        } (Tasks{})
-    };
-
-    /// \brief Dynamic task mover
-    using Mover = std::function<
-        void(AnyTask&, DynamicComposer&, DynamicComposer&&)
-    >;
-    /// \brief Task movers
-    static inline
-    const std::unordered_map<std::type_index, Mover> movers {
-        [] <Task... Ts> (meta::List<Ts...>) {
-            std::unordered_map<std::type_index, Mover> ret{};
-
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
-                const std::type_index idx{ typeid(T) };
-                ret[idx] = [] (
-                    AnyTask& task,
-                    DynamicComposer& comp,
-                    DynamicComposer&& other
-                ) {
-                    task_manip::moveConstructTask<T>(task, comp, other);
-                };
-            };
-
-            ( push(meta::TypeTag<Ts>()), ... );
-            return ret;
-        } (Tasks{})
-    };
-
-    /// \brief Dynamic task update status getter
-    using UpdatedGetter = std::function<bool(AnyTask&)>;
-    /// \brief Task update status checkers
-    static inline
-    const std::unordered_map<std::type_index, UpdatedGetter> getUpdated {
-        [] <Task... Ts> (meta::List<Ts...>) {
-            std::unordered_map<std::type_index, UpdatedGetter> ret{};
-
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
-                const std::type_index idx{ typeid(T) };
-                ret[idx] = [] (AnyTask& taskAny) {
-                    if constexpr (UpdatableTask<T>) {
-                        return taskAny.get<T>().updated();
-                    } else return false;
-                };
-            };
-
-            ( push(meta::TypeTag<Ts>{}), ... );
-            return ret;
-        } (Tasks{})
-    };
-
-    /// \brief Task updater
-    using Updater = std::function<void(AnyTask&, AnyTask&)>;
-    /// \brief Task updaters
-    static inline
-    const std::unordered_map<std::type_index, Updater> updaters {
-        [] <Task... Ts> (meta::List<Ts...>) {
-            std::unordered_map<std::type_index, Updater> ret{};
-
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
-                const std::type_index idx{ typeid(T) };
-
-                ret[idx] = [] (AnyTask& taskAny, AnyTask& other) {
-                    if (taskAny.type() == other.type()) return;
-
-                    auto& t = taskAny.get<T>();
-
-                    const auto tryUpdate =
-                        [&t, &other] <Task Oth> (meta::TypeTag<Oth>) {
-                            if constexpr (
-                                requires (Oth& o) { t.onUpdated(o); }
-                            ) {
-                                if (typeid(Oth) == other.type()) {
-                                    t.onUpdated(other.get<Oth>());
-                                }
-                            }
-                        };
-
-                    [&tryUpdate] <Task... Ts1> (meta::List<Ts1...>) {
-                        ( tryUpdate(meta::TypeTag<Ts1>{}), ... );
-                    } (Tasks{});
-                };
-            };
-
-            ( push(meta::TypeTag<Ts>{}), ... );
-            return ret;
-        } (Tasks{})
-    };
-
-    /// \brief Task runner
-    using Runner = std::function<void(AnyTask&, DynamicComposer&)>;
-    /// \brief Task runners
-    static inline
-    const std::unordered_map<std::type_index, Runner> runners {
-        [] <Task... Ts> (meta::List<Ts...>) {
-            std::unordered_map<std::type_index, Runner> ret{};
-
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
-                const std::type_index idx{ typeid(T) };
-                ret[idx] = [] (AnyTask& task, DynamicComposer& comp) {
-                    task_manip::runTask(task.get<T>(), comp);
-                };
-            };
-
-            ( push(meta::TypeTag<Ts>{}), ... );
-            return ret;
-        } (Tasks{})
-    };
-
-public:
     /// \brief Defaunt constructor does nothing
     DynamicComposer() = default;
 
@@ -298,9 +249,7 @@ public:
     } // <-- DynamicComposer(DynamicComposer&&)
 
     /**
-     * \brief Copy-assignment
-     *
-     * Requires all possibly contained tasks to be copyable
+     * \brief Copy-assignment all possibly contained tasks to be copyable
      */
     DynamicComposer& operator=(const DynamicComposer& other)
     requires (allCopyable(Tasks{})) {
@@ -308,8 +257,13 @@ public:
         this->tasks.resize(taskNum);
         for (std::size_t i = 0; i < taskNum; ++i) {
             const auto& otherTask = other.tasks.at(i);
-            const std::type_index idx{ otherTask.type() };
-            copiers.at(idx)(this->tasks[i], *this, other);
+            visit(
+                [this, i, &other] <Task T> (meta::TypeTag<T>) {
+                    task_manip::copyConstructTask<T>(
+                        this->tasks[i], *this, other
+                    );
+                }, otherTask->type()
+            );
         }
         return *this;
     } // <-- DynamicComposer& operator=(const DynamicComposer&)
@@ -324,8 +278,13 @@ public:
         this->tasks.resize(taskNum);
         for (std::size_t i = 0; i < taskNum; ++i) {
             const auto& otherTask = other.tasks.at(i);
-            const std::type_index idx{ otherTask.type() };
-            movers.at(idx)(this->tasks[i], *this, std::move(other));
+            visit(
+                [this, i, &other] <Task T> (meta::TypeTag<T>) {
+                    task_manip::moveConstructTask<T>(
+                        this->tasks[i], *this, other
+                    );
+                }, otherTask->type()
+            );
         }
         return *this;
     } // <-- DynamicComposer operator=(DynamicComposer&&)
@@ -339,7 +298,7 @@ public:
     /// \brief Set required tasks via template arguments
     template <Task... Tasks>
     void setTasks(const Inits& inits = {}, meta::List<Tasks...> = {}) {
-        TaskIdVec request{};
+        TaskIdxVec request{};
 
         ( request.emplace_back(typeid(Tasks)), ... );
 
@@ -350,7 +309,7 @@ public:
     void setTasks(
         const std::vector<std::string>& names, const Inits& inits = {}
     ) {
-        TaskIdVec request{};
+        TaskIdxVec request{};
         for (const auto& name : names) {
             request.push_back(namesMap.at(name));
         }
@@ -367,16 +326,20 @@ private:
      * 
      * Previous composer state gets reset
      */
-    void setTasks(const TaskIdVec& typeIdxs, const Inits& inits) {
+    void setTasks(const TaskIdxVec& typeIdxs, const Inits& inits) {
         this->reset();
 
-        std::vector<TaskIdVec> queue = { typeIdxs };
+        std::vector<TaskIdxVec> queue = { typeIdxs };
         while (queue.back().size() != 0) {
-            TaskIdVec next{};
+            TaskIdxVec next{};
             for (const auto taskIdx : queue.back()) {
-                for (const auto idx : dependencies.at(taskIdx)) {
-                    next.push_back(idx);
-                }
+                visit(
+                    [&next] <Task DepTask> (meta::TypeTag<DepTask>) {
+                        for (const auto idx : AsDynamic<DepTask>::deps) {
+                            next.push_back(idx);
+                        }
+                    }, taskIdx
+                );
             }
 
             queue.push_back(std::move(next));
@@ -388,16 +351,22 @@ private:
                 const auto found = std::find_if(
                     this->tasks.cbegin(), this->tasks.cend(),
                     [idx] (const auto& anyT) {
-                        return anyT.type() == idx;
+                        return anyT->type() == idx;
                     }
                 );
                 // Only add unique tasks
                 if (found != this->tasks.cend()) continue;
 
                 this->tasks.emplace_back();
-                constructTask.at(idx)(this->tasks.back(), *this);
+                visit(
+                    [this] <Task T> (meta::TypeTag<T>) {
+                        task_manip::constructTask<T>(
+                            this->tasks.back(), *this
+                        );
+                    }, idx
+                );
 
-                for (const auto& init : inits) init(this->tasks.back());
+                for (const auto& init : inits) init(*this->tasks.back());
             }
         }
     } // <-- void setTasks(typeIdxs)
@@ -406,13 +375,13 @@ public:
     /// \brief Run the tasks
     void run() {
         for (auto t = this->tasks.begin(); t != this->tasks.end(); ++t) {
-            if (getUpdated.at(t->type())(*t)) {
+            if ((*t)->updated()) {
                 for (auto o = std::next(t); o != this->tasks.end(); ++o) {
-                    updaters.at(o->type())(*o, *t);
+                    (*o)->onUpdated(*(*t));
                 }
             }
 
-            runners.at(t->type())(*t, *this);
+            (*t)->run(*this);
         }
     } // <-- void run()
 
@@ -423,13 +392,13 @@ public:
         const auto it = std::find_if(
             this->tasks.begin(), this->tasks.end(),
             [] (const auto& anyT) {
-                return anyT.type() == typeid(TaskType);
+                return anyT->type() == typeid(TaskType);
             }
         );
 
         if (it == this->tasks.end()) throw NoTaskError<TaskType>{};
 
-        return it->template get<TaskType>();
+        return (*it)->template as<TaskType>().task;
     } // <-- TaskType& get()
     /// \brief Get task const reference by type
     template <Task TaskType>
@@ -437,13 +406,13 @@ public:
         const auto it = std::find_if(
             this->tasks.cbegin(), this->tasks.cend(),
             [] (const auto& anyT) {
-                return anyT.type() == typeid(TaskType);
+                return anyT->type() == typeid(TaskType);
             }
         );
 
         if (it == this->tasks.cend()) throw NoTaskError<TaskType>{};
 
-        return it->template get<TaskType>();
+        return (*it)->template as<TaskType>().task;
     } // <-- TaskType& get()
     /// \brief Get several tasks as a tuple of references
     template <Task... TasksList>
