@@ -1,13 +1,6 @@
-####################################################################################################
-##################                  'Combine' test manager test                  ###################
-####################################################################################################
-
-# Gflags
-include(fetch-gflags)
-
 # Main executables
-add_executable(test_combine test.cc)
+add_executable(test_combine main.cc test.cc)
 
 # Link libraries
-target_link_libraries(test_combine PRIVATE ${PROJECT_NAME} gflags)
-target_compile_options(test_combine PRIVATE "-fconcepts-diagnostics-depth=4")
+target_link_libraries(test_combine PRIVATE ${PROJECT_NAME} gtest)
+target_add_openmp( test_combine )

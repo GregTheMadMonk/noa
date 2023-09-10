@@ -40,7 +40,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Geometry/getEntityCenter.h>
 
 // NOA headers
-#include <noa/utils/common.hh>
+#include <noa/utils/common/common.hh>
 
 // Local headers
 #include "configtagpermissive.hh"

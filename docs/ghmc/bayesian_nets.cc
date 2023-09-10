@@ -1,5 +1,5 @@
 #include "noa/ghmc.hh"
-#include "noa/utils/common.hh"
+#include "noa/utils/common/common.hh"
 
 #include <torch/extension.h>
 

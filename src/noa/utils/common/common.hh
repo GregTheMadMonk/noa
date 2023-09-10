@@ -33,7 +33,10 @@
 #include <torch/torch.h>
 #include <torch/script.h>
 
-/// NOA utility namespace
+/// \brief Main NOA namespace
+namespace noa {}
+
+/// \brief NOA utility code namespace
 namespace noa::utils {
 
     /// Path type
