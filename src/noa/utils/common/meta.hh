@@ -74,20 +74,20 @@ namespace detail::append {
         typename Who,
         typename... Args
     > TypeTag<To<Args..., Who>>
-    operator+(TypeTag<To<Args...>>, TypeTag<Who>);
+    operator<<(TypeTag<To<Args...>>, TypeTag<Who>);
 
     template <Template To, typename... Who> using Append =
-        decltype( (TypeTag<To>{} + ... + TypeTag<Who>{}) )::Type;
+        decltype( (TypeTag<To>{} << ... << TypeTag<Who>{}) )::Type;
 
     template <
         template <typename...> class To,
         typename Who,
         typename... Args
     > TypeTag<To<Who, Args...>>
-    operator+(TypeTag<Who>, TypeTag<To<Args...>>);
+    operator>>(TypeTag<Who>, TypeTag<To<Args...>>);
 
     template <Template To, typename... Who> using LAppend =
-        decltype( (TypeTag<Who>{} + ... + TypeTag<To>{}) )::Type;
+        decltype( (TypeTag<Who>{} >> ... >> TypeTag<To>{}) )::Type;
 
 } // <-- namespace detail::append
 
@@ -116,7 +116,7 @@ namespace detail::append_unique {
             (std::same_as<Who, Args> || ... || false),
             To<Args...>, To<Args..., Who>
         >
-    > operator+(TypeTag<To<Args...>>, TypeTag<Who>);
+    > operator<<(TypeTag<To<Args...>>, TypeTag<Who>);
         
 
     template <Template To, typename... Who> struct AppendUnique;
@@ -127,7 +127,7 @@ namespace detail::append_unique {
     > struct AppendUnique<To<Args...>, Who...> {
         using Type =
             decltype(
-                (TypeTag<To<Args...>>{} + ... + TypeTag<Who>{})
+                (TypeTag<To<Args...>>{} << ... << TypeTag<Who>{})
             )::Type;
     };
 
@@ -140,7 +140,7 @@ namespace detail::append_unique {
             (std::same_as<Who, Args> || ... || false),
             To<Args...>, To<Who, Args...>
         >
-    > operator+(TypeTag<Who>, TypeTag<To<Args...>>);
+    > operator>>(TypeTag<Who>, TypeTag<To<Args...>>);
 
     template <Template To, typename... Who> struct LAppendUnique;
     template <
@@ -150,7 +150,7 @@ namespace detail::append_unique {
     > struct LAppendUnique<To<Args...>, Who...> {
         using Type =
             decltype(
-                (TypeTag<Who>{} + ... + TypeTag<To<Args...>>{})
+                (TypeTag<Who>{} >> ... >> TypeTag<To<Args...>>{})
             )::Type;
     };
 
@@ -177,14 +177,14 @@ namespace detail::unique {
         typename T,
         typename... Args
     > TypeTag< AppendUnique< Dst<Args...>, T > >
-    operator+(TypeTag< Dst<Args...> >, TypeTag<T>);
+    operator<<(TypeTag< Dst<Args...> >, TypeTag<T>);
     // Left append
     template <
         template <typename...> class Dst,
         typename T,
         typename... Args
     > TypeTag< LAppendUnique< Dst<Args...>, T > >
-    operator+(TypeTag<T>, TypeTag< Dst<Args...> >);
+    operator>>(TypeTag<T>, TypeTag< Dst<Args...> >);
 
     template <Template Source> struct Unique;
     template <
@@ -193,7 +193,7 @@ namespace detail::unique {
     > struct Unique<SourceTemplate<Args...>> {
         using Type =
             decltype(
-                (TypeTag< SourceTemplate<> >{} + ... + TypeTag<Args>{})
+                (TypeTag< SourceTemplate<> >{} << ... << TypeTag<Args>{})
             )::Type;
     };
 
@@ -204,7 +204,7 @@ namespace detail::unique {
     > struct LUnique<SourceTemplate<Args...>> {
         using Type =
             decltype(
-                (TypeTag<Args>{} + ... + TypeTag< SourceTemplate<> >{})
+                (TypeTag<Args>{} >> ... >> TypeTag< SourceTemplate<> >{})
             )::Type;
     };
 
