@@ -18,8 +18,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  *****************************************************************************/
 /**
- * \file domain.hh
- * \brief \ref Domain wraps TNL Mesh and provedes a simple interface for storing data over it
+ * @file domain.hh
+ * @brief @ref Domain wraps TNL Mesh and provedes a simple interface for storing data over it
  *
  * Implemented by: Gregory Dushkin
  */
@@ -50,7 +50,7 @@
 namespace noa::utils::domain {
 
 /**
- * \brief Domain stores a TNL mesh and various data over its elements in one place
+ * @brief Domain stores a TNL mesh and various data over its elements in one place
  *        providing a friendly all-in-one-place interface for solvers.
  */
 template <
@@ -67,38 +67,39 @@ template <
     using GlobalIndexType = TGlobalIndexType;
     using LocalIndexType  = TLocalIndexType;
 
-    /// \brief TNL Mesh config
+    /// @brief TNL Mesh config
     using MeshConfig     = TNL::Meshes::DefaultConfig<CellTopology, CellTopology::dimension, RealType, GlobalIndexType, LocalIndexType>;
-    /// \brief TNL Mesh type
+    /// @brief TNL Mesh type
     using MeshType       = TNL::Meshes::Mesh<MeshConfig>;
-    /// \brief TNL VTU writer
+    /// @brief TNL VTU writer
     using MeshWriterType = TNL::Meshes::Writers::VTUWriter<MeshType>;
-    /// \brief TNL Mesh point type
+    /// @brief TNL Mesh point type
     using PointType      = MeshType::PointType;
 
-    /// \brief Mesh cell dimension
+    /// @brief Mesh cell dimension
     static constexpr auto dCell = MeshType::getMeshDimension();
-    /// \brief Mesh edge dimension
+    /// @brief Mesh edge dimension
     static constexpr auto dEdge = dCell - 1;
 
-    /// \brief Layer manager type
+    /// @brief Layer manager type
     using LayerManagerType         = LayerManager<DeviceType, GlobalIndexType>;
-    /// \brief Real TNL vector view
-    using RealVectorViewType       = LayerManagerType::template Vector<RealType>;
-    /// \brief Int TNL vector view
-    using IntVectorViewType        = LayerManagerType::template Vector<int>;
-    /// \brief GlobalIndexType TNL vector view
-    using IndexVectorViewType      = LayerManagerType::template Vector<GlobalIndexType>;
-    /// \brief LocalIndexType TNL vector view
-    using LocalIndexVectorViewType = LayerManagerType::template Vector<LocalIndexType>;
+    /// @brief Layer manager vector type
+    template <typename DataType>
+    using Vector = LayerManagerType::template Vector<DataType>;
+    /// @brief Layer manager vector view type
+    template <typename DataType>
+    using VectorView = Vector<DataType>::ViewType;
+    /// @brief Layer manager const vector ciew type
+    template <typename DataType>
+    using VectorConstView = Vector<DataType>::ConstViewType;
 
 private:
-    /// \brief Domain mesh
+    /// @brief Domain mesh
     std::optional<MeshType> mesh = std::nullopt;
-    /// \brief Mesh data layers
+    /// @brief Mesh data layers
     std::vector<LayerManagerType> layers{};
 
-    /// \brief Updates all layers' sizes from mesh entities count
+    /// @brief Updates all layers' sizes from mesh entities count
     template <int fromDimension = dCell>
     void updateLayerSizes() {
         const auto size = this->isClean() ? 0 : this->mesh->template getEntitiesCount<fromDimension>();
@@ -107,27 +108,27 @@ private:
     }
 
 public:
-    /// \brief Default constructor
+    /// @brief Default constructor
     Domain() {
         // Generate layer managers for each one of the mesh dimensions
         this->layers = std::vector<LayerManagerType>(dCell + 1);
     } // <-- Domain()
 
-    /// \brief Copy-constructor
+    /// @brief Copy-constructor
     Domain(const Domain& other) = default;
-    /// \brief Move-constructor
+    /// @brief Move-constructor
     Domain(Domain&& other) = default;
 
-    /// \brief Copy-assignment
+    /// @brief Copy-assignment
     Domain& operator=(const Domain& other) = default;
-    /// \brief Move-assignment
+    /// @brief Move-assignment
     Domain& operator=(Domain&&) = default;
 
-    /// \brief Destructor
+    /// @brief Destructor
     ~Domain() = default;
 
     /**
-     * \brief Reset the domain
+     * @brief Reset the domain
      *
      * Clears the mesh and layer data
      */
@@ -140,37 +141,40 @@ public:
         this->resetLayers();
     }
 
-    /// \brief Reset layer data only
+    /// @brief Reset layer data only
     void resetLayers() {
         for (auto& layer : this->layers) layer.reset();
     }
 
-    /// \brief Check if the domain contains a mesh. Equivalent to `!mesh.has_value()`
+    /// @brief Check if the domain contains a mesh. Equivalent to `!mesh.has_value()`
     [[nodiscard]] bool isClean() const { return !this->mesh.has_value(); }
 
-    /// \brief Check if the domain has any layers
+    /// @brief Check if the domain has any layers
     [[nodiscard]] bool hasLayers() const { return !this->layers.empty(); }
 
     /**
-     * \brief Get a const reference to a stored mesh
+     * @brief Get a const reference to a stored mesh
      *
-     * \throw std::bad_optional_access if there is no mesh stored as a result
+     * @throw std::bad_optional_access if there is no mesh stored as a result
      *        of `std::optional::value()` call
      */
     const MeshType& getMesh() const { return this->mesh.value(); }
 
     /**
-     * \brief Get center coordinates for an entity with index
+     * @brief Get center coordinates for an entity with index
      *
-     * \throw std::bad_optional_access if there is no mesh stored as a result
+     * @throw std::bad_optional_access if there is no mesh stored as a result
      *        of `std::optional::value()` call
      */
     template <int tDimension>
     auto getEntityCenter(GlobalIndexType index) const {
-        return TNL::Meshes::getEntityCenter(this->mesh.value(), this->mesh->template getEntity<tDimension>(index));
+        return TNL::Meshes::getEntityCenter(
+            this->mesh.value(),
+            this->mesh->template getEntity<tDimension>(index)
+        );
     } // <-- getEntityCenter(index)
 
-    /// \brief Get a layer manager for dimension
+    /// @brief Get a layer manager for dimension
     LayerManagerType& getLayers(const std::size_t& dimension) {
         return this->layers.at(dimension);
     } // <-- getLayers(dimension)
@@ -179,17 +183,20 @@ public:
     } // <-- getLayers(dimension) const
 
     /**
-     * \brief Set domain mesh
+     * @brief Set domain mesh
      *
-     * Sets the \ref mesh optional and updates all layers' sizes
+     * Sets the @ref mesh optional and updates all layers' sizes
      * accordigly
      */
-    void setMesh(const MeshType& newMesh) {
-        this->mesh = newMesh;
+    /// @brief Set domain mesh (move)
+    template <typename MeshType_>
+    requires std::same_as<std::remove_cvref_t<MeshType_>, MeshType>
+    void setMesh(MeshType_&& newMesh) {
+        this->mesh = std::forward<MeshType_>(newMesh);
         this->updateLayerSizes();
-    } // <-- setMesh(newMesh)
+    } // <-- setMesh(newMesh) (move)
 
-    /// \brief Write domain to a file
+    /// @brief Write domain to a file
     void write(const Path& filename) const {
         if (this->isClean()) {
             throw std::runtime_error("Domain contains no mesh data, nothing to save!");
@@ -199,9 +206,9 @@ public:
     } // <-- write(filename) const
 
     /**
-     * \brief Write domain contents to an output stream
+     * @brief Write domain contents to an output stream
      *
-     * \throw std::bad_optional_access if there is no mesh stored as a result
+     * @throw std::bad_optional_access if there is no mesh stored as a result
      *        of `std::optional::value()` call
      */
     friend std::ostream& operator<<(std::ostream& stream, const Domain& self) {
@@ -232,10 +239,10 @@ public:
     } // <-- operator<<(stream)
 
     /**
-     * \brief Load the domain from a VTU file specified by filename
+     * @brief Load the domain from a VTU file specified by filename
      *
-     * \param filename   - VTU file name
-     * \param cellLayers - a map of index->name for cell layers to load
+     * @param filename   - VTU file name
+     * @param cellLayers - a map of index->name for cell layers to load
      *
      * Currently, only cell layers loading is supported.
      * TODO: Load all available layers
@@ -281,11 +288,11 @@ public:
     } // <-- loadFrom(filename)
 
     /**
-     * \brief Generate the grid mesh for this domain
+     * @brief Generate the grid mesh for this domain
      *
-     * \param elements    - number of elements along all axes
-     * \param elementSize - element size along all axes
-     * \param offset      - domain origin point offset
+     * @param elements    - number of elements along all axes
+     * @param elementSize - element size along all axes
+     * @param offset      - domain origin point offset
      */
     void generateGrid(
         std::array<GlobalIndexType, dCell> elements,
@@ -346,37 +353,10 @@ public:
             }
         );
 
-        MeshType mesh{};
-        builder.build(mesh);
-        this->setMesh(mesh);
+        MeshType genMesh{};
+        builder.build(genMesh);
+        this->setMesh(std::move(genMesh));
     } // <-- void generate2DGrid(elements, elementSize, offset) | Triangle
 }; // <-- struct Domain
-
-/// \brief Concept for all domain types
-template <typename DomainCandidate>
-concept CDomain = requires (DomainCandidate dc) {
-    [] <
-        typename CellTopology,
-        typename Device,
-        typename Real,
-        typename GlobalIndex,
-        typename LocalIndex
-    > (
-        Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>
-    ) {} (dc);
-}; // <-- concept CDomain
-
-/// \brief Concept for any domain of specific topology
-template <typename DomainCandidate, typename CellTopology>
-concept CDomainWithTopology = requires(DomainCandidate dc) {
-    [] <
-        typename Device,
-        typename Real,
-        typename GlobalIndex,
-        typename LocalIndex
-    > (
-        Domain<CellTopology, Device, Real, GlobalIndex, LocalIndex>
-    ) {} (dc);
-} && CDomain<DomainCandidate>; // <-- concept CDomainWithTopology
 
 } // <-- namespace noa::utils::domain

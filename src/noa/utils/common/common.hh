@@ -18,7 +18,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.   *
  *****************************************************************************/
 /**
- * \file common.hh
+ * @file common.hh
  * Implemented by: Roland Grinis
  */
 
@@ -33,13 +33,12 @@
 #include <torch/torch.h>
 #include <torch/script.h>
 
-/// \brief Main NOA namespace
+/// @brief Main NOA namespace
 namespace noa {}
 
-/// \brief NOA utility code namespace
+/// @brief NOA utility code namespace
 namespace noa::utils {
 
-    /// Path type
     using Path = std::filesystem::path;
     using Status = bool;
     using Line = std::string;

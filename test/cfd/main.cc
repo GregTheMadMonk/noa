@@ -1,91 +1,99 @@
 #include <iostream>
 
 #include <noa/utils/combine/combine.hh>
-#include <noa/utils/cfd/cfd.hh>
-
-template <typename VectorType>
-float g(typename VectorType::ConstViewType in) {
-    float ret = 0;
-
-    in.forAllElements([&ret] (auto, auto& v) { ret += v; });
-
-    return ret / in.getSize();
-}
-
-template <typename VectorType>
-void gWrtP(typename VectorType::ConstViewType in, typename VectorType::ViewType out) {
-    out.forAllElements([size=in.getSize()] (auto, auto& v) { v = 1.0 / size; });
-}
+#include <noa/cfd/mhfe.hh>
 
 int main(int argc, char** argv) {
-    using DomainType     = noa::utils::domain::Domain<noa::TNL::Meshes::Topologies::Triangle>;
-    using VectorType     = DomainType::LayerManagerType::Vector<typename DomainType::RealType>;
-    using CFDProblemType = noa::utils::cfd::tasks::CFDProblem<DomainType>;
-    using MHFEType       = noa::utils::cfd::tasks::MHFE<DomainType, true>;
-    using GradEvType     = noa::utils::cfd::tasks::GradEv<gWrtP<VectorType>, DomainType>;
-    using FinDiffType    = noa::utils::cfd::tasks::FinDiff<g<VectorType>, MHFEType, DomainType>;
+    using Domain =
+        noa::utils::domain::Domain<noa::TNL::Meshes::Topologies::Triangle>;
+    using Problem =
+        noa::cfd::CFDProblem<Domain>;
+    using MHFE =
+        noa::cfd::MHFE<Domain, true>;
 
-    using noa::utils::combine::StaticComputation;
+    namespace cmb = noa::utils::combine;
 
-    // StaticComputation<MHFEType> computation;
-    StaticComputation<GradEvType, FinDiffType> computation;
-    auto& problem = computation.template get<CFDProblemType>();
-    auto& mhfe    = computation.template get<MHFEType>();
+    cmb::DynamicComposer<MHFE> comp{};
+    comp.setTasks<MHFE>({
+//  cmb::StaticComposer<MHFE> comp{
+        [] (Problem& problem) {
+            // Initialize the problem
+            // Create the mesh
+            const std::size_t   Nx = 5;
+            const Problem::Real dx = 10.0 / Nx;
+            Domain dummy{};
+            dummy.generateGrid(
+                { 2 * Nx, Nx },
+                { dx,     dx}
+            );
+            problem.setMesh(std::move(dummy.getMesh()));
 
-    std::cout << problem.solution->getSize() << std::endl;
-    std::cout << problem.edgeSolution->getSize() << std::endl;
-    
-    DomainType domain;
-    //noa::utils::domain::generate2DGrid(domain, 20, 10, 1.0, 1.0);
-    const auto Nx = 5;
-    const auto dx = 10.0 / Nx;
-    noa::utils::domain::generate2DGrid(domain, 2 * Nx, Nx, dx, dx);
+            std::cout << problem.solution->getSize() << std::endl;
+            std::cout << problem.edgeSolution->getSize() << std::endl;
 
-    problem.setMesh(domain.getMesh());
+            *problem.solution = 0;
+            *problem.a = 1;
+            *problem.c = 1;
 
-    std::cout << problem.solution->getSize() << std::endl;
-    std::cout << problem.edgeSolution->getSize() << std::endl;
+            *problem.dirichlet = 0;
+            *problem.dirichletMask = 0;
+            *problem.neumann = 0;
+            *problem.neumannMask = 0;
 
-    // Set up the problem
-    problem.solution.fill(0);
-    problem.a.fill(1);
-    problem.c.fill(1);
+            *problem.edgeSolution = 0;
 
-    problem.dirichlet.fill(0);
-    problem.dirichletMask.fill(0);
-    problem.neumann.fill(0);
-    problem.neumannMask.fill(0);
+            auto& mesh = problem.getDomain().getMesh();
+            mesh.forBoundary<Domain::dEdge>(
+                [&mesh, &problem] (auto edge) {
+                    const auto p1 = mesh.getPoint(
+                        mesh.template getSubentityIndex<Domain::dEdge, 0>(
+                            edge, 0
+                        )
+                    );
+                    const auto p2 = mesh.getPoint(
+                        mesh.template getSubentityIndex<Domain::dEdge, 0>(
+                            edge, 1
+                        )
+                    );
 
-    problem.edgeSolution.fill(0);
+                    // Edge direction vector
+                    const auto r = p2 - p1;
+                    // Edge center
+                    const auto c = (p2 + p1) / 2;
 
-    problem.getDomain().getMesh().forBoundary<DomainType::dimEdge>(
-        [&problem] (auto edgeIdx) {
-            const auto& mesh = problem.getDomain().getMesh();
+                    // x = const boundary
+                    if (r[0] == 0) {
+                        problem.dirichletMask[edge] = 1;
 
-            const auto p1 = mesh.getPoint(mesh.template getSubentityIndex<DomainType::dimEdge, 0>(edgeIdx, 0));
-            const auto p2 = mesh.getPoint(mesh.template getSubentityIndex<DomainType::dimEdge, 0>(edgeIdx, 1));
+                        bool mask =
+                            (p1[0] == 0) && (c[1] > 1) && (c[1] < 9);
 
-            // Edge direction vector
-            const auto r = p2 - p1;
-            // Edge center
-            const auto c = (p1 + p2) / 2;
+                        problem.dirichlet[edge] = mask;
+                        problem.edgeSolution[edge] = mask;
+                    } else if (r[1] == 0) { // y = const boundary
+                        problem.neumannMask[edge] = 1;
+                    }
+                }
+            );
 
-            // x = const boundary
-            if (r[0] == 0) {
-                problem.dirichletMask[edgeIdx] = 1;
-
-                bool mask = (p1[0] == 0) && (c[1] > 1) && (c[1] < 9);
-
-                problem.dirichlet[edgeIdx] = mask; // Implicit cast bool -> float
-                problem.edgeSolution[edgeIdx] = mask;
-            } else if (r[1] == 0) { // y = const boundary
-                problem.neumannMask[edgeIdx] = 1;
-            }
+            // Set the time step
+            problem.setTau(0.005);
         }
+    }
     );
 
-    mhfe.tau = 0.005;
+    const auto& problem = comp.template get<Problem>();
+    for (
+        auto time = problem.getTime();
+        time < 10.0;
+        comp.run(), time = problem.getTime()
+    ) {
+        problem.getDomain().write("out/" + std::to_string(time) + ".vtu");
+        std::cerr << "\r" << time << "            ";
+    }
+    std::cerr << '\n';
 
+#if 0
     std::ofstream f("dump.dat");
     while (mhfe.getTime() < 25.0) {
         computation.run();
@@ -102,5 +110,6 @@ int main(int argc, char** argv) {
     }
     std::cerr << std::endl;
 
+#endif
     return 0;
 }

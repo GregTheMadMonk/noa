@@ -232,11 +232,11 @@ struct LayerManager {
         /// Layer map start iterator
         auto begin() { return this->layers.begin(); }
         /// Layer map start iterator (const override)
-        const auto begin() const { return this->layers.begin(); }
+        auto begin() const { return this->layers.cbegin(); }
         /// Layer map end iterator
         auto end() { return this->layers.end(); }
         /// Layer map end iterator (const override)
-        const auto end() const { return this->layers.end(); }
+        auto end() const { return this->layers.cend(); }
 
         /// \brief Remove all layers
         void reset() {
@@ -289,11 +289,5 @@ struct LayerManager {
             return layers.at(index);
         }
 }; // <-- struct LayerManager
-
-/// \brief Concept for all LayerManager instantiations
-template <typename LayerManagerCandidate>
-concept CLayerManager = requires (LayerManagerCandidate lmc) {
-    [] <typename Device, typename Index> (LayerManager<Device, Index>) {} (lmc);
-}; // <-- concept CLayerManager
 
 } // <-- namespace noa::utils::domain
