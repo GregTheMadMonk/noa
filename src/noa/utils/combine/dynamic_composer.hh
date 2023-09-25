@@ -1,6 +1,6 @@
 /**
- * \file dynamic_composer.hh
- * \brief Definition of Combine's dynamic task composer
+ * @file dynamic_composer.hh
+ * @brief Definition of Combine's dynamic task composer
  */
 #pragma once
 
@@ -20,25 +20,25 @@
 namespace noa::utils::combine {
 
 /**
- * \brief Dynamic composer performs dependency resolution at runtime
+ * @brief Dynamic composer performs dependency resolution at runtime
  *
  * This class allows the user to specify what tasks are needed to be
- * executed at runtime, unlike with \brief StaticComposer.
+ * executed at runtime, unlike with @ref StaticComposer.
  *
- * \tparam TaskList tasks for which this composer will enable dynamic
+ * @tparam TaskList tasks for which this composer will enable dynamic
  *         dependency resoltion. All of the tasks specified here will also
  *         lead to their dependencies being recursively added to the list
  *         to avoid situations where a task's dependency is unable to be
  *         dynamically resolved due to a mistake. Dependency expantion
- *         algorithm from \ref StaticComposer is used
+ *         algorithm from @ref StaticComposer is used
  */
 template <Task... TaskList>
 class DynamicComposer {
-    /// \brief All tasks that could possibly be handled by this composer
+    /// @brief All tasks that could possibly be handled by this composer
     using Tasks = detail::Unroll< meta::List<TaskList...> >::Type;
 
     /**
-     * \brief `std::out_of_range` child for when there was no task of type
+     * @brief `std::out_of_range` child for when there was no task of type
      *        `TaskType` found
      */
     template <Task TaskType> struct NoTaskError : std::out_of_range {
@@ -49,33 +49,33 @@ class DynamicComposer {
         } {}
     }; // <-- struct NoTaskError<TaskType>
 
-    /// \brief Task type index vector
+    /// @brief Task type index vector
     using TaskIdxVec = std::vector<std::type_index>;
 
     template <Task> class AsDynamic;
-    /// \brief Base abstract class for dynamic task container
+    /// @brief Base abstract class for dynamic task container
     struct DynamicTask {
-        /// \brief Convert to specific child type reference
+        /// @brief Convert to specific child type reference
         template <Task TaskType>
         AsDynamic<TaskType>& as()
         { return *reinterpret_cast<AsDynamic<TaskType>*>(this); }
-        /// \brief Convert to specific child type const reference
+        /// @brief Convert to specific child type const reference
         template <Task TaskType>
         const AsDynamic<TaskType>& as() const
         { return *reinterpret_cast<const AsDynamic<TaskType>*>(this); }
 
-        /// \brief Stored task type index
+        /// @brief Stored task type index
         virtual std::type_index type() const = 0;
-        /// \brief Run the stored task
+        /// @brief Run the stored task
         virtual void run(DynamicComposer&) = 0;
-        /// \brief Check if the task was updated
+        /// @brief Check if the task was updated
         virtual bool updated() const = 0;
         /**
-         * \brief Call the `onUpdated()` function on th stored task with
+         * @brief Call the `onUpdated()` function on th stored task with
          *        another task if available
          */
         virtual void onUpdated(DynamicTask&) = 0;
-        /// \brief Get task dependencies
+        /// @brief Get task dependencies
         virtual const TaskIdxVec& dependencies() const = 0;
 
         virtual ~DynamicTask() {}
@@ -91,7 +91,7 @@ class DynamicComposer {
         } // <-- void emplace(ptr, args...)
     }; // <-- class DynamicTask
 
-    /// \brief Dynamic wrapper for a task type
+    /// @brief Dynamic wrapper for a task type
     template <Task TaskType>
     struct AsDynamic : public DynamicTask {
         TaskType task;
@@ -143,14 +143,14 @@ class DynamicComposer {
     }; // <-- class AsDynamic
 
     /**
-     * \brief Task storage
+     * @brief Task storage
      *
      * Tasks are stored in the order of execution in a vector
      */
     std::vector<std::unique_ptr<DynamicTask>> tasks;
 
     /**
-     * \brief Convert runtime task type info to compile-time type
+     * @brief Convert runtime task type info to compile-time type
      *
      * Calls `f` with `meta::TypeTag<T>` argument (like std::visit), where
      * `typeid(T) == idx`
@@ -169,7 +169,7 @@ class DynamicComposer {
         } (Tasks{});
     } // <-- static auto visit(idx, f)
     /**
-     * \brief Converts runtime task type info to compile-time to call the
+     * @brief Converts runtime task type info to compile-time to call the
      *        functor with a proper type
      */
     template <typename Func>
@@ -181,7 +181,7 @@ class DynamicComposer {
         );
     } // <-- static void visit(task, f)
     /**
-     * \brief Converts runtime task type info to compile-time to call the
+     * @brief Converts runtime task type info to compile-time to call the
      *        functor with a proper type if possible
      */
     template <typename Func>
@@ -196,7 +196,7 @@ class DynamicComposer {
     } // <-- static void visit(task, f)
 
 public:
-    /** \brief Dynamic task initializer
+    /** @brief Dynamic task initializer
      *
      * Initializers for static tasks are statically polymorphic functions.
      * We can't use this approach here, so a wrapper is required!
@@ -205,21 +205,21 @@ public:
         std::function<void(DynamicTask&)> callback = nullptr;
 
     public:
-        /// \brief Construct from an arbitrary functor
+        /// @brief Construct from an arbitrary functor
         template <typename Func>
         Initializer(Func&& f) {
             this->callback =
                 [f] (DynamicTask& task) { tryVisit(f, task); };
         } // <-- Initializer(f)
 
-        /// \brief Construct from a functor invokable with `DynamicTask&`
+        /// @brief Construct from a functor invokable with `DynamicTask&`
         template <std::invocable<DynamicTask&> Func>
         Initializer(Func&& f) : callback(f) {}
 
         void operator()(DynamicTask& task) const { this->callback(task); }
     }; // <-- class Initializer
 
-    /// \brief Task name to `std::type_index` mapping
+    /// @brief Task name to `std::type_index` mapping
     static inline
     const std::unordered_map<std::string, std::type_index> namesMap {
         [] <Task... Ts> (meta::List<Ts...>) {
@@ -235,21 +235,21 @@ public:
         } (Tasks{})
     };
 
-    /// \brief Defaunt constructor does nothing
+    /// @brief Defaunt constructor does nothing
     DynamicComposer() = default;
 
-    /// \brief Copy-constructor (calls copy-assignment)
+    /// @brief Copy-constructor (calls copy-assignment)
     DynamicComposer(const DynamicComposer& other) {
         *this = other;
     } // <-- DynamicComposer(const DynamicComposer&)
 
-    /// \brief Move-constructor (calls move-assignment)
+    /// @brief Move-constructor (calls move-assignment)
     DynamicComposer(DynamicComposer&& other) {
         *this = std::move(other);
     } // <-- DynamicComposer(DynamicComposer&&)
 
     /**
-     * \brief Copy-assignment all possibly contained tasks to be copyable
+     * @brief Copy-assignment all possibly contained tasks to be copyable
      */
     DynamicComposer& operator=(const DynamicComposer& other)
     requires (allCopyable(Tasks{})) {
@@ -269,7 +269,7 @@ public:
     } // <-- DynamicComposer& operator=(const DynamicComposer&)
 
     /**
-     * \brief Move-assignemnt
+     * @brief Move-assignemnt
      *
      * Requires all possibly contained tasks to be movable
      */
@@ -289,13 +289,13 @@ public:
         return *this;
     } // <-- DynamicComposer operator=(DynamicComposer&&)
 
-    /// \brief Reset the composer state by clearing the task vector
+    /// @brief Reset the composer state by clearing the task vector
     void reset() { this->tasks.clear(); }
 
-    /// \brief Inititalizers vector
+    /// @brief Inititalizers vector
     using Inits = std::vector<Initializer>;
 
-    /// \brief Set required tasks via template arguments
+    /// @brief Set required tasks via template arguments
     template <Task... Tasks>
     void setTasks(const Inits& inits = {}, meta::List<Tasks...> = {}) {
         TaskIdxVec request{};
@@ -305,7 +305,7 @@ public:
         this->setTasks(request, inits);
     } // <-- void setTasks(meta::List<Tasks...>)
 
-    /// \brief Set required tasks via names
+    /// @brief Set required tasks via names
     void setTasks(
         const std::vector<std::string>& names, const Inits& inits = {}
     ) {
@@ -318,10 +318,10 @@ public:
 
 private:
     /**
-     * \brief Set required tasks via type indices
+     * @brief Set required tasks via type indices
      *
      * All public `setTasks` function calls lead to this private overload.
-     * This function processes the input vector and constructs \ref tasks
+     * This function processes the input vector and constructs @ref tasks
      * accordingly.
      * 
      * Previous composer state gets reset
@@ -372,7 +372,24 @@ private:
     } // <-- void setTasks(typeIdxs)
 
 public:
-    /// \brief Run the tasks
+    /// @brief Get all the possible task names
+    static inline std::vector<std::string> getAllowedTasks() {
+        return [] <Task... AllTasks> (meta::List<AllTasks...>) {
+            std::vector<std::string> ret{};
+
+            (
+                [&ret] <Task TaskType> (meta::TypeTag<TaskType>) {
+                    if constexpr (NamedTask<TaskType>) {
+                        ret.push_back(taskName<TaskType>().data());
+                    }
+                } (meta::TypeTag<AllTasks>{}), ...
+            );
+
+            return ret;
+        } (Tasks{});
+    } // <-- static inline std::vector<std::string> getAllowedTasks()
+
+    /// @brief Run the tasks
     void run() {
         for (auto t = this->tasks.begin(); t != this->tasks.end(); ++t) {
             if ((*t)->updated()) {
@@ -386,7 +403,7 @@ public:
     } // <-- void run()
 
     // Compatibility functions for 'static' task getters
-    /// \brief Get task reference by type
+    /// @brief Get task reference by type
     template <Task TaskType>
     TaskType& get() {
         const auto it = std::find_if(
@@ -400,7 +417,7 @@ public:
 
         return (*it)->template as<TaskType>().task;
     } // <-- TaskType& get()
-    /// \brief Get task const reference by type
+    /// @brief Get task const reference by type
     template <Task TaskType>
     const TaskType& get() const {
         const auto it = std::find_if(
@@ -414,12 +431,12 @@ public:
 
         return (*it)->template as<TaskType>().task;
     } // <-- TaskType& get()
-    /// \brief Get several tasks as a tuple of references
+    /// @brief Get several tasks as a tuple of references
     template <Task... TasksList>
     auto getList(meta::List<TasksList...> = {}) {
         return std::tie(this->get<TasksList>()...);
     } // <-- auto getList(meta::List<TasksList...>)
-    /// \brief Get several tasks as a tuple of const references
+    /// @brief Get several tasks as a tuple of const references
     template <Task... TasksList>
     auto getList(meta::List<TasksList...> = {}) const {
         return std::tie(this->get<TasksList>()...);
