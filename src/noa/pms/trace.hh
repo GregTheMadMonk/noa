@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <noa/utils/common/common.hh>
+#include <noa/utils/common.hh>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/DefaultConfig.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Topologies/Tetrahedron.h>

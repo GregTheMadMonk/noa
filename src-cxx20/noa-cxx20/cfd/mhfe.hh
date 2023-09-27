@@ -11,11 +11,11 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/LinearSolverTypeResolver.h>
 
 // NOA headers
-#include <noa/utils/combine/combine.hh>
-#include <noa/utils/common/meta.hh>
-#include <noa/utils/common/unreachable.hh>
-#include <noa/utils/domain/domain.hh>
-#include <noa/utils/tnl/tnlx.hh>
+#include <noa-cxx20/combine/combine.hh>
+#include <noa-cxx20/utils/domain/domain.hh>
+#include <noa-cxx20/utils/meta.hh>
+#include <noa-cxx20/utils/tnl/tnlx.hh>
+#include <noa-cxx20/utils/unreachable.hh>
 
 // Local headers
 #include "problem.hh"

@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
 				"rock_thickness will be ignored!" << endl;
 		// Create and load rock mesh
 		rockDomain = &world.add_domain();
-		rockDomain->loadFrom(FLAGS_mesh);
+		rockDomain->loadFrom(FLAGS_mesh, {}); // TODO: fix
 
 		// Initialize all mesh cells to rock
 		auto& rockCellLayers = rockDomain->getLayers(3);

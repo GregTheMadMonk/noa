@@ -2,7 +2,7 @@
 
 #include <noa/pms/pumas.hh>
 #include <noa/pms/trace.hh>
-#include <noa/utils/domain/domain.hh>
+#include <noa-cxx20/utils/domain/domain.hh>
 
 #include <limits>
 #include <vector>
@@ -89,7 +89,7 @@ class ParticleWorld {
 
                         for (const auto& domain : domains) {
                                 const auto& mesh = domain.getMesh();
-                                constexpr auto dim = domain.getMeshDimension(); // = 3
+                                constexpr auto dim = domain.dCell; // = 3
                                 const auto cells = mesh.template getEntitiesCount<dim>();
                                 /* PASEUDO-CODE
                                 std::optional<std::size_t> t_index;

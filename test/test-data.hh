@@ -1,7 +1,7 @@
 #pragma once
 
 #include <noa/ghmc.hh>
-#include <noa/utils/common/common.hh>
+#include <noa/utils/common.hh>
 #include <noa/utils/meshes.hh>
 
 using namespace noa::ghmc;

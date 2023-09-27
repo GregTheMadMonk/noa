@@ -7,7 +7,7 @@
 #include <string_view>
 #include <typeinfo>
 
-#include <noa/utils/common/meta.hh>
+#include <noa-cxx20/utils/meta.hh>
 
 namespace noa::utils::combine {
 

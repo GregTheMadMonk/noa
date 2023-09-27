@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <noa/utils/common/meta.hh>
+#include <noa-cxx20/utils/meta.hh>
 
 #include "static_composer.hh" // detail::Unroll
 #include "task_manip.hh"

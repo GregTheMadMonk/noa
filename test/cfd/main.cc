@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <noa/utils/combine/combine.hh>
-#include <noa/cfd/mhfe.hh>
+#include <noa-cxx20/combine/combine.hh>
+#include <noa-cxx20/cfd/mhfe.hh>
 
 int main(int argc, char** argv) {
     using Domain =

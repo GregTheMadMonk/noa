@@ -1,6 +1,6 @@
 #pragma once
 
-#include <noa/utils/domain/domain.hh>
+#include <noa-cxx20/utils/domain/domain.hh>
 
 #include <gtest/gtest.h>
 

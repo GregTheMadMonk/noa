@@ -5,10 +5,10 @@
 #pragma once
 
 // NOA headers
-#include <noa/utils/combine/combine.hh>
-#include <noa/utils/common/meta.hh>
-#include <noa/utils/domain/domain.hh>
-#include <noa/utils/domain/layer_view.hh>
+#include <noa-cxx20/combine/combine.hh>
+#include <noa-cxx20/utils/meta.hh>
+#include <noa-cxx20/utils/domain/domain.hh>
+#include <noa-cxx20/utils/domain/layer_view.hh>
 
 namespace noa::cfd {
 

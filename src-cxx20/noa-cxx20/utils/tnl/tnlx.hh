@@ -13,7 +13,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/SparseMatrix.h>
 
 // NOA headers
-#include <noa/utils/common/meta.hh>
+#include <noa-cxx20/utils/meta.hh>
 
 /// @brief Extensions to the TNL library
 namespace noa::utils::tnl {

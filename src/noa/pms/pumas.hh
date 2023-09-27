@@ -23,8 +23,7 @@
 
 #pragma once
 
-#include "noa/kernels.hh"
-#include "noa/utils/common/common.hh"
+#include "noa/utils/common.hh"
 
 #include <cstdio>
 

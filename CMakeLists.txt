@@ -34,8 +34,8 @@ function(target_add_openmp target_name)
 	target_compile_options( ${target_name} BEFORE PRIVATE -DHAVE_OPENMP $<$<COMPILE_LANGUAGE:CXX>:${OpenMP_CXX_FLAGS}> )
 endfunction()
 
-# Require C++20
-set(CMAKE_CXX_STANDARD 20)
+# Require C++17 for most of the NOA
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Warning flags
@@ -43,9 +43,6 @@ set(W_FLAGS "") #"-Wall;-Wextra;-Wpedantic")
 
 # Native optimisations
 set(NA_OPT_FLAGS "-march=native;-mtune=native")
-
-# Feature flags
-set(FEATURE_FLAGS "-fconcepts-diagnostics-depth=5")
 
 # CUDA modern C++ extensions
 set(MCXX_CUDA "--expt-relaxed-constexpr;--expt-extended-lambda")
@@ -79,9 +76,32 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
+# C++20 NOA headers
+add_library(${PROJECT_NAME}_CXX20 INTERFACE)
+# Alias
+add_library(
+    ${PROJECT_NAME}::${PROJECT_NAME}_CXX20 ALIAS ${PROJECT_NAME}_CXX20
+) # <-- add_library
+
 # Interface LibTorch
 target_link_libraries(${PROJECT_NAME} INTERFACE torch)
 set_target_properties(${PROJECT_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES torch)
+
+# C++20 NOA uses C++17 headers too
+target_link_libraries(${PROJECT_NAME}_CXX20 INTERFACE ${PROJECT_NAME})
+set_target_properties(
+    ${PROJECT_NAME}_CXX20
+    PROPERTIES INTERFACE_LINK_LIBRARIES ${PROJECT_NAME}
+) # <-- set_target_properties
+# C++20 NOA requires at least C++20 (naturally)
+target_compile_features(${PROJECT_NAME}_CXX20 INTERFACE cxx_std_20)
+# Library headers
+target_include_directories(
+    ${PROJECT_NAME}_CXX20
+    INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src-cxx20>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+) # <-- target_include_directories
 
 if (BUILD_NOA_TESTS)
     enable_testing()
@@ -130,6 +150,9 @@ if (INSTALL_NOA)
             DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
 
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/noa
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/src-cxx20/noa-cxx20
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 endif ()

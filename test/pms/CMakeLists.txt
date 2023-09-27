@@ -18,7 +18,7 @@ add_executable(muon_model
 add_dependencies(muon_model pumas_materials)
 
 # Link libraries
-target_link_libraries(muon_model PRIVATE ${PROJECT_NAME} gflags ZLIB::ZLIB)
+target_link_libraries(muon_model PRIVATE ${PROJECT_NAME}_CXX20 gflags ZLIB::ZLIB)
 target_compile_options(muon_model PRIVATE
         PRIVATE -O3 -DHAVE_ZLIB
 	$<$<COMPILE_LANGUAGE:CXX>:${W_FLAGS} -fpermissive>)

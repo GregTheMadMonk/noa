@@ -7,7 +7,7 @@
 #define NOA_COMPILE_TIME_TESTS
 
 // NOA headers
-#include <noa/utils/combine/combine.hh>
+#include <noa-cxx20/combine/combine.hh>
 
 // gtest
 #include <gtest/gtest.h>

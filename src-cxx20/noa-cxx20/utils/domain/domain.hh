@@ -41,7 +41,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Geometry/getOutwardNormalVector.h>
 
 // NOA headers
-#include <noa/utils/common/common.hh>
+#include <noa/utils/common.hh> // For type aliases
 
 // Local headers
 #include "configtagpermissive.hh"

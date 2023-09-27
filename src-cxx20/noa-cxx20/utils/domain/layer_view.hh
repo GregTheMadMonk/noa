@@ -11,7 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.hpp>
 
 // NOA headers
-#include <noa/utils/common/meta.hh>
+#include <noa-cxx20/utils/meta.hh>
 
 // Local headers
 #include "domain.hh"

@@ -2,7 +2,7 @@
 
 #include <noa/pms/dcs.hh>
 #include <noa/pms/physics.hh>
-#include <noa/utils/common/common.hh>
+#include <noa/utils/common.hh>
 
 #include <gtest/gtest.h>
 

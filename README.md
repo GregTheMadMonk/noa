@@ -12,11 +12,11 @@ and high frequency trading.
 Currently, we support only `GNU`, and `CUDA` for GPU 
 (check [WSL](https://docs.nvidia.com/cuda/wsl-user-guide/index.html) for Windows,
 and [LIMA](https://github.com/lima-vm/lima) for macOS).
-A toolchain fully supporting `C++20` is required.
+A toolchain fully supporting `C++17` is required.
 `NOA` is a header-only library, so you can directly 
 drop the `src/noa` folder into your project.
 
-:warning: However, beyond `C++20` source code, the project contains:
+:warning: However, beyond `C++17` source code, the project contains:
 * `CUDA` sources in `noa/kernels.cuh`
 * `C++` third-party sources in `noa/kernels.hh`
 
