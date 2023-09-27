@@ -4,8 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Jakub Klinkovsky
-
 #pragma once
 
 /*
@@ -14,6 +12,7 @@
  */
 
 #include <memory>  // std::unique_ptr
+#include <map> // std::map
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Exceptions/CudaSupportMissing.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
@@ -21,6 +20,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Math.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/DeviceInfo.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/SharedMemory.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/copy.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Vector.h>
 
 namespace noa::TNL::Matrices {
@@ -52,9 +52,12 @@ public:
          const RealType beta,
          RealType* y )
    {
-      TNL_ASSERT_GT( m, 0, "m must be positive" );
-      TNL_ASSERT_GT( n, 0, "n must be positive" );
-      TNL_ASSERT_GE( lda, m, "lda must be at least m" );
+      if( m <= 0 )
+         throw std::invalid_argument( "gemv: m must be positive" );
+      if( n <= 0 )
+         throw std::invalid_argument( "gemv: n must be positive" );
+      if( lda < m )
+         throw std::invalid_argument( "gemv: lda must be at least m" );
 
       std::unique_ptr< RealType[] > alphax{ new RealType[ n ] };
       for( IndexType k = 0; k < n; k++ )
@@ -63,7 +66,7 @@ public:
       if( n == 1 ) {
          if( beta != 0.0 ) {
 #ifdef HAVE_OPENMP
-#pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
+            #pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
 #endif
             for( IndexType j = 0; j < m; j++ )
                y[ j ] = A[ j ] * alphax[ 0 ] + beta * y[ j ];
@@ -71,7 +74,7 @@ public:
          else {
 // the vector y might be uninitialized, and 0.0 * NaN = NaN
 #ifdef HAVE_OPENMP
-#pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
+            #pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
 #endif
             for( IndexType j = 0; j < m; j++ )
                y[ j ] = A[ j ] * alphax[ 0 ];
@@ -84,13 +87,13 @@ public:
          const IndexType blocks = m / block_size;
 
 #ifdef HAVE_OPENMP
-#pragma omp parallel if( noa::TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
+         #pragma omp parallel if( noa::TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
 #endif
          {
             RealType aux[ block_size ];
 
 #ifdef HAVE_OPENMP
-#pragma omp for nowait
+            #pragma omp for nowait
 #endif
             for( IndexType b = 0; b < blocks; b++ ) {
                const IndexType block_offset = b * block_size;
@@ -120,7 +123,7 @@ public:
 
 // the first thread that reaches here processes the last, incomplete block
 #ifdef HAVE_OPENMP
-#pragma omp single nowait
+            #pragma omp single nowait
 #endif
             {
                // TODO: unlike the complete blocks, the tail is traversed row-wise
@@ -170,15 +173,20 @@ public:
          RealType* C,
          const IndexType ldc )
    {
-      TNL_ASSERT_GT( m, 0, "m must be positive" );
-      TNL_ASSERT_GT( n, 0, "n must be positive" );
-      TNL_ASSERT_GE( lda, m, "lda must be at least m" );
-      TNL_ASSERT_GE( ldb, m, "lda must be at least m" );
-      TNL_ASSERT_GE( ldc, m, "lda must be at least m" );
+      if( m <= 0 )
+         throw std::invalid_argument( "geam: m must be positive" );
+      if( n <= 0 )
+         throw std::invalid_argument( "geam: n must be positive" );
+      if( lda < m )
+         throw std::invalid_argument( "geam: lda must be at least m" );
+      if( ldb < m )
+         throw std::invalid_argument( "geam: ldb must be at least m" );
+      if( ldc < m )
+         throw std::invalid_argument( "geam: ldc must be at least m" );
 
       if( n == 1 ) {
 #ifdef HAVE_OPENMP
-#pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
+         #pragma omp parallel for if( noa::TNL::Devices::Host::isOMPEnabled() )
 #endif
          for( IndexType j = 0; j < m; j++ )
             C[ j ] = alpha * A[ j ] + beta * B[ j ];
@@ -190,11 +198,11 @@ public:
          const IndexType blocks = m / block_size;
 
 #ifdef HAVE_OPENMP
-#pragma omp parallel if( noa::TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
+         #pragma omp parallel if( noa::TNL::Devices::Host::isOMPEnabled() && blocks >= 2 )
 #endif
          {
 #ifdef HAVE_OPENMP
-#pragma omp for nowait
+            #pragma omp for nowait
 #endif
             for( IndexType b = 0; b < blocks; b++ ) {
                const IndexType block_offset = b * block_size;
@@ -209,7 +217,7 @@ public:
 
 // the first thread that reaches here processes the last, incomplete block
 #ifdef HAVE_OPENMP
-#pragma omp single nowait
+            #pragma omp single nowait
 #endif
             {
                for( IndexType j = 0; j < n; j++ ) {
@@ -328,15 +336,15 @@ public:
          const RealType beta,
          RealType* y )
    {
-      TNL_ASSERT( m <= lda, );
-      TNL_ASSERT( n <= 256,
-                  std::cerr << "The gemv kernel is optimized only for small 'n' and assumes that n <= 256." << std::endl; );
+      if( m > lda )
+         throw std::invalid_argument( "gemv: the size 'm' must be less than or equal to 'lda'." );
+      if( n > 256 )
+         throw std::invalid_argument( "The gemv kernel is optimized only for small 'n' and assumes that n <= 256." );
 
       // TODO: use static storage, e.g. from the CudaReductionBuffer, to avoid frequent reallocations
       Containers::Vector< RealType, Devices::Cuda, IndexType > xDevice;
       xDevice.setSize( n );
-      Algorithms::MultiDeviceMemoryOperations< Devices::Cuda, Devices::Host >::copy< RealType, RealType, IndexType >(
-         xDevice.getData(), x, n );
+      Algorithms::copy< Devices::Cuda, Devices::Host >( xDevice.getData(), x, n );
 
       // desGridSize = blocksPerMultiprocessor * numberOfMultiprocessors
       const int desGridSize = 32 * Cuda::DeviceInfo::getCudaMultiprocessors( Cuda::DeviceInfo::getActiveDevice() );
@@ -373,11 +381,16 @@ public:
          RealType* C,
          const IndexType ldc )
    {
-      TNL_ASSERT_GT( m, 0, "m must be positive" );
-      TNL_ASSERT_GT( n, 0, "n must be positive" );
-      TNL_ASSERT_GE( lda, m, "lda must be at least m" );
-      TNL_ASSERT_GE( ldb, m, "lda must be at least m" );
-      TNL_ASSERT_GE( ldc, m, "lda must be at least m" );
+      if( m <= 0 )
+         throw std::invalid_argument( "geam: m must be positive" );
+      if( n <= 0 )
+         throw std::invalid_argument( "geam: n must be positive" );
+      if( lda < m )
+         throw std::invalid_argument( "geam: lda must be at least m" );
+      if( ldb < m )
+         throw std::invalid_argument( "geam: ldb must be at least m" );
+      if( ldc < m )
+         throw std::invalid_argument( "geam: ldc must be at least m" );
 
       Cuda::LaunchConfiguration launch_config;
 
@@ -397,5 +410,46 @@ public:
       Cuda::launchKernelSync( kernel, launch_config, m, n, alpha, A, lda, beta, B, ldb, C, ldc );
    }
 };
+
+/**
+ * \brief This function computes \f$( A + A^T ) / 2 \f$, where \f$ A \f$ is a square matrix.
+ *
+ * \tparam InMatrix is the type of the input matrix.
+ * \tparam OutMatrix is the type of the output matrix.
+ * \param inMatrix is the input matrix.
+ * \return the output matrix.
+ */
+template< typename OutMatrix, typename InMatrix >
+OutMatrix
+getSymmetricPart( const InMatrix& inMatrix )
+{
+   static_assert(
+      std::is_same_v< typename InMatrix::DeviceType, Devices::Host >
+         || std::is_same_v< typename InMatrix::DeviceType, Devices::Sequential >,
+      "The input matrix must be stored on host, i.e. only Devices::Host and Devices::Sequential devices are allowed." );
+   if( inMatrix.getRows() != inMatrix.getColumns() )
+      throw std::invalid_argument( "getSymmetricPart: the input matrix must be square" );
+
+   // TODO: the following needs to be optimized and it works only for sparse matrices on host
+   using RealType = typename InMatrix::RealType;
+   using IndexType = typename InMatrix::IndexType;
+
+   OutMatrix outMatrix;
+   std::map< std::pair< IndexType, IndexType >, RealType > map;
+   for( IndexType rowIdx = 0; rowIdx < inMatrix.getRows(); rowIdx++ ) {
+      auto row = inMatrix.getRow( rowIdx );
+      for( IndexType localIdx = 0; localIdx < row.getSize(); localIdx++ ) {
+         IndexType columnIdx = row.getColumnIndex( localIdx );
+         RealType value = row.getValue( localIdx );
+         if( auto element = map.find( std::make_pair( rowIdx, columnIdx ) ); element != map.end() )
+            value = ( value + element->second ) / 2.0;
+         map[ std::make_pair( rowIdx, columnIdx ) ] = value;
+         map[ std::make_pair( columnIdx, rowIdx ) ] = value;
+      }
+   }
+   outMatrix.setDimensions( inMatrix.getRows(), inMatrix.getColumns() );
+   outMatrix.setElements( map );
+   return outMatrix;
+}
 
 }  // namespace noa::TNL::Matrices

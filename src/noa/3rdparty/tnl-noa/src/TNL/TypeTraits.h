@@ -6,10 +6,30 @@
 
 #pragma once
 
+#include <complex>
 #include <type_traits>
 #include <utility>
 
 namespace noa::TNL {
+
+template< class T >
+struct is_complex : public std::false_type
+{};
+template< class T >
+struct is_complex< const T > : public is_complex< T >
+{};
+template< class T >
+struct is_complex< volatile const T > : public is_complex< T >
+{};
+template< class T >
+struct is_complex< volatile T > : public is_complex< T >
+{};
+template< class T >
+struct is_complex< std::complex< T > > : public std::true_type
+{};
+
+template< class T >
+constexpr bool is_complex_v = is_complex< T >::value;
 
 // clang-format off
 
@@ -62,12 +82,8 @@ class HasSetSizeMethod
 private:
    template< typename U >
    static constexpr auto check(U*)
-   -> typename
-      std::enable_if_t<
-         std::is_same<
-               decltype( std::declval<U>().setSize(0) ),
-               void
-            >::value,
+   -> std::enable_if_t<
+         std::is_same_v< decltype( std::declval<U>().setSize(0) ), void >,
          std::true_type
       >;
 
@@ -89,12 +105,8 @@ class HasSubscriptOperator
 private:
    template< typename U >
    static constexpr auto check(U*)
-   -> typename
-      std::enable_if_t<
-         ! std::is_same<
-               decltype( std::declval<U>()[ std::declval<U>().getSize() ] ),
-               void
-            >::value,
+   -> std::enable_if_t<
+         ! std::is_same_v< decltype( std::declval<U>()[ std::declval<U>().getSize() ] ), void >,
          std::true_type
       >;
 
@@ -116,12 +128,8 @@ class HasAddAssignmentOperator
 private:
    template< typename U >
    static constexpr auto check(U*)
-   -> typename
-      std::enable_if_t<
-         ! std::is_same<
-               decltype( std::declval<U>() += std::declval<U>() ),
-               void
-            >::value,
+   -> std::enable_if_t<
+         ! std::is_same_v< decltype( std::declval<U>() += std::declval<U>() ), void >,
          std::true_type
       >;
 
@@ -195,9 +203,6 @@ private:
             #pragma push
             #pragma diag_suppress 2361
          #endif
-      #elif defined(__INTEL_COMPILER)
-         #pragma warning(push)
-         #pragma warning(disable:3291)
       #endif
       template< typename M, M method >
       static constexpr std::true_type is_constexpr_impl( decltype(int{((*method)(), 0U)}) );
@@ -207,9 +212,6 @@ private:
          #else
             #pragma pop
          #endif
-      #elif defined(__INTEL_COMPILER)
-         // FIXME: this does not work - warning would be shown again...
-         //#pragma warning(pop)
       #endif
 
       template< typename M, M method >
@@ -251,10 +253,9 @@ template< typename T >
 struct IsViewType
 {
 private:
-   template< typename C > static constexpr auto test(C)
-      -> std::integral_constant< bool,
-               std::is_same< typename C::ViewType, C >::value
-         >;
+   template< typename C >
+   static constexpr auto test(C) -> std::integral_constant< bool, std::is_same_v< typename C::ViewType, C > >;
+
    static constexpr std::false_type test(...);
 
 public:
@@ -279,6 +280,24 @@ public:
 };
 
 /**
+ * \brief Type trait for checking if T has getCommunicator method.
+ */
+template< typename T >
+class HasIsMatrixMethod
+{
+private:
+   using YesType = char[1];
+   using NoType = char[2];
+
+   template< typename C > static YesType& test( decltype(std::declval< C >().isMatrix()) );
+   template< typename C > static NoType& test(...);
+
+public:
+   static constexpr bool value = ( sizeof( test< std::decay_t<T> >(0) ) == sizeof( YesType ) );
+};
+
+
+/**
  * \brief Copy const qualifier from Source type to Target type.
  */
 template< typename Target >
@@ -287,9 +306,9 @@ struct copy_const
    template< typename Source >
    struct from
    {
-      using type = typename std::conditional<
-         std::is_const< Source >::value,
-         std::add_const_t< Target >, Target >::type;
+      using type = std::conditional_t<
+         std::is_const_v< Source >,
+         std::add_const_t< Target >, Target >;
    };
 };
 

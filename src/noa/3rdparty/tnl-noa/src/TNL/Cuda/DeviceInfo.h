@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <noa/3rdparty/tnl-noa/src/TNL/String.h>
+#include <string>
 
 namespace noa::TNL::Cuda {
 
@@ -19,7 +19,7 @@ struct DeviceInfo
    static int
    getActiveDevice();
 
-   static String
+   static std::string
    getDeviceName( int deviceNum );
 
    static int

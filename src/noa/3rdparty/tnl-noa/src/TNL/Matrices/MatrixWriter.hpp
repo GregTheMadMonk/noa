@@ -15,7 +15,7 @@ namespace noa::TNL::Matrices {
 
 template< typename Matrix, typename Device >
 void
-MatrixWriter< Matrix, Device >::writeGnuplot( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose )
+MatrixWriter< Matrix, Device >::writeGnuplot( const std::string& fileName, const Matrix& matrix, bool verbose )
 {
    HostMatrix hostMatrix;
    hostMatrix = matrix;
@@ -33,7 +33,7 @@ MatrixWriter< Matrix, Device >::writeGnuplot( std::ostream& str, const Matrix& m
 
 template< typename Matrix, typename Device >
 void
-MatrixWriter< Matrix, Device >::writeMtx( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose )
+MatrixWriter< Matrix, Device >::writeMtx( const std::string& fileName, const Matrix& matrix, bool verbose )
 {
    HostMatrix hostMatrix;
    hostMatrix = matrix;
@@ -51,7 +51,7 @@ MatrixWriter< Matrix, Device >::writeMtx( std::ostream& str, const Matrix& matri
 
 template< typename Matrix, typename Device >
 void
-MatrixWriter< Matrix, Device >::writeEps( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose )
+MatrixWriter< Matrix, Device >::writeEps( const std::string& fileName, const Matrix& matrix, bool verbose )
 {
    HostMatrix hostMatrix;
    hostMatrix = matrix;
@@ -73,10 +73,10 @@ MatrixWriter< Matrix, Device >::writeEps( std::ostream& str, const Matrix& matri
 /// \cond
 template< typename Matrix >
 void
-MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeGnuplot( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose )
+MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeGnuplot( const std::string& fileName, const Matrix& matrix, bool verbose )
 {
    std::fstream str;
-   str.open( fileName.getString(), std::ios::out );
+   str.open( fileName, std::ios::out );
    MatrixWriter< Matrix >::writeGnuplot( str, matrix, verbose );
 }
 
@@ -100,10 +100,10 @@ MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeGnuplot( std::ostream& str
 
 template< typename Matrix >
 void
-MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeMtx( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose )
+MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeMtx( const std::string& fileName, const Matrix& matrix, bool verbose )
 {
    std::fstream str;
-   str.open( fileName.getString(), std::ios::out );
+   str.open( fileName, std::ios::out );
    MatrixWriter< Matrix >::writeMtx( str, matrix, verbose );
 }
 
@@ -133,10 +133,10 @@ MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeMtx( std::ostream& str, co
 
 template< typename Matrix >
 void
-MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeEps( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose )
+MatrixWriter< Matrix, noa::TNL::Devices::Host >::writeEps( const std::string& fileName, const Matrix& matrix, bool verbose )
 {
    std::fstream str;
-   str.open( fileName.getString(), std::ios::out );
+   str.open( fileName, std::ios::out );
    MatrixWriter< Matrix >::writeEps( str, matrix, verbose );
 }
 

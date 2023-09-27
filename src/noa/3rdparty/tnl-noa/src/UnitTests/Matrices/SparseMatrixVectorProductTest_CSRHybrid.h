@@ -1,36 +1,41 @@
-#include <iostream>
 #include <TNL/Algorithms/Segments/CSR.h>
+#include <TNL/Algorithms/SegmentsReductionKernels/CSRHybridKernel.h>
 #include <TNL/Matrices/SparseMatrix.h>
+#include <TNL/Arithmetics/Complex.h>
 
-#ifdef HAVE_GTEST
 #include <gtest/gtest.h>
 
-const char* saveAndLoadFileName = "test_SparseMatrixTest_CSRHybrid_segments";
+template< typename Real, typename Device, typename Index >
+struct MatrixAndKernel
+{
+   using MatrixType =
+      TNL::Matrices::SparseMatrix< Real, Device, Index, TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSR >;
+   using KernelType = TNL::Algorithms::SegmentsReductionKernels::CSRHybridKernel< Index, Device >;
+};
 
 // types for which MatrixTest is instantiated
-using MatrixTypes = ::testing::Types
-<
-    TNL::Matrices::SparseMatrix< int,     TNL::Devices::Host, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< long,    TNL::Devices::Host, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< float,   TNL::Devices::Host, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< double,  TNL::Devices::Host, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< int,     TNL::Devices::Host, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< long,    TNL::Devices::Host, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< float,   TNL::Devices::Host, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< double,  TNL::Devices::Host, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >
+using MatrixAndKernelTypes = ::testing::Types< MatrixAndKernel< int, TNL::Devices::Host, int >,
+                                               MatrixAndKernel< long, TNL::Devices::Host, int >,
+                                               MatrixAndKernel< float, TNL::Devices::Host, int >,
+                                               MatrixAndKernel< double, TNL::Devices::Host, int >,
+                                               MatrixAndKernel< int, TNL::Devices::Host, long >,
+                                               MatrixAndKernel< long, TNL::Devices::Host, long >,
+                                               MatrixAndKernel< float, TNL::Devices::Host, long >,
+                                               MatrixAndKernel< double, TNL::Devices::Host, long >,
+                                               MatrixAndKernel< std::complex< float >, TNL::Devices::Host, long >
 #ifdef __CUDACC__
-   ,TNL::Matrices::SparseMatrix< int,     TNL::Devices::Cuda, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< long,    TNL::Devices::Cuda, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< float,   TNL::Devices::Cuda, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< double,  TNL::Devices::Cuda, int,   TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< int,     TNL::Devices::Cuda, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< long,    TNL::Devices::Cuda, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< float,   TNL::Devices::Cuda, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >,
-    TNL::Matrices::SparseMatrix< double,  TNL::Devices::Cuda, long,  TNL::Matrices::GeneralMatrix, TNL::Algorithms::Segments::CSRHybrid >
+                                               ,
+                                               MatrixAndKernel< int, TNL::Devices::Cuda, int >,
+                                               MatrixAndKernel< long, TNL::Devices::Cuda, int >,
+                                               MatrixAndKernel< float, TNL::Devices::Cuda, int >,
+                                               MatrixAndKernel< double, TNL::Devices::Cuda, int >,
+                                               MatrixAndKernel< int, TNL::Devices::Cuda, long >,
+                                               MatrixAndKernel< long, TNL::Devices::Cuda, long >,
+                                               MatrixAndKernel< float, TNL::Devices::Cuda, long >,
+                                               MatrixAndKernel< double, TNL::Devices::Cuda, long >
+//,MatrixAndKernel< TNL::Arithmetics::Complex<float>,   TNL::Devices::Cuda, long >
 #endif
->;
-
-#endif
+                                               >;
 
 #include "SparseMatrixVectorProductTest.h"
 #include "../main.h"

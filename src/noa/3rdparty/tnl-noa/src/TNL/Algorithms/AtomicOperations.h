@@ -4,11 +4,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Tomas Oberhuber, Jakub Klinkovsky
-
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Atomic.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
 
 namespace noa::TNL::Algorithms {
 

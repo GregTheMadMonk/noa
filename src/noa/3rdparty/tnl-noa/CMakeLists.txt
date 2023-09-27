@@ -1,23 +1,10 @@
-if( WIN32 )
-   # we don't support CUDA on Windows, so we can lower the requirement
-   cmake_minimum_required( VERSION 3.23 )
-else()
-   # cmake 3.24 is required for CUDA with "native" architecture selection
-   cmake_minimum_required( VERSION 3.24 )
-endif()
+# cmake 3.24 is required for CUDA with "native" architecture selection
+# cmake 3.25 is required for the "SYSTEM" keyword in FetchContent_Declare
+cmake_minimum_required( VERSION 3.25 )
 
 project( TNL )
 
 set( tnlVersion "0.1" )
-
-# check if TNL is being used directly or via add_subdirectory
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-   set( TNL_TOP_LEVEL_PROJECT ON )
-   set( TNL_SYSTEM "" )
-else()
-   set( TNL_TOP_LEVEL_PROJECT OFF )
-   set( TNL_SYSTEM SYSTEM )
-endif()
 
 # declare all custom build options
 option( TNL_USE_CUDA "Build with CUDA support" ON )
@@ -62,6 +49,10 @@ find_package( Ginkgo QUIET )
 # find the std::filesystem library
 find_package( Filesystem REQUIRED COMPONENTS Final )
 
+# Optionally bundled dependencies (system packages are preferred)
+# Reference: https://cmake.org/cmake/help/latest/guide/using-dependencies/index.html#fetchcontent-and-find-package-integration
+include( FetchTinyXML2 )
+
 # Settings for debug build
 if( CMAKE_BUILD_TYPE STREQUAL "Debug")
     set( CMAKE_EXECUTABLE_SUFFIX "-dbg${CMAKE_EXECUTABLE_SUFFIX}" )  # suffix for executables
@@ -72,108 +63,6 @@ endif()
 set( CMAKE_CXX_STANDARD 17 )
 set( CMAKE_CXX_STANDARD_REQUIRED ON )
 set( CMAKE_CXX_EXTENSIONS OFF )
-
-# set default build options
-if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" )
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=vla" )
-   set( CMAKE_CXX_FLAGS_DEBUG "-g" )
-   set( CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG" )
-endif()
-set( CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS_DEBUG}" )
-
-if( TNL_USE_CI_FLAGS )
-   # enforce (more or less) warning-free builds
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=deprecated -Wno-error=deprecated-declarations -Wno-error=uninitialized" )
-endif()
-
-# warn about redundant semicolons
-if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" )
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra-semi" )
-   if( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" )
-      set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra-semi-stmt" )
-   endif()
-endif()
-
-# optimize Release builds for the native CPU arch, unless explicitly disabled
-if( TNL_USE_MARCH_NATIVE_FLAG )
-   if( CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.0 )
-      # -march=native does not work on macOS with clang less than 15.0
-      # https://stackoverflow.com/questions/65966969/why-does-march-native-not-work-on-apple-m1
-      set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mcpu=apple-m1" )
-   else()
-      set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -mtune=native" )
-   endif()
-endif()
-
-# hack needed to avoid "file too big" errors on a 32-bit cross-compiler
-# https://stackoverflow.com/questions/71875002/file-too-big-with-mingw-w64-and-cmake
-if( MINGW )
-   if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
-      set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj")
-   endif()
-   if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-       OR ( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC" )
-      )
-      set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O2" )
-   endif()
-endif()
-if( MSVC )
-   # "/bigobj" avoids problems with large object files due to heavily templated code
-   # "/permissive-" enables two-phase name lookup according to the standard, see https://stackoverflow.com/q/74238513
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /permissive-" )
-endif()
-
-if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" )
-   # disable some unimportant warnings
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas" )
-elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Intel" )
-   # Intel's -Wall is very minimalistic, so add -w3 and disable some specific warnings
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w3 -diag-disable:remark" )
-endif()
-
-# disable GCC's infamous "maybe-uninitialized" warning (it produces mostly false positives)
-if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-maybe-uninitialized" )
-endif()
-
-# disable false Clang warning: https://stackoverflow.com/q/57645872
-if( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-self-assign-overloaded" )
-endif()
-
-# enable address sanitizer (does not work with MPI due to many false positives, does not work with nvcc at all)
-if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
-   if( NOT TNL_USE_MPI AND NOT TNL_USE_CUDA )
-      set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer" )
-      set( CMAKE_SHARED_LIBRARY_LINK_C_FLAGS_DEBUG "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined" )
-      set( CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined" )
-      set( CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined" )
-   endif()
-endif()
-
-# enable link time optimizations (but not in continuous integration)
-if( NOT DEFINED ENV{GITLAB_CI} )
-   if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
-      # FIXME: IPO with GCC 9.1.0 and Debug build = internal compiler error
-      # FIXME: IPO with GCC 9.1.0 and nvcc 10.1 and Release build = fatal error: bytecode stream in file `blabla` generated with LTO version 7.1 instead of the expected 8.0
-      #set( CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE )
-   elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
-      # FIXME: IPO with clang from MSYS2 leads to 'file format not recognized' linker errors
-      # FIXME: clang does not support IPO for CUDA
-      #set( CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE )
-   endif()
-endif()
-
-# force colorized output in continuous integration
-if( DEFINED ENV{GITLAB_CI} OR ${CMAKE_GENERATOR} STREQUAL "Ninja" )
-   message(STATUS "Continuous integration or Ninja detected -- forcing compilers to produce colorized output.")
-   if( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
-      set( TNL_COLOR_DIAGNOSTICS_FLAG "-fcolor-diagnostics" )
-   elseif( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
-      set( TNL_COLOR_DIAGNOSTICS_FLAG "-fdiagnostics-color" )
-   endif()
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TNL_COLOR_DIAGNOSTICS_FLAG}" )
-endif()
 
 # make cache variable so it can be used in downstream projects
 set( TNL_INCLUDE_DIRS
@@ -193,17 +82,22 @@ target_link_libraries( TNL_CXX INTERFACE TNL )
 target_link_libraries( TNL_CUDA INTERFACE TNL )
 
 # add the include directory to the interface
+if( PROJECT_IS_TOP_LEVEL )
+   set( TNL_SYSTEM "" )
+else()
+   set( TNL_SYSTEM SYSTEM )
+endif()
 target_include_directories( TNL ${TNL_SYSTEM}
                             INTERFACE $<BUILD_INTERFACE:${TNL_INCLUDE_DIRS}>
                                       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 # add compiler features to the interface
 target_compile_features( TNL INTERFACE cxx_std_17 )
-# add some compiler flags to the interface
-target_compile_options( TNL INTERFACE
-                        ${TNL_COLOR_DIAGNOSTICS_FLAG} )
 
 # add the std::filesystem library to the interface
 target_link_libraries( TNL INTERFACE std::filesystem )
+
+# set C++ compiler flags
+include( cmake/cxx_flags.cmake )
 
 # gtest has to be built before we add the MPI flags
 if( TNL_BUILD_TESTS OR TNL_BUILD_MATRIX_TESTS )
@@ -216,18 +110,15 @@ if( TNL_BUILD_TESTS OR TNL_BUILD_MATRIX_TESTS )
    set( CMAKE_CTEST_ARGUMENTS ${CMAKE_CTEST_ARGUMENTS} --output-junit "${CMAKE_BINARY_DIR}/tests-report.xml" )
 
    if( TNL_USE_SYSTEM_GTEST OR TNL_OFFLINE_BUILD )
-      # find gtest installed in the local system
-      find_package(GTest REQUIRED)
-      if( GTEST_FOUND )
-         include_directories( ${GTEST_INCLUDE_DIRS} )
-      endif( GTEST_FOUND )
+      # find GoogleTest installed in the local system
+      find_package( GTest REQUIRED )
    else()
-      # build gtest libs
-      include( BuildGtest )
+      # fetch and build GoogleTest from source
+      include( FetchGoogleTest )
    endif()
-   set( CXX_TESTS_FLAGS -DHAVE_GTEST )
-   set( CUDA_TESTS_FLAGS -DHAVE_GTEST )
-   set( TESTS_LIBRARIES ${GTEST_LIBRARIES} )
+   set( CXX_TESTS_FLAGS )
+   set( CUDA_TESTS_FLAGS )
+   set( TESTS_LIBRARIES GTest::gtest_main )
    set( TESTS_LINKER_FLAGS "" )
 
    if( TNL_BUILD_COVERAGE AND CMAKE_BUILD_TYPE STREQUAL "Debug" )
@@ -236,6 +127,21 @@ if( TNL_BUILD_TESTS OR TNL_BUILD_MATRIX_TESTS )
       set( CUDA_TESTS_FLAGS ${CUDA_TESTS_FLAGS} -Xcompiler --coverage )
       set( TESTS_LINKER_FLAGS ${TESTS_LINKER_FLAGS} --coverage )
    endif()
+
+   # function to simplify adding MPI tests
+   # usage: add_test_mpi(NAME <name> NPROC <nproc> COMMAND <command> [<arg>...])
+   function( add_test_mpi )
+      # parse function arguments
+      set( options )
+      set( oneValueArgs NAME NPROC )
+      set( multiValueArgs COMMAND )
+      cmake_parse_arguments( ADD_TEST_MPI "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+      # set flags for MPIEXEC_EXECUTABLE
+      set( mpiexec_flags "${MPIEXEC_NUMPROC_FLAG}" "${ADD_TEST_MPI_NPROC}" -H "localhost:${ADD_TEST_MPI_NPROC}" )
+      # set OMP_NUM_THREADS=1 to disable OpenMP for MPI tests
+      # (NPROC may be even greater than the number of physical cores, so it would just slow down)
+      add_test( NAME ${ADD_TEST_MPI_NAME} COMMAND "env" "OMP_NUM_THREADS=1" "${MPIEXEC_EXECUTABLE}" ${mpiexec_flags} ${ADD_TEST_MPI_COMMAND} )
+   endfunction()
 endif()
 
 ####
@@ -277,7 +183,7 @@ if( TNL_USE_CUDA )
    check_language( CUDA )
    if( CMAKE_CUDA_COMPILER )
       enable_language( CUDA )
-      set( TNL_BUILD_CUDA TRUE)
+      set( TNL_BUILD_CUDA TRUE )
 
       # set C++ standard
       set( CMAKE_CUDA_STANDARD 17 )
@@ -287,58 +193,8 @@ if( TNL_USE_CUDA )
       # enable separable compilation
       set( CMAKE_CUDA_SEPARABLE_COMPILATION ON )
 
-      # set necessary CUDA compiler flags on the interface
-      target_compile_options( TNL_CUDA INTERFACE
-            $<$<CUDA_COMPILER_ID:NVIDIA>:
-                  --expt-relaxed-constexpr ;
-                  --extended-lambda ;
-                  --default-stream per-thread ;
-            >
-      )
-
-      # Disable false compiler warnings
-      #   reference for the --diag_suppress and --display_error_number flags: https://stackoverflow.com/a/54142937
-      #   incomplete list of tokens: http://www.ssl.berkeley.edu/~jimm/grizzly_docs/SSL/opt/intel/cc/9.0/lib/locale/en_US/mcpcom.msg
-      target_compile_options( TNL_CUDA INTERFACE
-            $<$<CUDA_COMPILER_ID:NVIDIA>:
-                  -Wno-deprecated-gpu-targets ;
-                  "SHELL:-Xcudafe --diag_suppress=code_is_unreachable" ;
-                  "SHELL:-Xcudafe --diag_suppress=loop_not_reachable" ;
-                  "SHELL:-Xcudafe --diag_suppress=implicit_return_from_non_void_function" ;
-                  "SHELL:-Xcudafe --diag_suppress=unsigned_compare_with_zero" ;
-                  --display-error-number ;
-            >
-      )
-      # This diagnostic is just plain wrong in CUDA 9 and later, see https://github.com/kokkos/kokkos/issues/1470
-      target_compile_options( TNL_CUDA INTERFACE
-            $<$<CUDA_COMPILER_ID:NVIDIA>:
-                  "SHELL:-Xcudafe --diag_suppress=esa_on_defaulted_function_ignored"
-            >
-      )
-      # nvcc 10 causes many invalid VLA errors in the host code
-      target_compile_options( TNL_CUDA INTERFACE
-            $<$<AND:$<CUDA_COMPILER_ID:NVIDIA>,$<VERSION_LESS:$<CUDA_COMPILER_VERSION>,11>>:
-                  "SHELL:-Xcompiler -Wno-vla"
-            >
-      )
-
-      # set project-specific (i.e. not exported) build options
-      set( CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Wall" )
-      set( CMAKE_CUDA_FLAGS_DEBUG "-g" )
-      set( CMAKE_CUDA_FLAGS_RELEASE "-O3 -DNDEBUG" )
-      set( CMAKE_CUDA_FLAGS_RELWITHDEBINFO "${CMAKE_CUDA_FLAGS_RELEASE} ${CMAKE_CUDA_FLAGS_DEBUG} --generate-line-info" )
-
-      if( CMAKE_CUDA_COMPILER_ID STREQUAL "Clang" )
-         # disable some unimportant warnings
-         set( CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Wno-unknown-pragmas" )
-         if( TNL_USE_CI_FLAGS )
-            # enforce (more or less) warning-free builds
-            set( CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Werror -Wno-error=deprecated -Wno-error=deprecated-declarations -Wno-error=unknown-cuda-version" )
-         endif()
-         # workaround for Clang 15
-         # https://github.com/llvm/llvm-project/issues/58491
-         set( CMAKE_CUDA_FLAGS_DEBUG "-g -Xarch_device -g0" )
-      endif()
+      # set CUDA compiler flags
+      include( cmake/cuda_flags.cmake )
    endif()
    set( CMAKE_EXECUTABLE_SUFFIX "${executable_suffix_backup}" )
    unset( executable_suffix_backup )
@@ -401,7 +257,7 @@ if( TNL_USE_GMP )
    endif()
 endif()
 
-if( TNL_TOP_LEVEL_PROJECT )
+if( PROJECT_IS_TOP_LEVEL )
    # export the interface targets
    install( TARGETS TNL TNL_CXX TNL_CUDA EXPORT TNLTargets )
    # install a CMake file for the interface target
@@ -428,7 +284,7 @@ add_subdirectory( Documentation )
 # https://clang.llvm.org/docs/JSONCompilationDatabase.html
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "" )
 
-if( TNL_TOP_LEVEL_PROJECT )
+if( PROJECT_IS_TOP_LEVEL )
    # Print custom build options
    message( "-- Build options:" )
    message( "   TNL_USE_CUDA = ${TNL_USE_CUDA}" )

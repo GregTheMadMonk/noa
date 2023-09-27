@@ -9,6 +9,7 @@ for F in $(find); do
 		echo "Stylizing $F..."
 		# Replace include paths for TNL headers
 		sed -i 's/#include <TNL/\#include \<noa\/3rdparty\/tnl-noa\/src\/TNL/g' "$F"
+		sed -i 's/#include "TNL/\#include "noa\/3rdparty\/tnl-noa\/src\/TNL/g' "$F"
 		# Replace mpark::variant with std::variant
 		sed -i 's/#include <mpark\/variant.*/\#include \<variant\>/g' "$F"
 		sed -i 's/mpark::/std::/g' "$F"

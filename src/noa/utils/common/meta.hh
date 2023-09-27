@@ -15,6 +15,12 @@ namespace noa::utils::meta {
 /// \brief Structure used for perfect passing of types to functions
 template <typename T> struct TypeTag { using Type = T; };
 
+/// @brief Compile-time value strorage
+template <auto v> struct ValTag {
+    using Type = decltype(v);
+    static constexpr auto value = v;
+}; // <-- struct ValTag
+
 namespace detail {
     template <
         template <typename...> class Template,

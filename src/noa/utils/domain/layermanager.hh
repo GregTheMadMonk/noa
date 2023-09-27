@@ -37,43 +37,6 @@
 
 namespace noa::utils::domain {
 
-/// The following macro switches on variant stored data type and performs a templated action
-/// WARNING: This is only designed to be used inside of the `Layer` struct
-#define LVFOR(VARIANT, WHAT) /* WHAT(auto& v) accepts a Vector<DataType> reference v */\
-                switch (VARIANT.index()) {\
-                        case 0: /* int8_t */\
-                                WHAT(std::get<Vector<std::int8_t>>(VARIANT));\
-                                break;\
-                        case 1: /* uint8_t */\
-                                WHAT(std::get<Vector<std::uint8_t>>(VARIANT));\
-                                break;\
-                        case 2: /* int16_t */\
-                                WHAT(std::get<Vector<std::int16_t>>(VARIANT));\
-                                break;\
-                        case 3: /* uint16_t */\
-                                WHAT(std::get<Vector<std::uint16_t>>(VARIANT));\
-                                break;\
-                        case 4: /* int32_t */\
-                                WHAT(std::get<Vector<std::int32_t>>(VARIANT));\
-                                break;\
-                        case 5: /* uint32_t */\
-                                WHAT(std::get<Vector<std::uint32_t>>(VARIANT));\
-                                break;\
-                        case 6: /* int64_t */\
-                                WHAT(std::get<Vector<std::int64_t>>(VARIANT));\
-                                break;\
-                        case 7: /* uint64_t */\
-                                WHAT(std::get<Vector<std::uint64_t>>(VARIANT));\
-                                break;\
-                        case 8: /* float */\
-                                WHAT(std::get<Vector<float>>(VARIANT));\
-                                break;\
-                        case 9: /* double */\
-                                WHAT(std::get<Vector<double>>(VARIANT));\
-                                break;\
-                }
-// <-- end #define LVFOR(VARIANT, WHAT)
-
 // struct Layer
 // A wrapper class to contain one mesh baked data layer
 template <typename Device = TNL::Devices::Host, typename Index = std::size_t>
@@ -130,14 +93,23 @@ struct Layer {
         // Resize layer
         void setSize(const Index& newSize) {
                 size = newSize;
-                const auto setSize_f = [&] (auto& v) {
+                std::visit(
+                    [&] (auto& v) {
                         v.setSize(size);
-                };
-                LVFOR(data, setSize_f);
+                    }, this->data
+                );
         }
 
         // Get layer size
         const Index& getSize() const { return size; }
+
+        // Visit the data
+        template <typename Func>
+        auto visit(Func&& f) { return std::visit(f, this->data); }
+
+        // Visit the data (const)
+        template <typename Func>
+        auto visit(Func&& f) const { return std::visit(f, this->data); }
 
         // Set layer data from std::vector of same size
         template <typename DataType>
@@ -173,26 +145,29 @@ struct Layer {
         // Write layer using a TNL mesh writer
         template <typename Writer>
         void writeCellData(Writer& writer, const std::string& fallback_name) const {
-                const auto writeCellData_f = [&] (auto& v) {
-                        writer.writeCellData(v, (alias.empty()) ? fallback_name : alias);
-                };
-                LVFOR(data, writeCellData_f);
+            std::visit(
+                [&] (auto& v) {
+                    writer.writeCellData(v, (alias.empty()) ? fallback_name : alias);
+                }, this->data
+            );
         }
 
         template <typename Writer>
         void writeDataArray(Writer& writer, const std::string& fallback_name) const {
-                const auto writeDataArray_f = [&] (auto& v) {
+            std::visit(
+                [&] (auto& v) {
                         writer.writeDataArray(v, (alias.empty()) ? fallback_name : alias);
-                };
-                LVFOR(data, writeDataArray_f);
+                }, this->data
+            );
         }
 
         template <typename Writer>
         void writePointData(Writer& writer, const std::string& fallback_name) const {
-                const auto writePointData_f = [&] (auto& v) {
-                        writer.writePointData(v, (alias.empty()) ? fallback_name : alias);
-                };
-                LVFOR(data, writePointData_f);
+            std::visit(
+                [&] (auto& v) {
+                    writer.writePointData(v, (alias.empty()) ? fallback_name : alias);
+                }, this->data
+            );
         }
 }; // <-- struct Layer
 

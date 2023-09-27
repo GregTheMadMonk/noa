@@ -38,6 +38,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/TypeResolver/resolveMeshType.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Writers/VTUWriter.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Geometry/getEntityCenter.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Meshes/Geometry/getOutwardNormalVector.h>
 
 // NOA headers
 #include <noa/utils/common/common.hh>
@@ -92,6 +93,68 @@ template <
     /// @brief Layer manager const vector ciew type
     template <typename DataType>
     using VectorConstView = Vector<DataType>::ConstViewType;
+
+    /// @brief Point info struct
+    class Point {
+        /// @brief Point index
+        GlobalIndexType idx;
+        /// @brief Coordinate
+        PointType coords;
+
+    public:
+        /// @brief Grab the point info
+        Point(GlobalIndexType idx, const MeshType& mesh)
+        : idx(idx)
+        , coords(mesh.getPoint(idx))
+        {}
+
+        const auto& index() const { return this->idx; }
+        const auto& point() const { return this->coords; }
+    }; // <-- class Point
+
+    /// @brief Edge info struct
+    class Edge {
+        /// @brief Edge index
+        GlobalIndexType idx;
+        /// @brief Point coordinates
+        std::vector<PointType> pts;
+        /// @brief Edge center
+        PointType c;
+        /// @brief Edge normal
+        PointType n;
+
+    public:
+        Edge(GlobalIndexType idx, const MeshType& mesh)
+        : idx(idx) {
+            const auto pointsCount =
+                mesh.template getSubentitiesCount<dEdge, 0>(idx);
+
+            this->pts.reserve(pointsCount);
+            for (LocalIndexType pi = 0; pi < pointsCount; ++pi) {
+                const auto point =
+                    mesh.template getSubentityIndex<dEdge, 0>(idx, pi);
+                this->pts.push_back(mesh.getPoint(point));
+            }
+
+            const auto edgeEntity =
+                mesh.template getEntity<dEdge>(idx);
+
+            this->c = TNL::Meshes::getEntityCenter(mesh, edgeEntity);
+
+            this->n = TNL::Meshes::getOutwardNormalVector(
+                mesh, edgeEntity, this->c
+            );
+        } // <-- Edge(idx, mesh)
+
+        /// @brief Get edge points
+        const auto& points() const { return this->pts; }
+
+        /// @brief Get edge center
+        const PointType& center() const { return this->c; }
+
+        /// @brief Get edge normal
+        const PointType& normal() const { return this->n; }
+    }; // <-- class Edge
 
 private:
     /// @brief Domain mesh
@@ -195,6 +258,14 @@ public:
         this->mesh = std::forward<MeshType_>(newMesh);
         this->updateLayerSizes();
     } // <-- setMesh(newMesh) (move)
+
+    /// @brief Fetch and get the full point info
+    Point getPoint(GlobalIndexType idx) const
+    { return Point{ idx, this->mesh.value() }; }
+
+    /// @brief Fetch and get the full edge info
+    Edge getEdge(GlobalIndexType idx) const
+    { return Edge{ idx, this->mesh.value() }; }
 
     /// @brief Write domain to a file
     void write(const Path& filename) const {

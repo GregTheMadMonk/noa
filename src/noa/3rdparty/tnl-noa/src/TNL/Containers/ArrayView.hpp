@@ -10,11 +10,13 @@
 #include <stdexcept>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/copy.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/equal.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/fill.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/parallelFor.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperations.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MultiDeviceMemoryOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/detail/ArrayIO.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/detail/ArrayAssignment.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Containers/detail/MemoryOperations.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Allocators/Default.h>
 
 #include "ArrayView.h"
@@ -91,9 +93,9 @@ template< typename Value, typename Device, typename Index >
 ArrayView< Value, Device, Index >&
 ArrayView< Value, Device, Index >::operator=( const ArrayView& view )
 {
-   TNL_ASSERT_EQ( getSize(), view.getSize(), "The sizes of the array views must be equal, views are not resizable." );
-   if( getSize() > 0 )
-      Algorithms::MemoryOperations< Device >::copy( getData(), view.getData(), getSize() );
+   if( getSize() != view.getSize() )
+      throw std::logic_error( "operator=: the sizes of the array views must be equal, views are not resizable." );
+   Algorithms::copy< Device >( getData(), view.getData(), getSize() );
    return *this;
 }
 
@@ -179,7 +181,7 @@ ArrayView< Value, Device, Index >::setElement( IndexType i, ValueType value )
 {
    TNL_ASSERT_GE( i, (Index) 0, "Element index must be non-negative." );
    TNL_ASSERT_LT( i, this->getSize(), "Element index is out of bounds." );
-   Algorithms::MemoryOperations< Device >::setElement( &this->data[ i ], value );
+   detail::MemoryOperations< Device >::setElement( &this->data[ i ], value );
 }
 
 template< typename Value, typename Device, typename Index >
@@ -189,7 +191,7 @@ ArrayView< Value, Device, Index >::getElement( IndexType i ) const
 {
    TNL_ASSERT_GE( i, (Index) 0, "Element index must be non-negative." );
    TNL_ASSERT_LT( i, this->getSize(), "Element index is out of bounds." );
-   return Algorithms::MemoryOperations< Device >::getElement( &data[ i ] );
+   return detail::MemoryOperations< Device >::getElement( &data[ i ] );
 }
 
 template< typename Value, typename Device, typename Index >
@@ -251,8 +253,7 @@ ArrayView< Value, Device, Index >::operator==( const ArrayT& array ) const
       return false;
    if( this->getSize() == 0 )
       return true;
-   return Algorithms::MultiDeviceMemoryOperations< DeviceType, typename ArrayT::DeviceType >::compare(
-      this->getData(), array.getData(), array.getSize() );
+   return Algorithms::equal< DeviceType, typename ArrayT::DeviceType >( this->getData(), array.getData(), array.getSize() );
 }
 
 template< typename Value, typename Device, typename Index >
@@ -269,7 +270,7 @@ ArrayView< Value, Device, Index >::setValue( ValueType value, IndexType begin, I
 {
    if( end == 0 )
       end = this->getSize();
-   Algorithms::MemoryOperations< Device >::set( &getData()[ begin ], value, end - begin );
+   Algorithms::fill< Device >( &getData()[ begin ], value, end - begin );
 }
 
 template< typename Value, typename Device, typename Index >
@@ -320,14 +321,14 @@ ArrayView< Value, Device, Index >::forAllElements( Function&& f ) const
 
 template< typename Value, typename Device, typename Index >
 void
-ArrayView< Value, Device, Index >::save( const String& fileName ) const
+ArrayView< Value, Device, Index >::save( const std::string& fileName ) const
 {
    File( fileName, std::ios_base::out ) << *this;
 }
 
 template< typename Value, typename Device, typename Index >
 void
-ArrayView< Value, Device, Index >::load( const String& fileName )
+ArrayView< Value, Device, Index >::load( const std::string& fileName )
 {
    File( fileName, std::ios_base::in ) >> *this;
 }

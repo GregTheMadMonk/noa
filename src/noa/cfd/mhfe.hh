@@ -11,6 +11,7 @@
 #include <noa/3rdparty/tnl-noa/src/TNL/Solvers/LinearSolverTypeResolver.h>
 
 // NOA headers
+#include <noa/utils/combine/combine.hh>
 #include <noa/utils/common/meta.hh>
 #include <noa/utils/common/unreachable.hh>
 #include <noa/utils/domain/domain.hh>
@@ -59,9 +60,23 @@ template <
         TNL::Matrices::SparseMatrix<Real, Device, GlobalIndex>;
 
     template <typename DataType>
-    using Vector = TNL::Containers::Vector<DataType, Device, GlobalIndex>;
+    using Vector = Problem::template Vector<DataType>;
+
+    /// @brief Task name is MHFE or LMHFE depending on `lumping`
+    static constexpr auto name = 
+        std::same_as<Real, double>
+        ? (lumping ? "dbl_LMHFE" : "dbl_MHFE")
+        : (lumping ? "LMHFE" : "MHFE");
 
 private:
+    /// @brie Problem solution
+    LayerView<Real> solution;
+    /// @brief Solution on the previous time step
+    LayerView<Real> prevSolution;
+
+    /// @brief Problem edge-wise solution
+    LayerView<Real> edgeSolution;
+
     /// @brief System matrix row capacities
     LayerView<GlobalIndex> capacities;
 
@@ -73,9 +88,6 @@ private:
     LocalIndex maxEdges;
     /// @brief Cached cell measures
     LayerView<Real> measures;
-
-    /// @brief Solution on the previous time step
-    LayerView<Real> prevSolution;
 
     LayerView<Real> lambda;
     LayerView<Real> alpha_i;
@@ -105,6 +117,9 @@ private:
     using Solver = TNL::Solvers::Linear::LinearSolver<SparseMatrix>;
     /// @brief System solver
     std::shared_ptr<Solver> solver = nullptr;
+
+    /// @brief Updated state. Triggered by a recalculation of cached vals
+    bool isUpdated = false;
     
     /// @brief System matrix delta from a pair of cell's edges
     Real delta(
@@ -337,16 +352,18 @@ private:
         // Create the linear system matrix
         this->M = std::make_shared<SparseMatrix>(edges, edges);
         this->M->setRowCapacities(*this->capacities);
-        this->M->forAllElements(
-            [] (auto, auto, auto, auto& v) { v = 0; }
-        );
+        *this->M << 0;
 
         // Fill the linear system matrix
         mesh.template forAll<Domain::dEdge>(
             [&mesh, &prob, this] (auto edge) {
-                this->M->addElement(edge, edge, 1, 1);
+                this->M->addElement(
+                    edge, edge, prob.dirichletMask[edge], 1
+                );
 
-                if (prob.dirichletMask[edge]) return;
+                if (prob.dirichletMask[edge] && !prob.neumannMask[edge]) {
+                    return;
+                }
 
                 for (LocalIndex c = 0; c < this->localCells[edge]; ++c) {
                     const auto cell =
@@ -370,16 +387,24 @@ private:
         preconditioner->update(this->M);
         solver->setMatrix(this->M);
         solver->setPreconditioner(this->preconditioner);
+
+        this->isUpdated = true;
     } // <-- void cache(prob)
 
 public:
     /// @brief Default constructor. Creates and binds layers
     MHFE(Problem& prob)
-        : capacities(prob.template addLayer<GlobalIndex>(Domain::dEdge))
+        : solution(
+            prob.template addLayer<Real>(
+                Domain::dCell, std::string{name} + " solution"
+            )
+          )
+        , prevSolution(prob.template addLayer<Real>(Domain::dCell))
+        , edgeSolution(prob.template addLayer<Real>(Domain::dEdge))
+        , capacities(prob.template addLayer<GlobalIndex>(Domain::dEdge))
         , localCells(prob.template addLayer<LocalIndex>(Domain::dEdge))
         , edges(prob.template addLayer<LocalIndex>(Domain::dCell))
         , measures(prob.template addLayer<Real>(Domain::dCell))
-        , prevSolution(prob.template addLayer<Real>(Domain::dCell))
         , lambda(prob.template addLayer<Real>(Domain::dCell))
         , alpha_i(prob.template addLayer<Real>(Domain::dCell))
         , alpha(prob.template addLayer<Real>(Domain::dCell))
@@ -388,10 +413,40 @@ public:
         , rhs(prob.template addLayer<Real>(Domain::dEdge))
     { this->cache(prob); }
 
+    /// @brief Copy task
+    MHFE(utils::combine::TaskCopy, const MHFE& other, Problem& prob)
+        : solution(other.solution.copy(prob.getDomainForChange()))
+        , prevSolution(other.prevSolution.copy(prob.getDomainForChange()))
+        , edgeSolution(other.edgeSolution.copy(prob.getDomainForChange()))
+        , capacities(other.capacities.copy(prob.getDomainForChange()))
+        , localCells(other.localCells.copy(prob.getDomainForChange()))
+        , edges(other.edges.copy(prob.getDomainForChange()))
+        , measures(other.measures.copy(prob.getDomainForChange()))
+        , lambda(other.lambda.copy(prob.getDomainForChange()))
+        , alpha_i(other.alpha_i.copy(prob.getDomainForChange()))
+        , alpha(other.alpha.copy(prob.getDomainForChange()))
+        , beta(other.beta.copy(prob.getDomainForChange()))
+        , l(other.l.copy(prob.getDomainForChange()))
+        , rhs(other.rhs.copy(prob.getDomainForChange()))
+    { this->cache(prob); }
+
+    /// @brief Move task
+    MHFE(utils::combine::TaskMove, MHFE&& other, Problem& prob)
+    : MHFE(utils::combine::TaskCopy{}, other, prob)
+    {}
+
+    // Remove default move-copy operations
+    MHFE(const MHFE&) = delete;
+    MHFE& operator=(const MHFE&) = delete;
+    MHFE(MHFE&&) = delete;
+    MHFE& operator=(MHFE&&) = delete;
+
     /// @brief MHFE step
     void run(Problem& prob) {
+        this->isUpdated = false;
+
         // Back up previous step's solution
-        *this->prevSolution = *prob.solution;
+        *this->prevSolution = *this->solution;
 
         using namespace noa::utils::tnl::op;
         // Update the RHS vector
@@ -401,7 +456,7 @@ public:
             [&mesh, &prob, this] (auto edge) {
                 this->rhs[edge] =
                     prob.neumannMask[edge] * prob.neumann[edge]
-                    + prob.dirichletMask[edge] + prob.dirichlet[edge];
+                    + prob.dirichletMask[edge] * prob.dirichlet[edge];
 
                 if (prob.dirichletMask[edge] && !prob.neumannMask[edge]) {
                     return;
@@ -416,12 +471,12 @@ public:
                     if constexpr (lumping) {
                         this->rhs[edge] +=
                             prob.c[cell] * this->measures[cell]
-                            * prob.edgeSolution[edge] / 3.0
+                            * this->edgeSolution[edge] / 3.0
                             / prob.getTau();
                     } else {
                         this->rhs[edge] +=
                             prob.a[cell] * this->lambda[cell] *
-                            prob.solution[cell] / this->l[cell]
+                            this->solution[cell] / this->l[cell]
                             / this->beta[cell];
                     }
                 }
@@ -429,10 +484,10 @@ public:
         );
 
         // Solve the linear system
-        this->solver->solve(*this->rhs, *prob.edgeSolution);
+        this->solver->solve(*this->rhs, *this->edgeSolution);
 
         // Update cell-wise solution
-        *prob.solution << [&mesh, &prob, this] (auto cell, auto& pv) {
+        *this->solution << [&mesh, &prob, this] (auto cell, auto& pv) {
             pv =
                 this->prevSolution[cell] * this->lambda[cell]
                 / this->beta[cell];
@@ -443,7 +498,7 @@ public:
                         Domain::dCell, Domain::dEdge
                     >(cell, lei);
                 pv +=
-                    prob.a[cell] * prob.edgeSolution[edge]
+                    prob.a[cell] * this->edgeSolution[edge]
                     / this->beta[cell] / this->l[cell];
             }
         };
@@ -452,8 +507,56 @@ public:
     /// @brief Problem update triggers cached values recalculation
     void onUpdated(const Problem& prob) { this->cache(prob); }
 
-    /// @brief Get linear system matrix
-    const SparseMatrix& getM() const { return this->M; }
+    [[nodiscard]] const SparseMatrix& getM() const { return *this->M; }
+
+    [[nodiscard]] auto getLambda() const
+    { return this->lambda->getConstView(); }
+
+    [[nodiscard]] auto getBeta() const
+    { return this->beta->getConstView(); }
+
+    [[nodiscard]] auto getAlphaI() const
+    { return this->alpha_i->getConstView(); }
+
+    [[nodiscard]] auto getAlpha() const
+    { return this->alpha->getConstView(); }
+
+    [[nodiscard]] auto getEdges() const
+    { return this->edges->getConstView(); }
+
+    [[nodiscard]] auto getLocalCells() const
+    { return this->localCells->getConstView(); }
+
+    [[nodiscard]] auto getMeasures() const
+    { return this->measures->getConstView(); }
+
+    [[nodiscard]] auto getCapacities() const
+    { return this->capacities->getConstView(); }
+
+    [[nodiscard]] auto getMaxEdges() const { return this->maxEdges; }
+
+    [[nodiscard]] const auto& getBinv() const
+    { return this->Binv; }
+
+    /// @brief Get cell-wise solution
+    [[nodiscard]] auto getSolution() const
+    { return this->solution->getConstView(); }
+
+    /// @brief Get cell-wise solution from the previous step
+    [[nodiscard]] auto getPreviousStepSolution() const
+    { return this->prevSolution->getConstView(); }
+
+    /// @brief Get edge-wise solution
+    [[nodiscard]] auto getEdgeSolution() const
+    { return this->edgeSolution->getConstView(); }
+
+    /// @brief Solve the linear system with (L)MHFE matrix and given RHS
+    void solve(
+        Vector<Real>::ConstViewType rhs,
+        Vector<Real>::ViewType out
+    ) const {
+        this->solver->solve(rhs, out);
+    } // <-- void solve(rhs, out)
 }; // <-- struct MHFE<Domain, lumping> (Triangle)
 
 } // <-- namespace noa::cfd

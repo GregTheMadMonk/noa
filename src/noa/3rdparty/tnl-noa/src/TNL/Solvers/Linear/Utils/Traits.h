@@ -4,8 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Jakub Klinkovský
-
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/MPI/Comm.h>

@@ -4,14 +4,12 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Jakub Klinkovský
-
 #pragma once
 
 #include <ostream>
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Assert.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/String.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeInfo.h>
 
 namespace noa::TNL::Containers {

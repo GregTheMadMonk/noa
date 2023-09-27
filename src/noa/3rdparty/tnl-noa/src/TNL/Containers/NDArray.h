@@ -4,8 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Jakub Klinkovsky
-
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
@@ -19,7 +17,7 @@ namespace noa::TNL::Containers {
  * \defgroup ndarray  N-dimensional arrays
  *
  * This group includes several classes for the representation of N-dimensional
- * arrays and some helper classes. See the \ref tutorial_NDArrays "tutorial"
+ * arrays and some helper classes. See the \ref ug_NDArrays "Users' Guide" for
  * showing how these data structures can be used.
  *
  * @{
@@ -51,7 +49,7 @@ struct SliceInfo
  *
  * Note that the class inherits from the `Indexer`, i.e. \ref NDArrayIndexer.
  *
- * See also the \ref tutorial_NDArrays "tutorial".
+ * See also the \ref ug_NDArrays "Users' Guide".
  */
 template< typename Array, typename Indexer, typename Device = typename Array::DeviceType >
 class NDArrayStorage : public Indexer
@@ -549,7 +547,7 @@ protected:
  * \tparam Allocator Type of the allocator that will be used for allocating
  *                   elements of the array.
  *
- * See also the \ref tutorial_NDArrays "tutorial".
+ * See also the \ref ug_NDArrays "Users' Guide".
  */
 template< typename Value,
           typename SizesHolder,
@@ -620,7 +618,7 @@ public:
  *                     is used by default.
  * \tparam Index Type of indices used for addressing the array elements.
  *
- * See also the \ref tutorial_NDArrays "tutorial".
+ * See also the \ref ug_NDArrays "Users' Guide".
  */
 template< typename Value,
           typename SizesHolder,
@@ -670,7 +668,7 @@ public:
  * \tparam Allocator Type of the allocator that will be used for allocating
  *                   elements of the array.
  *
- * See also the \ref tutorial_NDArrays "tutorial".
+ * See also the \ref ug_NDArrays "Users' Guide".
  */
 template< typename Value,
           typename SizesHolder,

@@ -8,7 +8,7 @@ if( TNL_BUILD_DOC )
 
    # add subdirectories that contain code examples included in the documentation
    add_subdirectory( Examples )
-   add_subdirectory( Tutorials )
+   add_subdirectory( UsersGuide )
 
    # extract the version string during the configure step
    execute_process( COMMAND ${CMAKE_SOURCE_DIR}/scripts/get-version
@@ -18,20 +18,29 @@ if( TNL_BUILD_DOC )
    # check if Doxygen is installed
    find_package( Doxygen REQUIRED )
 
-   # collect source file dependencies for the doxygen command
-   file( GLOB_RECURSE TNL_DOC_INPUT_FILES
-         ${CMAKE_SOURCE_DIR}/src/TNL/*
-         ${CMAKE_SOURCE_DIR}/Documentation/Examples/*
-         ${CMAKE_SOURCE_DIR}/Documentation/Tutorials/*
-   )
+   # warn if Doxygen version does not match what we expect
+   set( TNL_EXPECTED_DOXYGEN_VERSION 1.9.8 )
+   if( NOT ${DOXYGEN_VERSION} VERSION_EQUAL ${TNL_EXPECTED_DOXYGEN_VERSION} )
+      message( WARNING "Found Doxygen version ${DOXYGEN_VERSION}, which does "
+            "not match the expected version ${TNL_EXPECTED_DOXYGEN_VERSION}. "
+            "The generated documentation output may be incorrect due to "
+            "various Doxygen quirks and bugs."
+      )
+   endif()
 
    # the documentation cannot be built without warnings when CUDA is disabled
    # (e.g. output of some examples will be missing)
-   if( DEFINED ENV{GITLAB_CI} OR TNL_BUILD_CUDA )
+   if( DEFINED ENV{GITLAB_CI} OR (TNL_USE_CI_FLAGS AND TNL_BUILD_CUDA) )
       set( DOXYGEN_WARN_AS_ERROR "YES" )
    else()
       set( DOXYGEN_WARN_AS_ERROR "NO" )
    endif()
+
+   # collect source file dependencies for the doxygen command
+   file( GLOB_RECURSE TNL_DOC_INPUT_FILES
+         ${CMAKE_SOURCE_DIR}/src/TNL/*
+         ${CMAKE_SOURCE_DIR}/Documentation/*
+   )
 
    # add custom target to generate the documentation during the build
    set( DOXYGEN_STAMP_FILE ${CMAKE_CURRENT_BINARY_DIR}/doxygen.stamp )
@@ -42,6 +51,7 @@ if( TNL_BUILD_DOC )
                                       WARN_AS_ERROR="${DOXYGEN_WARN_AS_ERROR}"
               ${DOXYGEN_EXECUTABLE}
       COMMAND cmake -E touch "${DOXYGEN_STAMP_FILE}"
+      DEPENDS ${TNL_DOC_INPUT_FILES}
       OUTPUT ${DOXYGEN_STAMP_FILE}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       COMMENT "Generating documentation with Doxygen" )

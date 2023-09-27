@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include <noa/3rdparty/tnl-noa/src/TNL/String.h>
-
 namespace noa::TNL::Arithmetics {
 
 template< class T >

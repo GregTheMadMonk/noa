@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <noa/3rdparty/tnl-noa/src/TNL/String.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/DenseMatrix.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/DenseMatrixView.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/SparseMatrix.h>
@@ -27,13 +26,13 @@ struct MatrixInfo
 template< typename Real, typename Device, typename Index, ElementsOrganization Organization >
 struct MatrixInfo< DenseMatrixView< Real, Device, Index, Organization > >
 {
-   [[nodiscard]] static String
+   [[nodiscard]] static std::string
    getDensity()
    {
       return "dense";
    }
 
-   [[nodiscard]] static String
+   [[nodiscard]] static std::string
    getFormat()
    {
       return "Dense";
@@ -53,23 +52,23 @@ template< typename Real,
           class SegmentsView >
 struct MatrixInfo< SparseMatrixView< Real, Device, Index, MatrixType, SegmentsView > >
 {
-   [[nodiscard]] static String
+   [[nodiscard]] static std::string
    getDensity()
    {
       return "sparse";
    }
 
-   [[nodiscard]] static String
+   [[nodiscard]] static std::string
    getFormat()
    {
-      String prefix;
+      std::string prefix;
       if( MatrixType::isSymmetric() ) {
-         if( std::is_same< Real, bool >::value )
+         if( std::is_same_v< Real, bool > )
             prefix = "Symmetric Binary ";
          else
             prefix = "Symmetric ";
       }
-      else if( std::is_same< Real, bool >::value )
+      else if( std::is_same_v< Real, bool > )
          prefix = "Binary ";
       return prefix + SegmentsView< Device, Index >::getSegmentsType();
    }
@@ -91,13 +90,13 @@ struct MatrixInfo< SparseMatrix< Real, Device, Index, MatrixType, Segments, Real
 template< typename Real, typename Device, typename Index, typename MatrixType >
 struct MatrixInfo< Sandbox::SparseSandboxMatrixView< Real, Device, Index, MatrixType > >
 {
-   [[nodiscard]] static String
+   [[nodiscard]] static std::string
    getDensity()
    {
       return "sparse";
    }
 
-   [[nodiscard]] static String
+   [[nodiscard]] static std::string
    getFormat()
    {
       if( MatrixType::isSymmetric() )

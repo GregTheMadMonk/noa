@@ -7,8 +7,8 @@
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/TypeTraits.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MemoryOperations.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/MultiDeviceMemoryOperations.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/copy.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/fill.h>
 
 namespace noa::TNL::Containers::detail {
 
@@ -32,12 +32,7 @@ struct ArrayAssignment< Array, T, true >
    assign( Array& a, const T& t )
    {
       TNL_ASSERT_EQ( a.getSize(), (decltype( a.getSize() )) t.getSize(), "The sizes of the arrays must be equal." );
-      // skip assignment of empty arrays
-      if( a.getSize() == 0 )
-         return;
-      Algorithms::MultiDeviceMemoryOperations< typename Array::DeviceType, typename T::DeviceType >::
-         template copy< typename Array::ValueType, typename T::ValueType, typename Array::IndexType >(
-            a.getArrayData(), t.getArrayData(), t.getSize() );
+      Algorithms::copy< typename Array::DeviceType, typename T::DeviceType >( a.getArrayData(), t.getArrayData(), t.getSize() );
    }
 };
 
@@ -55,12 +50,7 @@ struct ArrayAssignment< Array, T, false >
    static void
    assign( Array& a, const T& t )
    {
-      // skip assignment to an empty array
-      if( a.getSize() == 0 )
-         return;
-      Algorithms::MemoryOperations< typename Array::DeviceType >::template set< typename Array::ValueType,
-                                                                                typename Array::IndexType >(
-         a.getArrayData(), (typename Array::ValueType) t, a.getSize() );
+      Algorithms::fill< typename Array::DeviceType >( a.getArrayData(), (typename Array::ValueType) t, a.getSize() );
    }
 };
 

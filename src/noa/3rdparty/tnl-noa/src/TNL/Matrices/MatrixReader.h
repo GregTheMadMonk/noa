@@ -54,7 +54,7 @@ public:
     * \param verbose controls verbosity of the matrix import.
     */
    static void
-   readMtx( const String& fileName, Matrix& matrix, bool verbose = false );
+   readMtx( const std::string& fileName, Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for importing matrix from STL input stream.
@@ -105,7 +105,7 @@ public:
     *
     */
    static void
-   readMtx( const String& fileName, Matrix& matrix, bool verbose = false );
+   readMtx( const std::string& fileName, Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for importing matrix from STL input stream.
@@ -129,15 +129,6 @@ protected:
 
    static void
    readMtxHeader( std::istream& file, IndexType& rows, IndexType& columns, bool& symmetricMatrix, bool verbose );
-
-   static void
-   computeCompressedRowLengthsFromMtxFile( std::istream& file,
-                                           Containers::Vector< int, DeviceType, int >& rowLengths,
-                                           int columns,
-                                           int rows,
-                                           bool symmetricSourceMatrix,
-                                           bool symmetricTargetMatrix,
-                                           bool verbose );
 
    static void
    readMatrixElementsFromMtxFile( std::istream& file, Matrix& matrix, bool symmetricMatrix, bool verbose );

@@ -5,6 +5,10 @@
 #include <stdexcept>
 #ifdef __CUDACC__
 #include "LightSpMV-1.0/SpMV.h"
+// NOTE: compiling these .cu files separately may lead to a weird nvlink error when compiled with clang
+// (last observed with clang 15.0.7 and nvcc 11.8.89)
+#include "LightSpMV-1.0/SpMV.cu"
+#include "LightSpMV-1.0/SpMVCSR.cu"
 #endif
 #include <TNL/Matrices/SparseMatrix.h>
 
@@ -52,7 +56,7 @@ struct LightSpMVBenchmark
       opt._numGPUs = 1;
       opt._numRows = matrix.getRows();
       opt._numCols = matrix.getColumns();
-      opt._rowOffsets = matrix.getRowPointers().getData();
+      opt._rowOffsets = matrix.getSegments().getOffsets().getData();
       opt._numValues = matrix.getValues().getSize();
       opt._colIndexValues = matrix.getColumnIndexes().getData();
       opt._numericalValues = matrix.getValues().getData();

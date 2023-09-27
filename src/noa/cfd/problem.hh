@@ -5,6 +5,7 @@
 #pragma once
 
 // NOA headers
+#include <noa/utils/combine/combine.hh>
 #include <noa/utils/common/meta.hh>
 #include <noa/utils/domain/domain.hh>
 #include <noa/utils/domain/layer_view.hh>
@@ -23,8 +24,8 @@ struct InvalidProblem : public std::runtime_error {
  * @brief Initial task for all CFD problems
  *
  * Initializes and holds the domain with initial conditions, medium
- * properties and basic solution layers, as well as providing basic info
- * to the CFD solver (such as simulation time and time step).
+ * properties as well as providing basic info to the CFD solver (such as
+ * simulation time and time step).
  */
 template <utils::meta::InstanceOf<utils::domain::Domain> Domain>
 class CFDProblem {
@@ -33,11 +34,16 @@ class CFDProblem {
 
 public:
     using Real = Domain::RealType;
+    using Device       = Domain::DeviceType;
+    using GlobalIndex  = Domain::GlobalIndexType;
+    using LocalIndex   = Domain::LocalIndexType;
 
     template <typename DataType>
     using LayerView = utils::domain::LayerView<DataType, Domain>;
 
-    LayerView<Real> solution;
+    template <typename DataType>
+    using Vector = TNL::Containers::Vector<DataType, Device, GlobalIndex>;
+
     LayerView<Real> a;
     LayerView<Real> c;
 
@@ -45,7 +51,10 @@ public:
     LayerView<int>  dirichletMask;
     LayerView<Real> neumann;
     LayerView<int>  neumannMask;
-    LayerView<Real> edgeSolution;
+
+    /// @brief Name is always "Problem"
+    static constexpr auto name =
+        std::same_as<Real, double> ? "dblCFDProblem" : "CFDProblem";
 
 private:
     /// @brief Simulation time step
@@ -106,20 +115,44 @@ public:
      * they will persist and get resized accordingly
      */
     CFDProblem()
-        : solution(addLayer<Real>(Domain::dCell, "Computed solution"))
-        , a(addLayer<Real>(Domain::dCell)) 
-        , c(addLayer<Real>(Domain::dCell))
-        , dirichlet(addLayer<Real>(Domain::dEdge))
-        , dirichletMask(addLayer<int>(Domain::dEdge))
-        , neumann(addLayer<Real>(Domain::dEdge))
-        , neumannMask(addLayer<int>(Domain::dEdge))
-        , edgeSolution(addLayer<Real>(Domain::dEdge))
+        : a(addLayer<Real>(Domain::dCell, "a")) 
+        , c(addLayer<Real>(Domain::dCell, "c"))
+        , dirichlet(addLayer<Real>(Domain::dEdge, "dirichlet"))
+        , dirichletMask(addLayer<int>(Domain::dEdge, "dirichletMask"))
+        , neumann(addLayer<Real>(Domain::dEdge, "neumann"))
+        , neumannMask(addLayer<int>(Domain::dEdge, "neumannMask"))
         , tau{0.005}
         , time{}
         , isUpdated{true}
     {}
 
-    // TODO: TaskCopy/TaskMove
+    /// @brief Copy task
+    CFDProblem(utils::combine::TaskCopy, const CFDProblem& other)
+        : domain(other.domain)
+        , a(other.a.copy(domain)) 
+        , c(other.c.copy(domain))
+        , dirichlet(other.dirichlet.copy(domain))
+        , dirichletMask(other.dirichletMask.copy(domain))
+        , neumann(other.neumann.copy(domain))
+        , neumannMask(other.neumannMask.copy(domain))
+        , tau{other.tau}
+        , time{other.time}
+        , isUpdated{true}
+    {}
+
+    /// @brief Move task
+    CFDProblem(utils::combine::TaskMove, CFDProblem&& other)
+        : domain(std::move(other.domain))
+        , a(other.a.copy(domain)) 
+        , c(other.c.copy(domain))
+        , dirichlet(other.dirichlet.copy(domain))
+        , dirichletMask(other.dirichletMask.copy(domain))
+        , neumann(other.neumann.copy(domain))
+        , neumannMask(other.neumannMask.copy(domain))
+        , tau{other.tau}
+        , time{other.time}
+        , isUpdated{true}
+    {}
 
     // Remove default move-copy operations
     CFDProblem(const CFDProblem&) = delete;
@@ -141,12 +174,18 @@ public:
     /// @brief Signal children tasks that an update has occurred
     [[nodiscard]] bool updated() const noexcept { return this->isUpdated; }
 
+    /// @brief Get the problem's domain mutable reference. Triggers update
+    [[nodiscard]] Domain& getDomainForChange()
+    { this->isUpdated = true; return this->domain; }
     /// @brief Get the problem's domain
     [[nodiscard]] const Domain& getDomain() const { return this->domain; }
 
     /// @brief Set the domain's mesh. Triggers an updated state
-    void setMesh(const typename Domain::MeshType& mesh) {
-        this->domain.setMesh(mesh);
+    template <typename MeshType>
+    requires std::same_as<
+        std::remove_cvref_t<MeshType>, typename Domain::MeshType
+    > void setMesh(MeshType&& mesh) {
+        this->domain.setMesh(std::forward<MeshType>(mesh));
         this->isUpdated = true;
     } // <-- void setMesh(mesh)
 
@@ -156,6 +195,8 @@ public:
     void setTau(Real tau) { this->tau = tau; this->isUpdated = true; }
     /// @brief Get current simulation time
     [[nodiscard]] Real getTime() const { return this->time; }
+    /// @brief Set current simulation time
+    void setTime(Real time) { this->time = time; this->isUpdated = true; }
 }; // <-- struct CFDProblem<Domain>
 
 } // <-- namespace noa::cfd

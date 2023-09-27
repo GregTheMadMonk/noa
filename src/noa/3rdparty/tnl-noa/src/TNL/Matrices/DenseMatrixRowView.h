@@ -21,11 +21,6 @@ namespace noa::TNL::Matrices {
  * See \ref DenseMatrix and \ref DenseMatrixView.
  *
  * \par Example
- * \include Matrices/DenseMatrix/DenseMatrixExample_getRow.cpp
- * \par Output
- * \include DenseMatrixExample_getRow.out
- *
- * \par Example
  * \include Matrices/DenseMatrix/DenseMatrixViewExample_getRow.cpp
  * \par Output
  * \include DenseMatrixViewExample_getRow.out
@@ -108,7 +103,7 @@ public:
     * \return matrix row index.
     */
    [[nodiscard]] __cuda_callable__
-   const IndexType&
+   IndexType
    getRowIndex() const;
 
    /**
@@ -207,6 +202,7 @@ protected:
 
    ValuesViewType values;
 };
+
 }  // namespace noa::TNL::Matrices
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/DenseMatrixRowView.hpp>

@@ -7,9 +7,8 @@
 #pragma once
 
 #include <ostream>
-#include <iostream>
+#include <string>
 
-#include <noa/3rdparty/tnl-noa/src/TNL/String.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Devices/Host.h>
 
 namespace noa::TNL::Matrices {
@@ -61,7 +60,7 @@ public:
     * \param verbose controls verbosity of the matrix export.
     */
    static void
-   writeGnuplot( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeGnuplot( const std::string& fileName, const Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for exporting matrix to STL output stream using Gnuplot format.
@@ -81,7 +80,7 @@ public:
     * \param verbose controls verbosity of the matrix export.
     */
    static void
-   writeEps( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeEps( const std::string& fileName, const Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for exporting matrix to STL output stream using EPS format.
@@ -101,7 +100,7 @@ public:
     * \param verbose controls verbosity of the matrix export.
     */
    static void
-   writeMtx( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeMtx( const std::string& fileName, const Matrix& matrix, bool verbose = false );
 
    /**
     * \brief Method for exporting matrix to STL output stream using MTX format.
@@ -127,19 +126,19 @@ public:
    using RealType = typename Matrix::RealType;
 
    static void
-   writeGnuplot( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeGnuplot( const std::string& fileName, const Matrix& matrix, bool verbose = false );
 
    static void
    writeGnuplot( std::ostream& str, const Matrix& matrix, bool verbose = false );
 
    static void
-   writeEps( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeEps( const std::string& fileName, const Matrix& matrix, bool verbose = false );
 
    static void
    writeEps( std::ostream& str, const Matrix& matrix, bool verbose = false );
 
    static void
-   writeMtx( const noa::TNL::String& fileName, const Matrix& matrix, bool verbose = false );
+   writeMtx( const std::string& fileName, const Matrix& matrix, bool verbose = false );
 
    static void
    writeMtx( std::ostream& str, const Matrix& matrix, bool verbose = false );

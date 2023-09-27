@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
         [] (Problem& problem) {
             // Initialize the problem
             // Create the mesh
-            const std::size_t   Nx = 5;
+            const std::size_t   Nx = 10;
             const Problem::Real dx = 10.0 / Nx;
             Domain dummy{};
             dummy.generateGrid(
@@ -28,10 +28,9 @@ int main(int argc, char** argv) {
             );
             problem.setMesh(std::move(dummy.getMesh()));
 
-            std::cout << problem.solution->getSize() << std::endl;
-            std::cout << problem.edgeSolution->getSize() << std::endl;
+            std::cout << problem.a->getSize() << std::endl;
+            std::cout << problem.dirichlet->getSize() << std::endl;
 
-            *problem.solution = 0;
             *problem.a = 1;
             *problem.c = 1;
 
@@ -39,8 +38,6 @@ int main(int argc, char** argv) {
             *problem.dirichletMask = 0;
             *problem.neumann = 0;
             *problem.neumannMask = 0;
-
-            *problem.edgeSolution = 0;
 
             auto& mesh = problem.getDomain().getMesh();
             mesh.forBoundary<Domain::dEdge>(
@@ -69,7 +66,6 @@ int main(int argc, char** argv) {
                             (p1[0] == 0) && (c[1] > 1) && (c[1] < 9);
 
                         problem.dirichlet[edge] = mask;
-                        problem.edgeSolution[edge] = mask;
                     } else if (r[1] == 0) { // y = const boundary
                         problem.neumannMask[edge] = 1;
                     }
@@ -93,23 +89,5 @@ int main(int argc, char** argv) {
     }
     std::cerr << '\n';
 
-#if 0
-    std::ofstream f("dump.dat");
-    while (mhfe.getTime() < 25.0) {
-        computation.run();
-        std::cerr << "\r" << mhfe.getTime()
-            << " : " << sum(computation.template get<GradEvType>().getResult())
-            << " : " << sum(computation.template get<FinDiffType>().getResult())
-            << "                 ";
-        f << mhfe.getTime()
-            << ", " << sum(computation.template get<GradEvType>().getResult())
-            << ", " << sum(computation.template get<FinDiffType>().getResult())
-            << std::endl;
-        // std::cerr << g<VectorType>(*problem.solution) << std::endl;
-        problem.getDomain().write("temp/" + std::to_string(mhfe.getTime()) + ".vtu");
-    }
-    std::cerr << std::endl;
-
-#endif
     return 0;
 }

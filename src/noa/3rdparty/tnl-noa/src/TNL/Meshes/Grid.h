@@ -4,8 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Tomáš Oberhuber, Yury Hayeu
-
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Logger.h>

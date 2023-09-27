@@ -11,6 +11,7 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Math.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/TypeTraits.h>
 
 namespace noa::TNL::Arithmetics {
 /**
@@ -388,5 +389,15 @@ std::ostream&
 operator<<( std::ostream& str, const Complex< Value >& c );
 
 }  // namespace noa::TNL::Arithmetics
+
+namespace noa::TNL {
+
+template< class T >
+struct is_complex< Arithmetics::Complex< T > > : public std::true_type
+{};
+
+using Arithmetics::abs;
+
+}  // namespace noa::TNL
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Arithmetics/Complex.hpp>

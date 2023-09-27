@@ -5,11 +5,7 @@ set( COMMON_TESTS
             DenseMatrixCopyTest
             TridiagonalMatrixTest
             MultidiagonalMatrixTest
-            SparseMatrixTest_CSRScalar
-            SparseMatrixTest_CSRVector
-            SparseMatrixTest_CSRHybrid
-            SparseMatrixTest_CSRLight
-            SparseMatrixTest_CSRAdaptive
+            SparseMatrixTest_CSR
             SparseMatrixTest_Ellpack
             SparseMatrixTest_SlicedEllpack
             SparseMatrixTest_ChunkedEllpack
@@ -31,7 +27,8 @@ set( COMMON_TESTS
             SymmetricSparseMatrixTest_CSR
             LambdaMatrixTest
             SparseMatrixTest_SandboxMatrix
-            SparseMatrixVectorProductTest_SandboxMatrix
+            # SpMV with SandboxMatrix is not tested because it does not use segments
+            #SparseMatrixVectorProductTest_SandboxMatrix
             MatrixWrappingTest
 )
 
@@ -81,7 +78,6 @@ if( TNL_BUILD_MPI )
    # add MPI to the target: https://cliutils.gitlab.io/modern-cmake/chapters/packages/MPI.html
    target_link_libraries( DistributedMatrixTest PUBLIC MPI::MPI_CXX )
 
-   SET( mpi_test_parameters -np 4 -H localhost:4 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DistributedMatrixTest${CMAKE_EXECUTABLE_SUFFIX}" )
-   ADD_TEST( NAME DistributedMatrixTest COMMAND "mpirun" ${mpi_test_parameters})
-   ADD_TEST( NAME DistributedMatrixTest_nodistr COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DistributedMatrixTest${CMAKE_EXECUTABLE_SUFFIX}" )
+   add_test_mpi( NAME DistributedMatrixTest NPROC 4 COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DistributedMatrixTest${CMAKE_EXECUTABLE_SUFFIX}" )
+   add_test_mpi( NAME DistributedMatrixTest_nodistr NPROC 1 COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DistributedMatrixTest${CMAKE_EXECUTABLE_SUFFIX}" )
 endif()

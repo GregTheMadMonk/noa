@@ -1,7 +1,6 @@
 #include <TNL/DiscreteMath.h>
 
-#ifdef HAVE_GTEST
-   #include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace TNL;
 
@@ -30,6 +29,43 @@ TEST( DiscreteMathTest, PowerTest )
    testPower( 2, 4, 16 );
    testPower( 3, 4, 81 );
    testPower( 4, 4, 256 );
+}
+
+TEST( DiscreteMathTest, Log2Test )
+{
+   static_assert( TNL::discreteLog2( 0 ) == std::numeric_limits< int >::max() );
+   static_assert( TNL::discreteLog2( 0UL ) == std::numeric_limits< unsigned long >::max() );
+
+   static_assert( TNL::discreteLog2( 1 ) == 0 );
+   static_assert( TNL::discreteLog2( 2 ) == 1 );
+   static_assert( TNL::discreteLog2( 3 ) == 1 );
+   static_assert( TNL::discreteLog2( 4 ) == 2 );
+   static_assert( TNL::discreteLog2( 5 ) == 2 );
+   static_assert( TNL::discreteLog2( 6 ) == 2 );
+   static_assert( TNL::discreteLog2( 7 ) == 2 );
+   static_assert( TNL::discreteLog2( 8 ) == 3 );
+   static_assert( TNL::discreteLog2( 9 ) == 3 );
+   static_assert( TNL::discreteLog2( 10 ) == 3 );
+   static_assert( TNL::discreteLog2( 11 ) == 3 );
+   static_assert( TNL::discreteLog2( 12 ) == 3 );
+   static_assert( TNL::discreteLog2( 13 ) == 3 );
+   static_assert( TNL::discreteLog2( 14 ) == 3 );
+   static_assert( TNL::discreteLog2( 15 ) == 3 );
+   static_assert( TNL::discreteLog2( 16 ) == 4 );
+   static_assert( TNL::discreteLog2( 31 ) == 4 );
+   static_assert( TNL::discreteLog2( 32 ) == 5 );
+
+   static_assert( TNL::discreteLog2( 4294967286 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967287 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967288 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967289 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967290 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967291 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967292 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967293 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967294 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967295 ) == 31 );
+   static_assert( TNL::discreteLog2( 4294967296 ) == 32 );
 }
 
 void
@@ -104,7 +140,7 @@ TEST( DiscreteMathTest, detectMultiplicationOverflowTest )
       }
 
    for( unsigned char a = 0; a <= 16; a++ )
-      for( unsigned char b = -16; b < 16; b++ ) {
+      for( unsigned char b = 0; b < 16; b++ ) {
          EXPECT_FALSE( TNL::integerMultiplyOverflow( a, b ) ) << "a = " << +a << ", b = " << +b;
          EXPECT_FALSE( TNL::integerMultiplyOverflow( b, a ) ) << "a = " << +a << ", b = " << +b;
       }
@@ -114,7 +150,5 @@ TEST( DiscreteMathTest, detectMultiplicationOverflowTest )
          EXPECT_TRUE( TNL::integerMultiplyOverflow( b, a ) ) << "a = " << +a << ", b = " << +b;
       }
 }
-
-#endif
 
 #include "main.h"

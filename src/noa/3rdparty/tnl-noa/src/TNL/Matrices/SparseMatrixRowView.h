@@ -10,7 +10,6 @@
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Cuda/CudaCallable.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Matrices/MatrixRowViewIterator.h>
-#include <noa/3rdparty/tnl-noa/src/TNL/Matrices/details/SparseMatrixRowViewValueGetter.h>
 
 namespace noa::TNL::Matrices {
 
@@ -21,12 +20,7 @@ namespace noa::TNL::Matrices {
  * \tparam ValuesView is a vector view storing the matrix elements values.
  * \tparam ColumnsIndexesView is a vector view storing the column indexes of the matrix element.
  *
- * See \ref SparseMatrix and \ref SparseMatrixView.
- *
- * \par Example
- * \include Matrices/SparseMatrix/SparseMatrixExample_getRow.cpp
- * \par Output
- * \include SparseMatrixExample_getRow.out
+ * See \ref SparseMatrixBase, \ref SparseMatrix and \ref SparseMatrixView.
  *
  * \par Example
  * \include Matrices/SparseMatrix/SparseMatrixViewExample_getRow.cpp
@@ -44,7 +38,7 @@ public:
    [[nodiscard]] static constexpr bool
    isBinary()
    {
-      return std::is_same< std::decay_t< RealType >, bool >::value;
+      return std::is_same_v< std::decay_t< RealType >, bool >;
    }
 
    /**
@@ -107,7 +101,8 @@ public:
     */
    using ConstIteratorType = MatrixRowViewIterator< ConstRowView >;
 
-   using ValueGetterType = details::SparseMatrixRowViewValueGetter< SegmentView, ValuesView, ColumnsIndexesView >;
+   using GetValueResultType = std::conditional_t< isBinary(), bool, RealType& >;
+   using GetValueConstResultType = std::conditional_t< isBinary(), bool, std::add_const_t< RealType >& >;
 
    /**
     * \brief Constructor with \e segmentView, \e values and \e columnIndexes.
@@ -147,7 +142,7 @@ public:
     * \return constant reference to the matrix element column index.
     */
    [[nodiscard]] __cuda_callable__
-   const IndexType&
+   const typename ColumnsIndexesViewType::ValueType&
    getColumnIndex( IndexType localIdx ) const;
 
    /**
@@ -158,7 +153,7 @@ public:
     * \return non-constant reference to the matrix element column index.
     */
    [[nodiscard]] __cuda_callable__
-   IndexType&
+   typename ColumnsIndexesViewType::ValueType&
    getColumnIndex( IndexType localIdx );
 
    /**
@@ -170,7 +165,7 @@ public:
     */
    [[nodiscard]] __cuda_callable__
    auto
-   getValue( IndexType localIdx ) const -> typename ValueGetterType::ConstResultType;
+   getValue( IndexType localIdx ) const -> GetValueConstResultType;
 
    /**
     * \brief Returns non-constants reference to value of an element with given rank in the row.
@@ -181,7 +176,7 @@ public:
     */
    [[nodiscard]] __cuda_callable__
    auto
-   getValue( IndexType localIdx ) -> typename ValueGetterType::ResultType;
+   getValue( IndexType localIdx ) -> GetValueResultType;
 
    /**
     * \brief Sets a value of matrix element with given rank in the matrix row.
@@ -215,6 +210,16 @@ public:
    setElement( IndexType localIdx, IndexType columnIndex, const RealType& value );
 
    /**
+    * \brief Computes the global index of the matrix element with given rank in the matrix row.
+    *
+    * \param localIdx is the rank of the matrix element in the row.
+    * \return global index of the matrix element.
+    */
+   __cuda_callable__
+   IndexType
+   getGlobalIndex( IndexType localIdx ) const;
+
+   /**
     * \brief Comparison of two matrix rows.
     *
     * The other matrix row can be from any other matrix.
@@ -226,6 +231,13 @@ public:
    [[nodiscard]] __cuda_callable__
    bool
    operator==( const SparseMatrixRowView< _SegmentView, _ValuesView, _ColumnsIndexesView >& other ) const;
+
+   /**
+    * \brief Sort the matrix row by column indexes in ascending order.
+    */
+   __cuda_callable__
+   void
+   sortColumnIndexes();
 
    /**
     * \brief Returns iterator pointing at the beginning of the matrix row.
@@ -262,13 +274,6 @@ public:
    [[nodiscard]] __cuda_callable__
    ConstIteratorType
    cend() const;
-
-   [[nodiscard]] __cuda_callable__
-   IndexType
-   getPaddingIndex() const
-   {
-      return -1;
-   }
 
 protected:
    SegmentViewType segmentView;

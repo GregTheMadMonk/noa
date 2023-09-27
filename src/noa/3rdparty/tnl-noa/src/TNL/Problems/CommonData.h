@@ -4,8 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Tomas Oberhuber
-
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Config/ParameterContainer.h>

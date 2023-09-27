@@ -1,78 +1,13 @@
 # Template Numerical Library
 
-![TNL logo](tnl-logo.jpg)
+![TNL logo](tnl-logo.png)
 
 TNL is a collection of building blocks that facilitate the development of
 efficient numerical solvers. It is implemented in C++ using modern programming
 paradigms in order to provide flexible and user friendly interface. TNL provides
 native support for modern hardware architectures such as multicore CPUs, GPUs,
 and distributed systems, which can be managed via a unified interface.
-
-Similarly to the STL, features provided by the TNL can be grouped into
-several modules:
-
-- _Core concepts_.
-  The main concepts used in TNL are the _memory space_, which represents the
-  part of memory where given data is allocated, and the _execution model_,
-  which represents the way how given (typically parallel) algorithm is executed.
-  For example, data can be allocated in the main system memory, in the GPU
-  memory, or using the CUDA Unified Memory which can be accessed from the host
-  as well as from the GPU. On the other hand, algorithms can be executed using
-  either the host CPU or an accelerator (GPU), and for each there are many ways
-  to manage parallel execution. The usage of memory spaces is abstracted with
-  \ref TNL::Allocators "allocators" and the execution model is represented by
-  \ref TNL::Devices "devices". See the [Core concepts](core-concepts.md) page
-  for details.
-- \ref TNL::Containers "Containers".
-  TNL provides generic containers such as array, multidimensional array or array
-  views, which abstract data management and execution of common operations on
-  different hardware architectures.
-- _Linear algebra._
-  TNL provides generic data structures and algorithms for linear algebra, such
-  as \ref TNL::Containers::Vector "vectors",
-  \ref TNL::Matrices "sparse matrices",
-  \ref TNL::Solvers::Linear "Krylov solvers" and
-  \ref TNL::Solvers::Linear::Preconditioners "preconditioners".
-   - Sparse matrix formats: CSR, Ellpack, Sliced Ellpack, Chunked Ellpack, Bisection Ellpack,
-     tridiagonal, multidiagonal
-   - Lambda matrices (matrix elements are defined by C++ lambda functions)
-   - Stationary solvers: Jacobi, SOR
-   - Krylov solvers: CG, BiCGstab, BiCGstab(l), GMRES, TFQMR, IDR(s)
-   - Preconditioners: Jacobi, ILU(0) (CPU only), ILUT (CPU only)
-- \ref TNL::Meshes "Meshes".
-  TNL provides data structures for the representation of structured or
-  unstructured numerical meshes.
-- _Solvers for differential equations._
-  TNL provides a framework for the development of ODE or PDE solvers.
-- \ref TNL::Images "Image processing".
-  TNL provides structures for the representation of image data. Imports and
-  exports from several file formats such as DICOM, PNG, and JPEG are provided
-  using external libraries (see below).
-
-See also [Comparison with other libraries](comparison-with-other-libraries.md).
-
-TNL also provides several optional components:
-
-- TNL header files in the
-  [src/TNL](https://gitlab.com/tnl-project/tnl/tree/main/src/TNL)
-  directory.
-- Various pre-processing and post-processing tools in the
-  [src/Tools](https://gitlab.com/tnl-project/tnl/tree/main/src/Tools)
-  directory.
-- Various utilities implemented in Python in the
-  [src/Python](https://gitlab.com/tnl-project/tnl/tree/main/src/Python)
-  directory. Additionally, Python bindings for the C++ code are provided in
-  the separate [PyTNL](https://gitlab.com/tnl-project/pytnl) repository.
-- Examples of various numerical solvers in the
-  [src/Examples](https://gitlab.com/tnl-project/tnl/tree/main/src/Examples)
-  directory.
-- Benchmarks in the
-  [src/Benchmarks](https://gitlab.com/tnl-project/tnl/tree/main/src/Benchmarks)
-  directory.
-
-These components can be individually enabled or disabled and installed by a
-convenient `install` script. See the [Installation](#installation) section for
-details.
+Visit the main [TNL web page](https://tnl-project.org/) for details.
 
 ## Installation   {#installation}
 
@@ -173,7 +108,7 @@ computing platform, and (optionally) some libraries.
   <tr><td> [TinyXML2](https://github.com/leethomason/tinyxml2/) </td>
       <td> \ref TNL::Meshes::Readers "XML-based mesh readers" </td>
       <td> `-DHAVE_TINYXML2 -ltinyxml2` </td>
-      <td> If TinyXML2 is not found as a system library, the `install` script
+      <td> If TinyXML2 is not found as a system library, CMake
            will download, compile and install TinyXML2 along with TNL. </td>
   </tr>
   <tr><td> [CGAL](https://github.com/CGAL/cgal/) </td>
@@ -241,17 +176,33 @@ Note that [CMake](https://cmake.org/) 3.24 or later is required when using the
 
 ## Usage   {#usage}
 
-TNL can be used with various build systems if you configure the compiler flags
-as explained below. See also our [example projects](
-https://gitlab.com/tnl-project/example-projects). If you use the CMake build
-system, there are two options:
+The following shows some of the most convenient ways to use TNL.
+
+### Wrapper tnlcxx
+
+`tnlcxx` is a wrapper which configures the build system (CMake) for simple situations where
+the user needs to compile only one `.cpp` or `.cu` source file. The wrapper is available in a
+separate [git repository](https://gitlab.com/tnl-project/tnlcxx).
+
+### CMake projects
+
+There are two ways to incorporate TNL in a [CMake](https://cmake.org/)-based project:
 
 1. Install TNL system-wide or in your user home directory where CMake can find
    it, and use `find_package(TNL)` in your project.
 2. Add a git submodule for TNL to your project and include it with
    `add_subdirectory(libs/tnl)` in the `CMakeLists.txt` file.
 
-### C++ compiler flags
+See the [example projects](https://gitlab.com/tnl-project/example-projects) for details.
+
+### Makefile projects
+
+To incorporate TNL into an existing project using [GNU Make](https://www.gnu.org/software/make/)
+as the build system, see the `Makefile` and `config.mk` files in the relevant
+[example project](https://gitlab.com/tnl-project/example-projects/makefile).
+The compiler flags used in the example project are explained in the following section.
+
+### Important C++ compiler flags
 
 - Enable the C++17 standard: `-std=c++17`
 - Configure the include path: `-I /path/to/include`
@@ -269,10 +220,13 @@ system, there are two options:
 
 - Enable optimizations: `-O3 -DNDEBUG` (you can also add
   `-march=native -mtune=native` to enable CPU-specific optimizations).
-- Of course, there are many other useful compiler flags. See, for example, our
-  [CMakeLists.txt](https://gitlab.com/tnl-project/tnl/-/blob/main/CMakeLists.txt)
-  file for flags that we use when developing TNL (there are flags for e.g.
-  hiding some useless compiler warnings).
+- Of course, there are many other useful compiler flags. For example, the
+  flags that we use when developing TNL can be found in the
+  [cxx_flags.cmake][cxx_flags.cmake] and [cuda_flags.cmake][cuda_flags.cmake]
+  files in the Git repository.
+
+[cxx_flags.cmake]: https://gitlab.com/tnl-project/tnl/-/blob/main/cmake/cxx_flags.cmake
+[cuda_flags.cmake]: https://gitlab.com/tnl-project/tnl/-/blob/main/cmake/cuda_flags.cmake
 
 ### Compiler flags for parallel computing
 
@@ -297,9 +251,7 @@ If you installed some TNL tools or examples using the `install` script, we
 recommend you to configure several environment variables for convenience. If you
 used the default installation path `~/.local/`:
 
-- `export PATH=$PATH:$HOME/.local/bin`
-- If TinyXML2 was installed by the `install` script and not as a system package,
-  also `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/lib`
+    export PATH="$PATH:$HOME/.local/bin"
 
 These commands can be added to the initialization scripts of your favourite
 shell, e.g. `.bash_profile`.

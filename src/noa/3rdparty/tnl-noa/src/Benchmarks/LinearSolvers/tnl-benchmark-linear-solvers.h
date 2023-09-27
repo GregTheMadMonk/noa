@@ -1,5 +1,3 @@
-// Implemented by: Jakub Klinkovsky
-
 #pragma once
 
 #include <set>
@@ -348,7 +346,7 @@ struct LinearSolversBenchmark
    using Partitioner = Containers::Partitioner< IndexType >;
    using DistributedMatrix = Matrices::DistributedMatrix< MatrixType >;
    using DistributedVector = Containers::DistributedVector< RealType, DeviceType, IndexType >;
-   using DistributedRowLengths = typename DistributedMatrix::RowsCapacitiesType;
+   using DistributedRowLengths = typename DistributedMatrix::RowCapacitiesType;
 
    static bool
    run( Benchmark<>& benchmark,
@@ -390,7 +388,7 @@ struct LinearSolversBenchmark
          matrixPointer->vectorProduct( x, b );
       }
 
-      typename MatrixType::RowsCapacitiesType rowLengths;
+      typename MatrixType::RowCapacitiesType rowLengths;
       matrixPointer->getCompressedRowLengths( rowLengths );
       const IndexType maxRowLength = max( rowLengths );
 
@@ -491,7 +489,7 @@ struct LinearSolversBenchmark
                                                   DeviceType,
                                                   IndexType,
                                                   TNL::Matrices::GeneralMatrix,
-                                                  Algorithms::Segments::CSRDefault
+                                                  Algorithms::Segments::CSR
                                                 >;
          auto matrixCopy = std::make_shared< CSR >();
          Matrices::copySparseMatrix( *matrixCopy, *matrixPointer );

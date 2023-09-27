@@ -3,11 +3,11 @@
 #include <TNL/Math.h>
 #include <iostream>
 
-#ifdef HAVE_GTEST
 #include <gtest/gtest.h>
 
 template< typename Segments >
-void test_SetSegmentsSizes_EqualSizes()
+void
+test_SetSegmentsSizes_EqualSizes()
 {
    using DeviceType = typename Segments::DeviceType;
    using IndexType = typename Segments::IndexType;
@@ -55,7 +55,8 @@ void test_SetSegmentsSizes_EqualSizes()
 }
 
 template< typename Segments >
-void test_SetSegmentsSizes_EqualSizes_EllpackOnly()
+void
+test_SetSegmentsSizes_EqualSizes_EllpackOnly()
 {
    using IndexType = typename Segments::IndexType;
 
@@ -100,8 +101,9 @@ void test_SetSegmentsSizes_EqualSizes_EllpackOnly()
       EXPECT_EQ( segmentsView.getSegmentSize( i ), segmentSize );
 }
 
-template< typename Segments >
-void test_reduceAllSegments_MaximumInSegments()
+template< typename Segments, typename SegmentsReductionKernel >
+void
+test_reduceAllSegments_MaximumInSegments()
 {
    using DeviceType = typename Segments::DeviceType;
    using IndexType = typename Segments::IndexType;
@@ -117,34 +119,40 @@ void test_reduceAllSegments_MaximumInSegments()
    TNL::Containers::Vector< IndexType, DeviceType, IndexType > v( segments.getStorageSize() );
 
    auto view = v.getView();
-   auto init = [=] __cuda_callable__ ( const IndexType segmentIdx, const IndexType localIdx, const IndexType globalIdx ) mutable -> bool {
-      view[ globalIdx ] =  segmentIdx * 5 + localIdx + 1;
+   auto init =
+      [ = ] __cuda_callable__( const IndexType segmentIdx, const IndexType localIdx, const IndexType globalIdx ) mutable -> bool
+   {
+      view[ globalIdx ] = segmentIdx * 5 + localIdx + 1;
       return true;
    };
    segments.forAllElements( init );
 
-   TNL::Containers::Vector< IndexType, DeviceType, IndexType >result( segmentsCount );
+   TNL::Containers::Vector< IndexType, DeviceType, IndexType > result( segmentsCount );
 
    const auto v_view = v.getConstView();
    auto result_view = result.getView();
-   auto fetch = [=] __cuda_callable__ ( IndexType segmentIdx, IndexType localIdx, IndexType globalIdx, bool& compute ) -> IndexType {
+   auto fetch =
+      [ = ] __cuda_callable__( IndexType segmentIdx, IndexType localIdx, IndexType globalIdx, bool& compute ) -> IndexType
+   {
       return v_view[ globalIdx ];
    };
-   auto reduce = [] __cuda_callable__ ( IndexType& a, const IndexType b ) -> IndexType {
+   auto reduce = [] __cuda_callable__( IndexType & a, const IndexType b ) -> IndexType
+   {
       return TNL::max( a, b );
    };
-   auto keep = [=] __cuda_callable__ ( const IndexType i, const IndexType a ) mutable {
+   auto keep = [ = ] __cuda_callable__( const IndexType i, const IndexType a ) mutable
+   {
       result_view[ i ] = a;
    };
-   segments.reduceAllSegments( fetch, reduce, keep, std::numeric_limits< IndexType >::min() );
+   SegmentsReductionKernel reductionKernel;
+   reductionKernel.init( segments );
+   reductionKernel.reduceAllSegments( segments, fetch, reduce, keep, std::numeric_limits< IndexType >::min() );
 
    for( IndexType i = 0; i < segmentsCount; i++ )
       EXPECT_EQ( result.getElement( i ), ( i + 1 ) * segmentSize );
 
    result_view = 0;
-   segments.getView().reduceAllSegments( fetch, reduce, keep, std::numeric_limits< IndexType >::min() );
+   reductionKernel.reduceAllSegments( segments.getView(), fetch, reduce, keep, std::numeric_limits< IndexType >::min() );
    for( IndexType i = 0; i < segmentsCount; i++ )
       EXPECT_EQ( result.getElement( i ), ( i + 1 ) * segmentSize );
 }
-
-#endif

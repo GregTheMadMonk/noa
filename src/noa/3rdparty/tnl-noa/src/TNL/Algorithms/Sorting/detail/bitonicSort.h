@@ -7,6 +7,7 @@
 #pragma once
 
 #include <noa/3rdparty/tnl-noa/src/TNL/Containers/Array.h>
+#include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/copy.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/blockBitonicSort.h>
 #include <noa/3rdparty/tnl-noa/src/TNL/Algorithms/Sorting/detail/helpers.h>
 
@@ -312,8 +313,7 @@ bitonicSort( std::vector< Value >& vec, int begin, int end, const CMP& Cmp )
    auto view = Arr.getView();
    bitonicSort( view, begin, end, Cmp );
 
-   noa::TNL::Algorithms::MultiDeviceMemoryOperations< noa::TNL::Devices::Host, noa::TNL::Devices::Cuda >::copy(
-      vec.data(), view.getData(), view.getSize() );
+   Algorithms::copy< noa::TNL::Devices::Host, noa::TNL::Devices::Cuda >( vec.data(), view.getData(), view.getSize() );
 }
 
 template< typename Value >

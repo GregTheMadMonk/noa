@@ -4,8 +4,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-// Implemented by: Jakub Klinkovsky
-
 #pragma once
 
 #include "Preconditioner.h"
@@ -121,7 +119,7 @@ protected:
    Real tau = 1e-4;
 
    // The factors L and U are stored separately and the rows of U are reversed.
-   Matrices::SparseMatrix< RealType, DeviceType, IndexType, Matrices::GeneralMatrix, Algorithms::Segments::CSRDefault > L, U;
+   Matrices::SparseMatrix< RealType, DeviceType, IndexType, Matrices::GeneralMatrix, Algorithms::Segments::CSR > L, U;
 
    // Specialized methods to distinguish between normal and distributed matrices
    // in the implementation.
