@@ -20,6 +20,7 @@ option(BUILD_NOA_BENCHMARKS "Build and run benchmarks " OFF)
 option(BUILD_NOA_CUDA "Build CUDA support" OFF)
 option(BUILD_JNOA "Build JNI bindings" OFF)
 option(BUILD_DOCS "Build documentation with doxygen" OFF)
+option(HAVE_CXX20 "Export and build tests for NOA components that use C++20" ON)
 option(NO_OMP "Disables OpenMP libraries from being used in some parts the build. This is a temporal thing, as it appears that using OMP affects stability of some solvers" OFF)
 
 # Add OpenMP to target
@@ -76,37 +77,44 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-# C++20 NOA headers
-add_library(${PROJECT_NAME}_CXX20 INTERFACE)
-# Alias
-add_library(
-    ${PROJECT_NAME}::${PROJECT_NAME}_CXX20 ALIAS ${PROJECT_NAME}_CXX20
-) # <-- add_library
+if (HAVE_CXX20)
+    # C++20 NOA headers
+    add_library(${PROJECT_NAME}_CXX20 INTERFACE)
+    # Alias
+    add_library(
+        ${PROJECT_NAME}::${PROJECT_NAME}_CXX20
+        ALIAS ${PROJECT_NAME}_CXX20
+    ) # <-- add_library
 
-# Interface LibTorch
-target_link_libraries(${PROJECT_NAME} INTERFACE torch)
-set_target_properties(${PROJECT_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES torch)
+    # Interface LibTorch
+    target_link_libraries(${PROJECT_NAME} INTERFACE torch)
+    set_target_properties(
+        ${PROJECT_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES torch
+    ) # <-- set_target_properties
 
-# C++20 NOA uses C++17 headers too
-target_link_libraries(${PROJECT_NAME}_CXX20 INTERFACE ${PROJECT_NAME})
-set_target_properties(
-    ${PROJECT_NAME}_CXX20
-    PROPERTIES INTERFACE_LINK_LIBRARIES ${PROJECT_NAME}
-) # <-- set_target_properties
-# C++20 NOA requires at least C++20 (naturally)
-target_compile_features(${PROJECT_NAME}_CXX20 INTERFACE cxx_std_20)
-# Library headers
-target_include_directories(
-    ${PROJECT_NAME}_CXX20
-    INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src-cxx20>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-) # <-- target_include_directories
+    # C++20 NOA uses C++17 headers too
+    target_link_libraries(${PROJECT_NAME}_CXX20 INTERFACE ${PROJECT_NAME})
+    set_target_properties(
+        ${PROJECT_NAME}_CXX20
+        PROPERTIES INTERFACE_LINK_LIBRARIES ${PROJECT_NAME}
+    ) # <-- set_target_properties
+    # C++20 NOA requires at least C++20 (naturally)
+    target_compile_features(${PROJECT_NAME}_CXX20 INTERFACE cxx_std_20)
+    # Library headers
+    target_include_directories(
+        ${PROJECT_NAME}_CXX20
+        INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src-cxx20>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    ) # <-- target_include_directories
+endif()
 
 if (BUILD_NOA_TESTS)
     enable_testing()
     add_subdirectory(test)
-    add_subdirectory(test-cxx20)
+    if (HAVE_CXX20)
+        add_subdirectory(test-cxx20)
+    endif()
 endif ()
 
 if (BUILD_NOA_BENCHMARKS)
