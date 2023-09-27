@@ -106,6 +106,7 @@ target_include_directories(
 if (BUILD_NOA_TESTS)
     enable_testing()
     add_subdirectory(test)
+    add_subdirectory(test-cxx20)
 endif ()
 
 if (BUILD_NOA_BENCHMARKS)

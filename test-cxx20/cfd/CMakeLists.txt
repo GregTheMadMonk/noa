@@ -15,6 +15,5 @@ add_executable(mass_lumping main.cc)
 
 # Link libraries
 target_link_libraries(mass_lumping PRIVATE ${PROJECT_NAME}_CXX20 gflags ZLIB::ZLIB)
-# target_precompile_headers(mass_lumping PRIVATE main-pch.hh)
-target_compile_options( mass_lumping PRIVATE -DHAVE_ZLIB ${FEATURE_FLAGS})
+target_compile_options( mass_lumping PRIVATE -DHAVE_ZLIB )
 target_add_openmp( mass_lumping )

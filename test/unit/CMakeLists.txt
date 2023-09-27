@@ -15,14 +15,10 @@ find_package(ZLIB)
 # Source files
 set(NOA_TEST_SRC
         noa-test-suite.cc
-        test-combine.cc
         test-dcs-calc.cc
-        test-domain.cc
         test-ghmc-sampler.cc
-        test-mhfem.cc
         test-tnl.cc
         test-trace.cc
-        test-domain.cc
         ${NOA_ROOT_DIR}/test/kernels.cc)
 
 if (BUILD_NOA_CUDA)
@@ -44,7 +40,7 @@ set_target_properties(noa_test_suite PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_include_directories(noa_test_suite PRIVATE ${NOA_ROOT_DIR}/test)
 
 # Link libraries
-target_link_libraries(noa_test_suite PRIVATE gtest ${PROJECT_NAME} ${PROJECT_NAME}_CXX20 ZLIB::ZLIB)
+target_link_libraries(noa_test_suite PRIVATE gtest ${PROJECT_NAME} ZLIB::ZLIB)
 target_compile_options(noa_test_suite
         PRIVATE -O3 -DHAVE_ZLIB
         $<$<COMPILE_LANGUAGE:CXX>: ${W_FLAGS}>
