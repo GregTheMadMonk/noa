@@ -11,10 +11,10 @@
 #include "static_composer.hh"
 
 /// \brief Main Combine namespace
-namespace noa::utils::combine {
+namespace noa::combine {
     /// \brief Implementation detail
     namespace detail {}
 
     /// \brief Compile-time testing
     namespace test {}
-} // <-- namespace noa::utils::combine
+} // <-- namespace noa::combine

@@ -11,32 +11,32 @@
 #include "task_manip.hh"
 #include "task_traits.hh"
 
-namespace noa::utils::combine {
+namespace noa::combine {
 
 namespace detail {
 
     template <
         typename LastList,
-        meta::InstanceOf<meta::List>... Lists
+        utils::meta::InstanceOf<utils::meta::List>... Lists
     > struct Unroll {
         using Type = Unroll<
-            typename meta::Cast<
-                typename LastList::template Apply<GetDeps>, meta::Concat
+            typename utils::meta::Cast<
+                typename LastList::template Apply<GetDeps>, utils::meta::Concat
             >,
             typename LastList::Unique, Lists...
         >::Type;
     };
 
-    template < meta::InstanceOf<meta::List>... Lists >
+    template < utils::meta::InstanceOf<utils::meta::List>... Lists >
     struct Unroll<void, Lists...> {
-        using Type = meta::Concat< Lists... >::Unique;
+        using Type = utils::meta::Concat< Lists... >::Unique;
     };
 
-    template <typename Initializer, meta::InstanceOf<meta::List> Tasks>
+    template <typename Initializer, utils::meta::InstanceOf<utils::meta::List> Tasks>
     struct ValidateInitializer;
 
     template <typename Initializer, Task... Tasks>
-    struct ValidateInitializer<Initializer, meta::List<Tasks...>> {
+    struct ValidateInitializer<Initializer, utils::meta::List<Tasks...>> {
         static constexpr auto value =
             ( std::invocable<Initializer, Tasks&> || ... || false );
     };
@@ -59,14 +59,14 @@ namespace detail {
 template <Task... Tasks>
 class StaticComposer {
     /// Full task sequence (first to last, including dependencies)
-    using TaskSeq = detail::Unroll< meta::List<Tasks...> >::Type;
+    using TaskSeq = detail::Unroll< utils::meta::List<Tasks...> >::Type;
 
     /**
      * \brief Task storage
      *
      * Optional is used to allow to define task initialization order
      */
-    using TaskTup = meta::Cast<
+    using TaskTup = utils::meta::Cast<
         typename TaskSeq::template Apply<std::optional>,
         std::tuple
     >;
@@ -157,13 +157,13 @@ public:
 
     /// \brief Get several tasks as a tuple of references
     template <Task... TaskList>
-    auto getList(meta::List<TaskList...> = {}) {
+    auto getList(utils::meta::List<TaskList...> = {}) {
         return std::tie(this->get<TaskList>()...);
     }
 
     /// \brief Get several tasks as a tuple of const references
     template <Task... TaskList>
-    auto getList(meta::List<TaskList...> = {}) const {
+    auto getList(utils::meta::List<TaskList...> = {}) const {
         return std::tie(this->get<TaskList>()...);
     }
 
@@ -228,54 +228,54 @@ struct Task5 {
 
 static_assert(
     std::same_as<
-        detail::Unroll< meta::List<Task1> >::Type,
-        meta::List<Task1>
+        detail::Unroll< utils::meta::List<Task1> >::Type,
+        utils::meta::List<Task1>
     >
 );
 
 static_assert(
     std::same_as<
-        detail::Unroll< meta::List<Task2> >::Type,
-        meta::List<Task1, Task2>
+        detail::Unroll< utils::meta::List<Task2> >::Type,
+        utils::meta::List<Task1, Task2>
     >
 );
 
 static_assert(
     std::same_as<
-        detail::Unroll< meta::List<Task2, Task1> >::Type,
-        meta::List<Task1, Task2>
+        detail::Unroll< utils::meta::List<Task2, Task1> >::Type,
+        utils::meta::List<Task1, Task2>
     >
 );
 
 static_assert(
     std::same_as<
-        detail::Unroll< meta::List<Task1, Task2> >::Type,
-        meta::List<Task1, Task2>
+        detail::Unroll< utils::meta::List<Task1, Task2> >::Type,
+        utils::meta::List<Task1, Task2>
     >
 );
 
 static_assert(
     std::same_as<
-        detail::Unroll< meta::List<Task3> >::Type,
-        meta::List<Task1, Task2, Task3>
+        detail::Unroll< utils::meta::List<Task3> >::Type,
+        utils::meta::List<Task1, Task2, Task3>
     >
 );
 
 static_assert(
     std::same_as<
-        detail::Unroll< meta::List<Task4> >::Type,
-        meta::List<Task1, Task4>
+        detail::Unroll< utils::meta::List<Task4> >::Type,
+        utils::meta::List<Task1, Task4>
     >
 );
 
 static_assert(
     std::same_as<
-        detail::Unroll< meta::List<Task5> >::Type,
-        meta::List<Task1, Task2, Task4, Task5>
+        detail::Unroll< utils::meta::List<Task5> >::Type,
+        utils::meta::List<Task1, Task2, Task4, Task5>
     >
 );
 
 } // <-- namespace test::static_composer
 #endif // NOA_COMPILE_TIME_TESTS
 
-} // <-- namespace noa::utils::combine
+} // <-- namespace noa::combine

@@ -414,7 +414,7 @@ public:
     { this->cache(prob); }
 
     /// @brief Copy task
-    MHFE(utils::combine::TaskCopy, const MHFE& other, Problem& prob)
+    MHFE(combine::TaskCopy, const MHFE& other, Problem& prob)
         : solution(other.solution.copy(prob.getDomainForChange()))
         , prevSolution(other.prevSolution.copy(prob.getDomainForChange()))
         , edgeSolution(other.edgeSolution.copy(prob.getDomainForChange()))
@@ -431,8 +431,8 @@ public:
     { this->cache(prob); }
 
     /// @brief Move task
-    MHFE(utils::combine::TaskMove, MHFE&& other, Problem& prob)
-    : MHFE(utils::combine::TaskCopy{}, other, prob)
+    MHFE(combine::TaskMove, MHFE&& other, Problem& prob)
+    : MHFE(combine::TaskCopy{}, other, prob)
     {}
 
     // Remove default move-copy operations

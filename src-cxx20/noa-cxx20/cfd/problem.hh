@@ -127,7 +127,7 @@ public:
     {}
 
     /// @brief Copy task
-    CFDProblem(utils::combine::TaskCopy, const CFDProblem& other)
+    CFDProblem(combine::TaskCopy, const CFDProblem& other)
         : domain(other.domain)
         , a(other.a.copy(domain)) 
         , c(other.c.copy(domain))
@@ -141,7 +141,7 @@ public:
     {}
 
     /// @brief Move task
-    CFDProblem(utils::combine::TaskMove, CFDProblem&& other)
+    CFDProblem(combine::TaskMove, CFDProblem&& other)
         : domain(std::move(other.domain))
         , a(other.a.copy(domain)) 
         , c(other.c.copy(domain))

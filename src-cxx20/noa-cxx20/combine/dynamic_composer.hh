@@ -17,7 +17,7 @@
 #include "task_manip.hh"
 #include "task_traits.hh"
 
-namespace noa::utils::combine {
+namespace noa::combine {
 
 /**
  * @brief Dynamic composer performs dependency resolution at runtime
@@ -35,7 +35,7 @@ namespace noa::utils::combine {
 template <Task... TaskList>
 class DynamicComposer {
     /// @brief All tasks that could possibly be handled by this composer
-    using Tasks = detail::Unroll< meta::List<TaskList...> >::Type;
+    using Tasks = detail::Unroll< utils::meta::List<TaskList...> >::Type;
 
     /**
      * @brief `std::out_of_range` child for when there was no task of type
@@ -116,7 +116,7 @@ class DynamicComposer {
             if (typeid(TaskType) == other.type()) return;
 
             const auto updater =
-                [&t=this->task, &other] <Task O> (meta::TypeTag<O>) {
+                [&t=this->task, &other] <Task O> (utils::meta::TypeTag<O>) {
                     if constexpr (requires (O& o) { t.onUpdated(o); }) {
                         if (typeid(O) != other.type()) return;
 
@@ -124,13 +124,13 @@ class DynamicComposer {
                     }
                 };
 
-            [&updater] <Task... AllTasks> (meta::List<AllTasks...>) {
-                ( updater(meta::TypeTag<AllTasks>{}), ... );
+            [&updater] <Task... AllTasks> (utils::meta::List<AllTasks...>) {
+                ( updater(utils::meta::TypeTag<AllTasks>{}), ... );
             } (Tasks{});
         } // <-- void onUpdated(other)
 
         static inline const TaskIdxVec deps =
-            [] <Task... Deps> (meta::List<Deps...>) {
+            [] <Task... Deps> (utils::meta::List<Deps...>) {
                 TaskIdxVec ret{};
                 
                 ( ret.push_back(typeid(Deps)), ... );
@@ -152,19 +152,19 @@ class DynamicComposer {
     /**
      * @brief Convert runtime task type info to compile-time type
      *
-     * Calls `f` with `meta::TypeTag<T>` argument (like std::visit), where
+     * Calls `f` with `utils::meta::TypeTag<T>` argument (like std::visit), where
      * `typeid(T) == idx`
      */
     template <typename Func>
     static inline void visit(Func&& f, std::type_index idx) {
-        [idx, &f] <Task... AllTasks> (meta::List<AllTasks...>) {
+        [idx, &f] <Task... AllTasks> (utils::meta::List<AllTasks...>) {
             (
-                [idx, &f] <Task Task> (meta::TypeTag<Task>) {
-                    using Arg = meta::TypeTag<Task>;
+                [idx, &f] <Task Task> (utils::meta::TypeTag<Task>) {
+                    using Arg = utils::meta::TypeTag<Task>;
                     if constexpr (std::invocable<Func, Arg>) {
                         if (typeid(Task) == idx) f(Arg{});
                     }
-                } (meta::TypeTag<AllTasks>{}), ...
+                } (utils::meta::TypeTag<AllTasks>{}), ...
             );
         } (Tasks{});
     } // <-- static auto visit(idx, f)
@@ -175,7 +175,7 @@ class DynamicComposer {
     template <typename Func>
     static inline void visit(Func&& f, DynamicTask& task) {
         visit(
-            [&task, &f] <Task TaskType> (meta::TypeTag<TaskType>) {
+            [&task, &f] <Task TaskType> (utils::meta::TypeTag<TaskType>) {
                 f(task.template as<TaskType>().task);
             }, task.type()
         );
@@ -187,7 +187,7 @@ class DynamicComposer {
     template <typename Func>
     static inline void tryVisit(Func&& f, DynamicTask& task) {
         visit(
-            [&task, &f] <Task TaskType> (meta::TypeTag<TaskType>) {
+            [&task, &f] <Task TaskType> (utils::meta::TypeTag<TaskType>) {
                 if constexpr (std::invocable<Func, TaskType&>) {
                     f(task.template as<TaskType>().task);
                 }
@@ -222,14 +222,14 @@ public:
     /// @brief Task name to `std::type_index` mapping
     static inline
     const std::unordered_map<std::string, std::type_index> namesMap {
-        [] <Task... Ts> (meta::List<Ts...>) {
+        [] <Task... Ts> (utils::meta::List<Ts...>) {
             std::unordered_map<std::string, std::type_index> ret{};
 
-            const auto push = [&ret] <Task T> (meta::TypeTag<T>) {
+            const auto push = [&ret] <Task T> (utils::meta::TypeTag<T>) {
                 ret.emplace(taskName<T>().data(), typeid(T));
             };
 
-            ( push(meta::TypeTag<Ts>{}), ... );
+            ( push(utils::meta::TypeTag<Ts>{}), ... );
 
             return ret;
         } (Tasks{})
@@ -258,7 +258,7 @@ public:
         for (std::size_t i = 0; i < taskNum; ++i) {
             const auto& otherTask = other.tasks.at(i);
             visit(
-                [this, i, &other] <Task T> (meta::TypeTag<T>) {
+                [this, i, &other] <Task T> (utils::meta::TypeTag<T>) {
                     task_manip::copyConstructTask<T>(
                         this->tasks[i], *this, other
                     );
@@ -279,7 +279,7 @@ public:
         for (std::size_t i = 0; i < taskNum; ++i) {
             const auto& otherTask = other.tasks.at(i);
             visit(
-                [this, i, &other] <Task T> (meta::TypeTag<T>) {
+                [this, i, &other] <Task T> (utils::meta::TypeTag<T>) {
                     task_manip::moveConstructTask<T>(
                         this->tasks[i], *this, other
                     );
@@ -297,13 +297,13 @@ public:
 
     /// @brief Set required tasks via template arguments
     template <Task... Tasks>
-    void setTasks(const Inits& inits = {}, meta::List<Tasks...> = {}) {
+    void setTasks(const Inits& inits = {}, utils::meta::List<Tasks...> = {}) {
         TaskIdxVec request{};
 
         ( request.emplace_back(typeid(Tasks)), ... );
 
         this->setTasks(request, inits);
-    } // <-- void setTasks(meta::List<Tasks...>)
+    } // <-- void setTasks(utils::meta::List<Tasks...>)
 
     /// @brief Set required tasks via names
     void setTasks(
@@ -334,7 +334,7 @@ private:
             TaskIdxVec next{};
             for (const auto taskIdx : queue.back()) {
                 visit(
-                    [&next] <Task DepTask> (meta::TypeTag<DepTask>) {
+                    [&next] <Task DepTask> (utils::meta::TypeTag<DepTask>) {
                         for (const auto idx : AsDynamic<DepTask>::deps) {
                             next.push_back(idx);
                         }
@@ -359,7 +359,7 @@ private:
 
                 this->tasks.emplace_back();
                 visit(
-                    [this] <Task T> (meta::TypeTag<T>) {
+                    [this] <Task T> (utils::meta::TypeTag<T>) {
                         task_manip::constructTask<T>(
                             this->tasks.back(), *this
                         );
@@ -374,15 +374,15 @@ private:
 public:
     /// @brief Get all the possible task names
     static inline std::vector<std::string> getAllowedTasks() {
-        return [] <Task... AllTasks> (meta::List<AllTasks...>) {
+        return [] <Task... AllTasks> (utils::meta::List<AllTasks...>) {
             std::vector<std::string> ret{};
 
             (
-                [&ret] <Task TaskType> (meta::TypeTag<TaskType>) {
+                [&ret] <Task TaskType> (utils::meta::TypeTag<TaskType>) {
                     if constexpr (NamedTask<TaskType>) {
                         ret.push_back(taskName<TaskType>().data());
                     }
-                } (meta::TypeTag<AllTasks>{}), ...
+                } (utils::meta::TypeTag<AllTasks>{}), ...
             );
 
             return ret;
@@ -433,14 +433,14 @@ public:
     } // <-- TaskType& get()
     /// @brief Get several tasks as a tuple of references
     template <Task... TasksList>
-    auto getList(meta::List<TasksList...> = {}) {
+    auto getList(utils::meta::List<TasksList...> = {}) {
         return std::tie(this->get<TasksList>()...);
-    } // <-- auto getList(meta::List<TasksList...>)
+    } // <-- auto getList(utils::meta::List<TasksList...>)
     /// @brief Get several tasks as a tuple of const references
     template <Task... TasksList>
-    auto getList(meta::List<TasksList...> = {}) const {
+    auto getList(utils::meta::List<TasksList...> = {}) const {
         return std::tie(this->get<TasksList>()...);
-    } // <-- auto getList(meta::List<TasksList...>) const
+    } // <-- auto getList(utils::meta::List<TasksList...>) const
 }; // <-- class DynamicComposer<TaskList...>
 
-} // <-- namespace noa::utils::combine
+} // <-- namespace noa::combine

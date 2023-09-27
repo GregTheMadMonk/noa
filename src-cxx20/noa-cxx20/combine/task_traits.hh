@@ -9,7 +9,7 @@
 
 #include <noa-cxx20/utils/meta.hh>
 
-namespace noa::utils::combine {
+namespace noa::combine {
 
 /// \brief Task copy-constructor indicator
 struct TaskCopy {};
@@ -23,18 +23,18 @@ struct TaskMove {};
 template <typename TaskCandidate>
 concept Task = requires {
     /// * it has a constructor that is not a move- or copy- constructor
-    requires meta::InstanceOf<
-        meta::GetConstructorArgs<TaskCandidate>,
-        meta::List
+    requires utils::meta::InstanceOf<
+        utils::meta::GetConstructorArgs<TaskCandidate>,
+        utils::meta::List
     >;
-    requires !meta::GetConstructorArgs<TaskCandidate>
+    requires !utils::meta::GetConstructorArgs<TaskCandidate>
                                         ::template contains<TaskCopy>;
-    requires !meta::GetConstructorArgs<TaskCandidate>
+    requires !utils::meta::GetConstructorArgs<TaskCandidate>
                                         ::template contains<TaskMove>;
     /// * has a `run` method
-    requires meta::InstanceOf<
-        meta::GetCallableArgs<&TaskCandidate::run>,
-        meta::List
+    requires utils::meta::InstanceOf<
+        utils::meta::GetCallableArgs<&TaskCandidate::run>,
+        utils::meta::List
     >;
 }; // <-- concept Task
 
@@ -43,13 +43,13 @@ concept Task = requires {
 template <typename TaskType>
 concept CopyableTask = requires {
     requires Task<TaskType>;
-    requires meta::InstanceOf<
-        meta::GetConstructorArgs<TaskType, TaskCopy>,
-        meta::List
+    requires utils::meta::InstanceOf<
+        utils::meta::GetConstructorArgs<TaskType, TaskCopy>,
+        utils::meta::List
     >;
     requires std::same_as<
         std::remove_cv_t<
-            meta::At<meta::GetConstructorArgs<TaskType, TaskCopy>, 1>
+            utils::meta::At<utils::meta::GetConstructorArgs<TaskType, TaskCopy>, 1>
         >, TaskType
     >;
 }; // <-- concept CopyableTask
@@ -59,13 +59,13 @@ concept CopyableTask = requires {
 template <typename TaskType>
 concept MovableTask = requires {
     requires Task<TaskType>;
-    requires meta::InstanceOf<
-        meta::GetConstructorArgs<TaskType, TaskMove>,
-        meta::List
+    requires utils::meta::InstanceOf<
+        utils::meta::GetConstructorArgs<TaskType, TaskMove>,
+        utils::meta::List
     >;
     requires std::same_as<
         std::remove_cv_t<
-            meta::At<meta::GetConstructorArgs<TaskType, TaskMove>, 1>
+            utils::meta::At<utils::meta::GetConstructorArgs<TaskType, TaskMove>, 1>
         >, TaskType
     >;
 }; // <-- concept MovableTask
@@ -103,32 +103,32 @@ namespace detail {
 
 /// \brief Get task constructor dependencies
 template <Task TaskType>
-using ConstructorDeps = meta::GetConstructorArgs<TaskType>
+using ConstructorDeps = utils::meta::GetConstructorArgs<TaskType>
                         ::template Apply<std::remove_cvref_t>::Unique;
 /// \brief Get task `run` method dependencies
 template <Task TaskType>
-using RunDeps = meta::GetCallableArgs<&TaskType::run>
+using RunDeps = utils::meta::GetCallableArgs<&TaskType::run>
                         ::template Apply<std::remove_cvref_t>::Unique;
 /// \brief Get task copy constructor dependencies
 template <Task TaskType>
 using CopyDeps = std::conditional_t<
     CopyableTask<TaskType>,
-    typename meta::GetConstructorArgs<TaskType, TaskCopy>,
-    meta::List<void, void>
+    typename utils::meta::GetConstructorArgs<TaskType, TaskCopy>,
+    utils::meta::List<void, void>
 >::template Crop<2>::template Apply<std::remove_cvref_t>::Unique;
 /// \brief Get task move constructor dependencies
 template <Task TaskType>
 using MoveDeps = std::conditional_t<
     MovableTask<TaskType>,
-    typename meta::GetConstructorArgs<TaskType, TaskMove>,
-    meta::List<void, void>
+    typename utils::meta::GetConstructorArgs<TaskType, TaskMove>,
+    utils::meta::List<void, void>
 >::template Crop<2>::template Apply<std::remove_cvref_t>::Unique;
 
 } // <-- namespace detail
 
 /// \brief Get task dependencies
 template <Task TaskType>
-using GetDeps = meta::Concat<
+using GetDeps = utils::meta::Concat<
     detail::ConstructorDeps<TaskType>,
     detail::RunDeps<TaskType>,
     detail::CopyDeps<TaskType>,
@@ -139,13 +139,13 @@ using GetDeps = meta::Concat<
 
 /// \brief Are all tasks in the list copyable?
 template <Task... Tasks>
-consteval bool allCopyable(meta::List<Tasks...> = {}) {
+consteval bool allCopyable(utils::meta::List<Tasks...> = {}) {
     return (CopyableTask<Tasks> && ...);
 }
 
 /// \brief Are all tasks in the list movable?
 template <Task... Tasks>
-consteval bool allMovable(meta::List<Tasks...> = {}) {
+consteval bool allMovable(utils::meta::List<Tasks...> = {}) {
     return (MovableTask<Tasks> && ...);
 }
 
@@ -209,26 +209,26 @@ static_assert(Task<IsCopyableMovableTask>);
 static_assert(MovableTask<IsCopyableMovableTask>);
 static_assert(CopyableTask<IsCopyableMovableTask>);
 
-static_assert(std::same_as< GetDeps<IsTask1>,  meta::List<> >);
+static_assert(std::same_as< GetDeps<IsTask1>,  utils::meta::List<> >);
 
-static_assert(std::same_as< GetDeps<IsTask2>, meta::List<IsTask1> >);
+static_assert(std::same_as< GetDeps<IsTask2>, utils::meta::List<IsTask1> >);
 
-static_assert(std::same_as< GetDeps<IsCopyableTask1>, meta::List<> >);
+static_assert(std::same_as< GetDeps<IsCopyableTask1>, utils::meta::List<> >);
 static_assert(
     std::same_as<
-        GetDeps<IsCopyableTask2>, meta::List<IsTask2, IsTask1>
+        GetDeps<IsCopyableTask2>, utils::meta::List<IsTask2, IsTask1>
     >
 );
 
-static_assert(std::same_as< GetDeps<IsMovableTask1>, meta::List<> >);
+static_assert(std::same_as< GetDeps<IsMovableTask1>, utils::meta::List<> >);
 static_assert(
     std::same_as<
-        GetDeps<IsMovableTask2>, meta::List<IsTask2, IsTask1>
+        GetDeps<IsMovableTask2>, utils::meta::List<IsTask2, IsTask1>
     >
 );
 
 static_assert(
-    std::same_as< GetDeps<IsCopyableMovableTask>, meta::List<IsTask2> >
+    std::same_as< GetDeps<IsCopyableMovableTask>, utils::meta::List<IsTask2> >
 );
 
 struct IsUpdatableTask1 { void run(); bool updated() const; };
@@ -239,4 +239,4 @@ static_assert(UpdatableTask<IsUpdatableTask1>);
 } // <-- namespace test::task_traits
 #endif
 
-} // <-- namespace noa::utils::combine
+} // <-- namespace noa::combine

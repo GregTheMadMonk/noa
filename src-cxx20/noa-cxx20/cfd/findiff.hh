@@ -25,14 +25,14 @@ namespace noa::cfd {
  * Every time a computation is run, performs `Ncells` similar computations
  * with a set parameter variation
  */
-template <utils::combine::Task Method>
+template <combine::Task Method>
 requires requires (const Method& m) {
     { m.getSolution() } -> utils::tnl::LinearContainer;
     { [] (typename Method::Problem) {} }; // Check for `Problem` subtype
-//  requires utils::combine::GetDeps<Method>::Contains<CFDProblem>;
+//  requires combine::GetDeps<Method>::Contains<CFDProblem>;
 } class FinDiff {
     /// @brief Static composer type for method
-    using Other = utils::combine::StaticComposer<Method>;
+    using Other = combine::StaticComposer<Method>;
     /// @brief Problem type
     using Problem = Method::Problem;
     /// @brief Domain type
@@ -123,7 +123,7 @@ public:
         prob.template addLayer<Real>(
             Domain::dCell,
             std::string{"Finite difference for "}
-            + utils::combine::taskName<Method>().data()
+            + combine::taskName<Method>().data()
         )
       )
     { this->update(prob); }

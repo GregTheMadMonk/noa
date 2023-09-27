@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     using MHFE =
         noa::cfd::MHFE<Domain, true>;
 
-    namespace cmb = noa::utils::combine;
+    namespace cmb = noa::combine;
 
     cmb::DynamicComposer<MHFE> comp{};
     comp.setTasks<MHFE>({

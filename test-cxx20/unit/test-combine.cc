@@ -12,10 +12,10 @@
 // gtest
 #include <gtest/gtest.h>
 
-namespace combine = noa::utils::combine;
+namespace cmb = noa::combine;
 
-using combine::TaskCopy;
-using combine::TaskMove;
+using cmb::TaskCopy;
+using cmb::TaskMove;
 
 // Event messages
 class Msg {
@@ -253,7 +253,7 @@ void testTwoTasks(auto& comp) {
 
 TEST(Combine, StaticComposer_OneTask) {
     {
-        combine::StaticComposer<Task1> comp{ initializer };
+        cmb::StaticComposer<Task1> comp{ initializer };
         testOneTask(comp);
     }
 
@@ -264,7 +264,7 @@ TEST(Combine, StaticComposer_OneTask) {
 
 TEST(Combine, StaticComposer_TwoTasks) {
     {
-        combine::StaticComposer<Task2> comp{ initializer };
+        cmb::StaticComposer<Task2> comp{ initializer };
         testTwoTasks(comp);
     }
 
@@ -278,7 +278,7 @@ TEST(Combine, StaticComposer_TwoTasks) {
 
 TEST(Combine, DynamicComposer_OneTask) {
     {
-        combine::DynamicComposer<Task2> comp{};
+        cmb::DynamicComposer<Task2> comp{};
         comp.setTasks({ "Task1" }, { initializer });
 
         testOneTask(comp);
@@ -291,7 +291,7 @@ TEST(Combine, DynamicComposer_OneTask) {
 
 TEST(Combine, DynamicComposer_TwoTasks) {
     {
-        combine::DynamicComposer<Task2> comp{};
+        cmb::DynamicComposer<Task2> comp{};
         comp.setTasks({ "Task2" }, { initializer });
 
         testTwoTasks(comp);

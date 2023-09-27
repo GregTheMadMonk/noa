@@ -10,7 +10,7 @@
 
 #include "task_traits.hh"
 
-namespace noa::utils::combine::task_manip {
+namespace noa::combine::task_manip {
 
 namespace detail {
     struct Dummy { void run(); };
@@ -19,7 +19,7 @@ namespace detail {
 /// \brief A primitive validity checker. Could break easily
 template <typename C>
 concept Composer = requires (C c) {
-    c.getList(meta::List{});
+    c.getList(utils::meta::List{});
     c.template get<detail::Dummy>();
 };
 
@@ -100,4 +100,4 @@ constexpr inline void runTask(TaskType& task, ComposerType& composer) {
     );
 } // <-- void runTask(task)
 
-} // <-- namespace noa::utils::combine::task_manip
+} // <-- namespace noa::combine::task_manip
