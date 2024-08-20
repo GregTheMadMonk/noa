@@ -1,0 +1,10 @@
+module;
+
+#include "rapidcsv.h"
+
+export module rapidcsv;
+
+export namespace rapidcsv {
+    using ::rapidcsv::Document;
+    using ::rapidcsv::LabelParams;
+} // <-- namespace rapidcsv

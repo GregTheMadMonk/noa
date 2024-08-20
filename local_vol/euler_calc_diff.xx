@@ -1,0 +1,20 @@
+export module local_vol:euler_calc_diff;
+
+import :configs;
+import :euler_calc;
+
+import std;
+
+namespace local_vol {
+
+// Defined in local_vol.cc
+export
+void calc_pv_vegas(
+    std::mdspan<double, ext2d> vegas,
+    std::mdspan<const double, ext2d> sigmas,
+    const MarketDataConfig& market_config,
+    const ModelConfig& model_config,
+    const Trade& trade
+);
+
+} // <-- namespace local_vol

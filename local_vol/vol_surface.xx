@@ -1,0 +1,164 @@
+module;
+
+#include <cmath> // Math defines, replaced with constexpr sqrt in C++26
+
+export module local_vol:vol_surface;
+
+import :configs;
+import :spline;
+
+import std;
+
+namespace local_vol {
+
+inline constexpr double EPS = 1e-3;
+inline constexpr double TOL = 1e-9;
+
+[[nodiscard]]
+inline constexpr
+double normal_cdf(double value) {
+    return 0.5 * std::erfc(-value * M_SQRT1_2);
+}
+
+export class VolSurface {
+    std::vector<double> ttms;
+    double fwd;
+    double max_K;
+    double min_K;
+    std::size_t n_ttms;
+
+    [[nodiscard]]
+    inline constexpr
+    double clip_ttm(double ttm) const {
+        // assuming first quotes are EOD current date
+        ttm = std::max(ttm, this->ttms.front());
+        ttm = std::min(ttm, this->ttms.back());
+        return ttm;
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    double clip_F(double F) const {
+        F = std::max(F, this->min_K);
+        F = std::min(F, this->max_K);
+        return F;
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    std::tuple<size_t, size_t> get_ttm_interval(double ttm) const {
+        ttm = std::min(ttm, this->ttms.back());
+        std::size_t t1 = 0;
+        std::size_t t2 = 0;
+
+        for (auto i : std::views::iota(0uz, this->n_ttms)) {
+            const auto ttmi = this->ttms[i];
+            if (ttmi > ttm) {
+                t1 = i - 1;
+                t2 = i;
+                break;
+            }
+        }
+
+        return { t1, t2 };
+    }
+
+    [[nodiscard]]
+    inline /* constexpr in C++26 */
+    double compute_sigma(
+        double ttm,
+        std::size_t t1,
+        std::size_t t2,
+        double F,
+        const tk::spline& strike_splines
+    ) const {
+        // const fwd yield
+        const auto sigma1 = std::max(strike_splines(t1, F), TOL);
+        const auto sigma2 = std::max(strike_splines(t2, F), TOL);
+
+        const auto ttm1 = this->ttms[t1];
+        const auto ttm2 = this->ttms[t2];
+        const auto dttm = ttm2 - ttm1;
+
+        const auto tot_var = (
+            (ttm2 * sigma2 * sigma2) * (ttm2 - ttm) / dttm
+            +
+            (ttm1 * sigma1 * sigma1) * (ttm - ttm1) / dttm
+        );
+
+        return std::sqrt(tot_var / ttm);
+    }
+
+    [[nodiscard]]
+    inline /* constexpr in C++26 */
+    double bsm_pv(double ttm, double K, double sigma) const {
+        const double d1 = (
+            (std::log(this->fwd / K) + (sigma * sigma / 2) * ttm)
+            / (sigma * std::sqrt(ttm))
+        );
+        const double d2 = d1 - sigma * std::sqrt(ttm);
+        return this->fwd * normal_cdf(d1) - K * normal_cdf(d2);
+    }
+
+    [[nodiscard]]
+    inline /* constexpr in C++26 */
+    double compute_C(
+        double ttm,
+        double F,
+        const tk::spline& strike_splines
+    ) const {
+        const auto& [ t1, t2 ] = this->get_ttm_interval(ttm);
+        const auto sigma = this->compute_sigma(ttm, t1, t2, F, strike_splines);
+
+        return this->bsm_pv(ttm, F, sigma);
+    }
+
+    [[nodiscard]]
+    inline /* constexpr in C++26 */
+    double finite_diff_dupire(
+        double ttm,
+        double F,
+        const tk::spline& strike_splines
+    ) const {
+        const auto C    = compute_C(ttm, F, strike_splines);
+        const auto C_Kl = compute_C(ttm, clip_F(F - EPS), strike_splines);
+        const auto C_Ku = compute_C(ttm, clip_F(F + EPS), strike_splines);
+
+        const auto d2C  = C_Ku - 2 * C + C_Kl;
+        // butterly arbitrage
+        const auto d2C_dK2 = std::max(d2C / (EPS * EPS), TOL);
+
+        const auto C_tl = compute_C(clip_ttm(ttm - EPS), F, strike_splines);
+        const auto C_tu = compute_C(clip_ttm(ttm + EPS), F, strike_splines);
+
+        const auto dC    = C_tu - C_tl;
+        const auto dC_dT = std::max(dC / EPS, TOL); // calendar arbitrage
+
+        const auto loc_vol2 = (2 * dC_dT) / (F * F * d2C_dK2);
+        return std::sqrt(loc_vol2);
+    }
+
+public:
+    inline constexpr
+    VolSurface(const MarketDataConfig& market_config)
+        : fwd{market_config.fwd}
+        , n_ttms{market_config.ttms.size()}
+        , ttms{ market_config.ttms }
+        , max_K{ market_config.strikes.back() }
+        , min_K{ market_config.strikes.front() }
+    {}
+
+    double get_local_vol(
+        double K,
+        double ttm,
+        const tk::spline& strike_splines
+    ) const {
+        ttm = this->clip_ttm(ttm);
+        K = clip_F(K);
+        return this->finite_diff_dupire(ttm, K, strike_splines);
+    }
+
+    double flat_forward() const { return this->fwd; }
+}; // <-- class VolSurface
+
+} // <-- namespace local_vol

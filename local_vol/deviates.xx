@@ -1,0 +1,67 @@
+export module local_vol:deviates;
+
+import :random;
+
+import std;
+
+namespace local_vol {
+
+export class Normaldev_BM : public Ran {
+    double mu, sig;
+    double storedval;
+
+public:
+    inline constexpr
+    Normaldev_BM(double mmu, double ssig, std::uint64_t i)
+        : Ran{i}, mu{mmu}, sig{ssig}, storedval{}
+    {}
+
+    double dev() {
+        double v1, v2, rsq, fac;
+        if (storedval == 0.) {
+            do {
+                v1 = 2.0 * float64() - 1.0;
+                v2 = 2.0 * float64() - 1.0;
+                rsq = v1 * v1 + v2 * v2;
+            } while (rsq >= 1.0 || rsq == 0.0);
+            fac = std::sqrt(-2.0 * std::log(rsq) / rsq);
+            storedval = v1 * fac;
+            return mu * sig * v2 * fac;
+        }
+
+        fac = storedval;
+        storedval = 0.0;
+        return mu + sig * fac;
+    }
+}; // <-- class Normaldev_BM
+
+export class Normaldev : public Ranfib {
+    double mu, sig;
+
+public:
+    inline constexpr
+    Normaldev(double mmu, double ssig, std::uint64_t i)
+        : Ranfib{i}, mu{mmu}, sig{ssig}
+    {}
+
+    double dev() {
+        double u, v, x, y, q;
+        do {
+            u = float64();
+            v = 1.7156 * (float64() - 0.5);
+            x = u - 0.449871;
+            y = std::abs(v) + 0.386595;
+            q = x * x + y * (0.19600 * y - 0.25472 * x);
+        } while (
+            q > 0.27597
+            && (
+                q > 0.27846
+                || v * v > -4.0 * std::log(u) * u * u
+            )
+        );
+
+        return mu + sig * v / u;
+    }
+}; // <-- class Normaldeev
+
+} // <-- namespace local_vol

@@ -1,0 +1,18 @@
+export module local_vol:configs;
+
+import std;
+
+namespace local_vol {
+
+export struct ModelConfig {
+    std::size_t N;
+    std::size_t TTM;
+}; // <-- struct ModelConfig
+
+export struct MarketDataConfig {
+    std::vector<double> ttms;
+    std::vector<double> strikes;
+    double fwd;
+}; // <-- struct MarketDataConfig
+
+} // <-- namespace local_vol

@@ -1,0 +1,94 @@
+export module local_vol:random;
+
+import std;
+
+namespace local_vol {
+
+export class Ran {
+    std::uint64_t u, v, w;
+
+public:
+    inline constexpr
+    Ran(std::uint64_t j) : v(4101842887655102017LL), w(1) {
+        u = j ^v; std::ignore = int64();
+        v = u;    std::ignore = int64();
+        w = v;    std::ignore = int64();
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    std::uint64_t int64() {
+		u = u * 2862933555777941757LL + 7046029254386353087LL;
+		v ^= v >> 17; v ^= v << 31; v ^= v >> 8;
+		w = 4294957665U*(w & 0xffffffff) + (w >> 32);
+        std::uint64_t x = u ^ (u << 21); x ^= x >> 35; x ^= x << 4;
+		return (x + v) ^ w;
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    double float64()
+    { return 5.42101086242752217E-20 * int64(); }
+
+    [[nodiscard]]
+    inline constexpr
+    std::uint32_t int32()
+    { return static_cast<std::uint32_t>(int64()); }
+}; // <-- class Ran
+
+class Ranq1 {
+    std::uint64_t v;
+
+public:
+    inline constexpr
+    Ranq1(std::uint64_t j) : v(4101842887655102017LL) {
+        v ^= j;
+        v = int64();
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    std::uint64_t int64() {
+        v ^= v >> 21; v ^= v << 35; v ^= v >> 4;
+		return v * 2685821657736338717LL;
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    double float64()
+    { return 5.42101086242752217E-20 * int64(); }
+
+    [[nodiscard]]
+    inline constexpr
+    std::uint32_t int32()
+    { return static_cast<std::uint32_t>(int64()); }
+}; // <-- class Ranq1
+
+export class Ranfib {
+    double dtab[55], dd;
+    int inext, inextp;
+
+public:
+    inline constexpr
+    Ranfib(std::uint64_t j) : inext{}, inextp{31} {
+        Ranq1 init{j};
+        for (double& dk : dtab) dk = init.float64();
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    double float64() {
+        if (++inext == 55)  inext = 0;
+        if (++inextp == 55) inextp = 0;
+        dd = dtab[inext] - dtab[inextp];
+        if (dd < 0) dd += 1.0;
+        return (dtab[inext] = dd);
+    }
+
+    [[nodiscard]]
+	inline constexpr
+    std::uint32_t int32()
+    { return static_cast<std::uint32_t>(float64() * 4294967295.0); }
+}; // <-- class Randfib
+
+} // <-- namespace local_vol

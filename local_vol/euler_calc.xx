@@ -1,0 +1,155 @@
+export module local_vol:euler_calc;
+
+import :configs;
+import :deviates;
+import :mat;
+import :spline;
+import :vol_surface;
+
+import std;
+
+namespace local_vol {
+
+export
+template <typename T>
+concept Payoff = requires (const T t, double S) {
+    { t.premium(S) } -> std::same_as<double>;
+    { t.expiry()   } -> std::same_as<std::size_t>;
+}; // <-- concept Payoff
+
+#if 0
+// Or if you wanted CRTP now you do it like this:
+struct Payoff {
+    [[nodiscard]]
+    inline constexpr
+    double premium(this const auto& impl, double S) {
+        return impl.premium_impl(S);
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    std::size_t expiry(this const auto& impl) {
+        return impl.expiry_impl();
+    }
+}; // <-- struct Payoff
+#endif
+
+export class EuropeanCall {
+    double strike;
+    std::int64_t notional;
+    std::size_t  ttm;
+
+public:
+    inline constexpr
+    EuropeanCall(double sstrike, std::int64_t nnotional, std::size_t tttm)
+        : strike{sstrike}, notional{nnotional}, ttm{tttm}
+    {}
+
+    [[nodiscard]]
+    inline constexpr
+    double premium(double S) const {
+        return this->notional * std::max(S - this->strike, 0.0);
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    std::size_t expiry() const { return this->ttm; }
+}; // <-- class EuropeanCall
+static_assert(Payoff<EuropeanCall>);
+
+export class EuropeanPut {
+    double strike;
+    std::int64_t notional;
+    std::size_t  ttm;
+
+public:
+    inline constexpr
+    EuropeanPut(double sstrike, std::int64_t nnotional, std::size_t tttm)
+        : strike{sstrike}, notional{nnotional}, ttm{tttm}
+    {}
+
+    [[nodiscard]]
+    inline constexpr
+    double premium(double S) const {
+        return this->notional * std::max(this->strike - S, 0.0);
+    }
+
+    [[nodiscard]]
+    inline constexpr
+    std::size_t expiry() const { return this->ttm; }
+}; // <-- class EuropeanPut
+static_assert(Payoff<EuropeanPut>);
+
+using Vanilla = std::variant<EuropeanCall, EuropeanPut>;
+export using Trade   = std::vector<Vanilla>;
+
+inline constexpr double DT = 2.7E-3;
+
+[[nodiscard]]
+inline /* constexpr in C++26 ? */
+double calc_pv_impl(
+    const double* sigmas_ptr, std::size_t rows, std::size_t cols,
+    const MarketDataConfig& market_config,
+    const ModelConfig& model_config,
+    const Trade& trade
+) {
+    const mat2d_view<const double> strikes{
+        market_config.strikes.data(),
+        1, market_config.strikes.size()
+    };
+    const mat2d_view<const double> sigmas{ sigmas_ptr, rows, cols };
+
+    const tk::spline strike_splines{ strikes, sigmas };
+
+    const VolSurface vol_surface{ market_config };
+
+    Normaldev normal_dev{ 0., 1., 10 };
+
+    std::vector<double> pv(model_config.N, 0.0);
+    // for (auto& [ n, pvn ] : std::views::enumerate(pv)) {
+    for (auto [ n, pvn ] : std::views::zip(std::views::iota(0uz), pv)) {
+        double S = vol_surface.flat_forward();
+        double T = 0.0;
+        for (auto ttm : std::views::iota(0uz, model_config.TTM)) {
+            T = T + DT;
+            S = (
+                S + vol_surface.get_local_vol(S, T, strike_splines)
+                    * S * std::sqrt(DT) * normal_dev.dev()
+            );
+
+            // Cashflows
+            for (const auto& vanilla : trade) {
+                std::visit(
+                    [&pvn, ttm, S] (const Payoff auto& payoff) {
+                        if (payoff.expiry() == ttm) {
+                            pvn += payoff.premium(S);
+                        }
+                    }, vanilla
+                );
+            }
+        }
+    }
+
+    return std::accumulate(pv.cbegin(), pv.cend(), 0.0) / model_config.N;
+} // <-- calc_pv_impl
+
+export
+[[nodiscard]]
+inline /* constexpr in C++26 ? */
+double calc_pv(
+    std::mdspan<const double, ext2d> sigmas,
+    const MarketDataConfig& market_config,
+    const ModelConfig& model_config,
+    const Trade& trade
+) {
+    return calc_pv_impl(
+        sigmas.data_handle(),
+        sigmas.extents().extent(0),
+        sigmas.extents().extent(1),
+        market_config,
+        model_config,
+        trade
+    );
+}
+
+} // <-- namespace local_vol

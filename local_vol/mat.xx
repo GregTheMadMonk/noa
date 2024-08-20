@@ -1,0 +1,115 @@
+export module local_vol:mat;
+
+import std;
+
+using ext2d = std::extents<
+    std::size_t,
+    std::dynamic_extent,
+    std::dynamic_extent
+>; // <-- using ext2d
+
+template <typename T>
+struct mat2d_view : public std::mdspan<T, ext2d> {
+    using std::mdspan<T, ext2d>::mdspan;
+
+    using std::mdspan<T, ext2d>::operator[];
+
+    /// @brief Get row
+    [[nodiscard]]
+    inline constexpr
+    auto operator[](this auto& self, std::size_t i)
+    { return std::span{ &self[i, 0], self.cols() }; }
+
+    [[nodiscard]]
+    inline constexpr
+    std::size_t rows() const { return this->extents().extent(0); }
+
+    [[nodiscard]]
+    inline constexpr
+    std::size_t cols() const { return this->extents().extent(1); }
+}; // <-- mat2d_view<T>
+
+template <typename T>
+struct mat2d {
+    std::vector<T> data;
+    mat2d_view<T>  view;
+
+    inline constexpr mat2d() = default;
+
+    inline constexpr
+    mat2d(std::size_t rows, std::size_t cols, const T& init = {})
+        : data(rows * cols, init)
+        , view{ data.data(), rows, cols }
+    {}
+
+    template <std::ranges::input_range Storage>
+    inline constexpr
+    mat2d(Storage&& input, std::size_t rows, std::size_t cols)
+        : data{ std::forward<Storage>(input) }
+        , view{ data.data(), rows, cols }
+    {}
+
+    template <typename Tt>
+    inline constexpr
+    mat2d(mat2d_view<Tt> view)
+    requires std::same_as<std::remove_cv_t<Tt>, T>
+        : data{ view.data_handle(), view.data_handle() + view.size() }
+        , view{ data.data(), view.rows(), view.cols() }
+    {}
+
+    inline constexpr
+    mat2d(const mat2d& other)
+        : data{ other.data }
+        , view{ data.data(), other.rows(), other.cols() }
+    {}
+
+    inline constexpr
+    mat2d(mat2d&& other)
+        : data{ std::move(other.data) }
+        , view{ data.data(), other.rows(), other.cols() }
+    {}
+
+    inline constexpr
+    mat2d& operator=(const mat2d& other) {
+        this->data = other.data;
+        this->view = mat2d_view<T>{
+            this->data.data(),
+            other.rows(), other.cols()
+        };
+
+        return *this;
+    }
+
+    inline constexpr
+    mat2d& operator=(mat2d&& other) {
+        this->data = std::move(other.data);
+        this->view = mat2d_view<T>{
+            this->data.data(),
+            other.rows(), other.cols()
+        };
+
+        return *this;
+    }
+
+    /// @brief Get element
+    [[nodiscard]]
+    inline constexpr
+    auto& operator[](this auto& self, std::size_t i, std::size_t j)
+    { return self.view[i, j]; }
+
+    /// @brief Get row
+    [[nodiscard]]
+    inline constexpr
+    auto operator[](this auto& self, std::size_t i)
+    { return std::span{ &self.view[i, 0], self.cols() }; }
+
+    [[nodiscard]]
+    inline constexpr
+    std::size_t rows() const { return this->view.extents().extent(0); }
+
+    [[nodiscard]]
+    inline constexpr
+    std::size_t cols() const { return this->view.extents().extent(1); }
+}; // <-- struct mat2d
+
+using mat_double = mat2d<double>;
