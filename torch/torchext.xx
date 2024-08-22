@@ -1,0 +1,106 @@
+export module torchext;
+
+export import :base;
+
+import std;
+
+namespace torchext {
+
+    export
+    [[nodiscard]]
+    inline constexpr
+    auto size(const torch::Tensor& t) {
+        std::size_t ret = t.sizes()[0];
+        for (std::size_t i = 1; i < t.sizes().size(); ++i) {
+            ret *= t.sizes()[i];
+        }
+        return ret;
+    } // <-- size(t)
+
+    using TypeMeta = decltype(std::declval<torch::Tensor>().dtype());
+
+    export
+    template <typename DType, typename Tensor>
+    requires std::same_as<std::remove_cv_t<Tensor>, torch::Tensor>
+    [[nodiscard]]
+    inline
+    auto to_span(Tensor& tensor) {
+        if (tensor.dtype() != TypeMeta::template Make<DType>()) {
+            throw std::runtime_error{
+                "Attempt to cast tensor to a span of type that is different "
+                "from its .dtype()"
+            };
+        }
+
+        using OutType = std::conditional_t<
+            std::is_const_v<Tensor>, const DType, DType
+        >;
+
+        return std::span{
+            reinterpret_cast<OutType*>(tensor.data_ptr()), size(tensor)
+        };
+    } // <-- to_span(tensor)
+
+    template <typename DType, typename Tensor, typename Func>
+    [[nodiscard]]
+    inline constexpr
+    auto make_callable_pair(Func&& f) {
+        using Span = decltype(to_span<DType>(std::declval<Tensor&>()));
+        constexpr bool inv = requires (Tensor& tensor) {
+            std::forward<Func>(f)(to_span<DType>(tensor));
+        };
+        if constexpr (inv) {
+            return std::pair{
+                std::optional{ TypeMeta::template Make<DType>() },
+                std::function{
+                    [&f] (Tensor& tensor) {
+                        std::forward<Func>(f)(to_span<DType>(tensor));
+                    }
+                }
+            };
+        } else {
+            return std::pair{
+                std::optional<TypeMeta>{},
+                std::function{ [] (Tensor&) {} }
+            };
+        }
+    } // <-- make_callable_pair(f)
+
+    export
+    template <typename Tensor, typename Func> // TODO: constrain Func
+    requires std::same_as<std::remove_cv_t<Tensor>, torch::Tensor>
+    inline
+    void visit(Func&& f, Tensor& tensor) {
+        const auto dtype = tensor.dtype();
+        const std::array callbacks{
+            make_callable_pair<double,         Tensor>(std::forward<Func>(f)),
+            make_callable_pair<float,          Tensor>(std::forward<Func>(f)),
+            make_callable_pair<char,           Tensor>(std::forward<Func>(f)),
+            make_callable_pair<short,          Tensor>(std::forward<Func>(f)),
+            make_callable_pair<int,            Tensor>(std::forward<Func>(f)),
+            make_callable_pair<long,           Tensor>(std::forward<Func>(f)),
+            make_callable_pair<unsigned char,  Tensor>(std::forward<Func>(f)),
+            make_callable_pair<unsigned short, Tensor>(std::forward<Func>(f)),
+            make_callable_pair<unsigned int,   Tensor>(std::forward<Func>(f)),
+            make_callable_pair<unsigned long,  Tensor>(std::forward<Func>(f)),
+        };
+
+        /*
+        const auto cb = std::ranges::find_if(
+            callbacks, [&dtype] (const auto& p) { return p.first == dtype; }
+        );
+        */
+        const auto cb = std::ranges::find(
+            callbacks, [&dtype] (const auto& p) { return p.first == dtype; }
+        );
+
+        if (cb == callbacks.cend()) {
+            throw std::runtime_error{
+                "Could not find a visitor callback for dtype!"
+            };
+        }
+
+        cb->second(tensor);
+    } // <-- visit(f, tensor)
+
+} // <-- namespace torchext

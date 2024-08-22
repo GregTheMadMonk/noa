@@ -1,0 +1,30 @@
+export module example_module;
+
+export import :sum_ptr;
+
+import enzyme;
+import std;
+
+namespace example_module {
+
+export
+template <typename Scalar>
+[[nodiscard]]
+inline constexpr
+Scalar scalar(Scalar x) { return x * x; }
+
+export
+template <typename Scalar>
+[[nodiscard]]
+inline
+Scalar d_scalar(Scalar x) {
+    return enzyme::get<0>(
+        enzyme::get<0>(
+            enzyme::autodiff<enzyme::Reverse>(
+                scalar<Scalar>, enzyme::Active{ x }
+            )
+        )
+    );
+} // <-- d_scalar(x)
+
+} // <-- namespace example_module

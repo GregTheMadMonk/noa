@@ -1,0 +1,27 @@
+module;
+
+#include <torch/torch.h>
+#include <torch/python.h>
+
+export module torchext:base;
+
+export namespace torch {
+
+    using ::torch::Tensor;
+
+} // <-- namespace torch
+
+export namespace pybind11 {
+
+    using ::pybind11::module_;
+    using ::pybind11::set_error;
+    using ::pybind11::raise_from;
+    using ::pybind11::error_already_set;
+
+    namespace detail {
+
+        using ::pybind11::detail::get_internals;
+
+    } // <-- namespace detail
+
+} // <-- namespace pybind11

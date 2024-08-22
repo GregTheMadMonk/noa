@@ -1,12 +1,16 @@
-add_library( example_module SHARED module.cc )
-target_link_libraries( example_module PRIVATE ClangEnzymeFlags PyTorch )
-target_compile_features( example_module PRIVATE cxx_std_23 )
+file( GLOB EXAMPLE_MOD_XX *.xx )
+set_source_files_properties( ${EXAMPLE_MOD_XX} PROPERTIES LANGUAGE CXX )
+add_library( example_module STATIC )
+target_sources(
+    example_module PUBLIC
+    FILE_SET example_module_xx
+    TYPE CXX_MODULES
+    FILES ${EXAMPLE_MOD_XX}
+)
+target_compile_features( example_module PUBLIC cxx_std_23 )
 target_include_directories(
     example_module PRIVATE "${Enzyme_SOURCE_DIR}/enzyme/include"
 )
-set_target_properties(
-    example_module PROPERTIES
-    PREFIX ""
-    SUFFIX "${PYTHON_EXTENSION_SUFFIX}"
-    OUTPUT_NAME "example_module"
-)
+
+# Public because also exports differentiable templates!
+target_link_libraries( example_module PUBLIC clang_enzyme )

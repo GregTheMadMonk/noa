@@ -38,27 +38,12 @@ CPMAddPackage(
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++" )
 
 # Add subprojects
+add_subdirectory( enzyme )
+
+add_subdirectory( example_module )
+add_subdirectory( example_consumer )
 add_subdirectory( local_vol )
 add_subdirectory( local_vol_consumer )
-
-# Add Python and Torch before project that need those
-find_package( Python REQUIRED COMPONENTS Development )
-find_package( Torch REQUIRED )
-
-if (NOT TORCH_PYTHON_LIBRARY)
-    find_library(TORCH_PYTHON_LIBRARY torch_python REQUIRED PATH "${TORCH_INSTALL_PREFIX}/lib")
-endif()
-
-message( STATUS "Torch install prefix: ${TORCH_INSTALL_PREFIX}" )
-message( STATUS "Torch libraries: ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY}" )
-
-add_library( PyTorch INTERFACE )
-target_include_directories( PyTorch INTERFACE ${TORCH_INCLUDE_DIRS} )
-target_link_libraries(
-    PyTorch INTERFACE
-    ${TORCH_LIBRARIES} ${TORCH_PYTHON_LIBRARY} Python::Python
-)
-target_compile_options( PyTorch INTERFACE ${TORCH_CXX_FLAGS} )
 
 execute_process(
     COMMAND python3-config --extension-suffix
@@ -66,5 +51,7 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+add_subdirectory( torch )
+
 # Add more subprojects
-add_subdirectory( example_module )
+add_subdirectory( python_bindings )

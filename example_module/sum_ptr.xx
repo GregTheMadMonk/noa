@@ -1,0 +1,39 @@
+module;
+
+#include <cassert>
+
+export module example_module:sum_ptr;
+
+import enzyme;
+import std;
+
+namespace example_module {
+
+template <typename T>
+inline constexpr
+T sum_ptr(const T* v, std::size_t size) {
+    T ret = 0;
+    for (std::size_t i = 0; i < size; ++i) ret += v[i];
+    return ret;
+}
+
+export
+template <typename T>
+[[nodiscard]]
+inline constexpr
+T sum_span(std::span<const T> v)
+{ return sum_ptr(v.data(), v.size()); }
+
+export
+template <typename T>
+inline
+void sum_span_diff(std::span<const T> v, std::span<T> derivative) {
+    assert(v.size() == derivative.size());
+    enzyme::autodiff<enzyme::Reverse>(
+        sum_ptr<T>,
+        enzyme::Duplicated<const T*>{ v.data(), derivative.data() },
+        enzyme::Const{ v.size() }
+    );
+}
+
+} // <-- namespace example_module
