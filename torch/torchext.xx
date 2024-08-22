@@ -81,16 +81,10 @@ namespace torchext {
             make_callable_pair<long,           Tensor>(std::forward<Func>(f)),
             make_callable_pair<unsigned char,  Tensor>(std::forward<Func>(f)),
             make_callable_pair<unsigned short, Tensor>(std::forward<Func>(f)),
-            make_callable_pair<unsigned int,   Tensor>(std::forward<Func>(f)),
             make_callable_pair<unsigned long,  Tensor>(std::forward<Func>(f)),
         };
 
-        /*
         const auto cb = std::ranges::find_if(
-            callbacks, [&dtype] (const auto& p) { return p.first == dtype; }
-        );
-        */
-        const auto cb = std::ranges::find(
             callbacks, [&dtype] (const auto& p) { return p.first == dtype; }
         );
 

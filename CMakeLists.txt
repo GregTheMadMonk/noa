@@ -32,6 +32,7 @@ CPMAddPackage(
     GITHUB_REPOSITORY "EnzymeAD/Enzyme"
     GIT_TAG "main"
     SOURCE_SUBDIR "enzyme"
+    PATCH_COMMAND git apply "${CMAKE_SOURCE_DIR}/enzyme-modsupport.diff"
 )
 
 # Restore libc++ in flags

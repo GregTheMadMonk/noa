@@ -5,6 +5,13 @@ Repo for Enzyme test until I find time to move all this to main NOA.
 Use Ninja and Clang+`libc++` 18.1.0+ because the whole repo uses C++23 and
 `import std`.
 
+If during configuration you get an error:
+```
+Could not find TORCH_PYTHON_LIBRARY using the following names
+```
+then provide a path to `libtorch_python.so` in `-DTORCH_PYTHON_LIBRARY=...`
+flag.
+
 List of targets:
 
 ## `enzyme`, `torch`
