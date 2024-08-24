@@ -16,6 +16,8 @@ project(
     LANGUAGES C CXX
 )
 
+option( GIT_DEPS "Donload dependencies as git repos" OFF )
+
 # Finally enable `import std` support for the project
 set( CMAKE_CXX_MODULE_STD ON )
 
@@ -28,12 +30,21 @@ include( CPM.cmake/cmake/CPM.cmake )
 # Import dependencies
 # Enzyme
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BCK}" )
-CPMAddPackage(
-    GITHUB_REPOSITORY "EnzymeAD/Enzyme"
-    GIT_TAG "main"
-    SOURCE_SUBDIR "enzyme"
-    PATCH_COMMAND git apply "${CMAKE_SOURCE_DIR}/enzyme-modsupport.diff"
-)
+if( GIT_DEPS )
+    CPMAddPackage(
+        GITHUB_REPOSITORY "EnzymeAD/Enzyme"
+        GIT_TAG "main"
+        SOURCE_SUBDIR "enzyme"
+        PATCH_COMMAND git apply "${CMAKE_SOURCE_DIR}/enzyme-modsupport.diff"
+    )
+else()
+    CPMAddPackage(
+        NAME "Enzyme"
+        URL "https://github.com/EnzymeAD/Enzyme/archive/refs/heads/main.zip"
+        SOURCE_SUBDIR "enzyme"
+        PATCH_COMMAND sh -c "patch -s -p1 < ${CMAKE_SOURCE_DIR}/enzyme-modsupport.diff"
+    )
+endif()
 
 # Restore libc++ in flags
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++" )
